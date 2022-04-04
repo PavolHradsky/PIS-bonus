@@ -3,7 +3,7 @@ from typing import List
 from PetriNet import PetriNet
 from functions import read_xml
 from Rpn import Rpn
-import Relh
+import tkinter as tk
 
 
 
@@ -11,11 +11,6 @@ def main():
     # places, transitions, arcs = read_xml(input("file name: "))
     places, transitions, arcs = read_xml("test.xml")
     net: PetriNet = PetriNet(places, transitions, arcs)
-    # print(net.M0)
-    # m1 = net.step(transitions[0], net.M0)
-    # print(m1)
-    # m2 = net.step(transitions[1], m1)
-    # print(m2)
 
     M: List[Rpn] = []
     H: List = []
@@ -38,6 +33,29 @@ def main():
     for h in H:
         print(h[0], h[1].name, h[2])
 
+    master = tk.Tk()
+    canvas = tk.Canvas(master, width=400, height=400, bg='white')
+    canvas.pack()
+
+    x = 100
+    y = 100
+
+    M_coords = []
+    for i, m in enumerate(M):
+        canvas.create_text(x, y, text=str(m.state))
+        M_coords.append((x, y))
+        y += 50
+        if i == len(M)//2-1:
+            x = 250
+            y = 100
+
+    for h in H:
+        x1, y1 = M_coords[[m.state for m in M].index(h[0])]
+        x2, y2 = M_coords[[m.state for m in M].index(h[2])]
+        canvas.create_line(x1, y1, x2, y2, arrow=tk.LAST)
+        canvas.create_text(x1+(x2-x1)/2, y1+(y2-y1)/2, text=str(h[1].name), fill="green", font='Arial 20')
+
+    tk.mainloop()
 
 
 if __name__ == '__main__':
