@@ -8,6 +8,13 @@ from Transition import Transition
 
 
 def get_item_by_name(transitions: List[Transition], places: List[Place], name: str) -> Item:
+    """
+    This function is finding object of place or transition based on its name (label)
+    :param transitions: list of objects transition
+    :param places: list of objects place
+    :param name: name (label) of place or transition
+    :return: founded object
+    """
     for item in transitions:
         if item.name == name:
             return item
@@ -17,8 +24,13 @@ def get_item_by_name(transitions: List[Transition], places: List[Place], name: s
             return item
 
 
-def read_xml():
-    tree = ET.parse('test.xml')
+def read_xml(file_name: str) -> (List[Place], List[Transition], List[Arc]):
+    """
+    This function parse xml file to lists of objects: places, transitions and arcs
+    :param file_name: name of file
+    :return: lists of objects
+    """
+    tree = ET.parse(file_name)
     root = tree.getroot()
 
     transitions: List[Transition] = []

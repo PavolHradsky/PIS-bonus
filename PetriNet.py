@@ -7,6 +7,20 @@ from Arc import Arc
 
 class PetriNet:
     def __init__(self, places: List[Place], transitions: List[Transition], arcs: List[Arc]):
+        """
+        class PetriNet represents petri net in form PN=(P, T, F, W, M0) where
+            P is set of places
+            T is set of transitions
+            F is set of arcs in form (item.name + item.name)
+            W is set of weights of arcs, represented as objects Arc
+                with attributes src, dest and multiplicity, where src and dest
+                are objects of transitions and places
+            M0 is initial marking of places represented as tuple of integers
+                where every int stands for count of tokens in place with same index
+        :param places: list of places
+        :param transitions: list of transitions
+        :param arcs: list of arcs
+        """
         self.P: List[Place] = places
         self.T: List[Transition] = transitions
         self.F: List[str] = [i.src.name + i.dest.name for i in arcs]
@@ -14,6 +28,13 @@ class PetriNet:
         self.M0: List[int] = [i.tokens for i in places]
 
     def step(self, tr: Transition, m: List[int]):
+        """
+        method step is calculating new marking from given marking (if its possible)
+        after using given transition
+        :param tr: transition to use
+        :param m: initial marking for this step (for example M0)
+        :return: new marking or None, if transition cant be used
+        """
         m_next = m.copy()
         for w in self.W:
             if w.dest == tr:
