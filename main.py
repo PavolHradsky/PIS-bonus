@@ -1,10 +1,10 @@
 from typing import List
+import networkx as nx
+import matplotlib.pyplot as plt
 
 from PetriNet import PetriNet
 from functions import read_xml
 from Rpn import Rpn
-import tkinter as tk
-
 
 
 def main():
@@ -33,29 +33,34 @@ def main():
     for h in H:
         print(h[0], h[1].name, h[2])
 
-    master = tk.Tk()
-    canvas = tk.Canvas(master, width=400, height=400, bg='white')
-    canvas.pack()
+    G = nx.DiGraph()
+    edges = {}
 
-    x = 100
-    y = 100
+    for m in M:
+        G.add_node(str(m.state))
 
-    M_coords = []
-    for i, m in enumerate(M):
-        canvas.create_text(x, y, text=str(m.state))
-        M_coords.append((x, y))
-        y += 50
-        if i == len(M)//2-1:
-            x = 250
-            y = 100
+    print(G.nodes())
 
     for h in H:
-        x1, y1 = M_coords[[m.state for m in M].index(h[0])]
-        x2, y2 = M_coords[[m.state for m in M].index(h[2])]
-        canvas.create_line(x1, y1, x2, y2, arrow=tk.LAST)
-        canvas.create_text(x1+(x2-x1)/2, y1+(y2-y1)/2, text=str(h[1].name), fill="green", font='Arial 20')
+        G.add_edge(str(h[0]), str(h[2]))
+        edges[(str(h[0]), str(h[2]))] = h[1].name
 
-    tk.mainloop()
+    print(G.edges())
+
+    pos = nx.circular_layout(G)
+    plt.figure()
+    nx.draw(
+        G, pos, edge_color='black', width=1, linewidths=1,
+        node_size=200, alpha=0.8,
+        labels={node: node for node in G.nodes()}
+    )
+    nx.draw_networkx_edge_labels(
+        G, pos,
+        edge_labels=edges,
+        font_color='red',
+    )
+    plt.axis('off')
+    plt.show()
 
 
 if __name__ == '__main__':
