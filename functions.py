@@ -38,7 +38,7 @@ def read_xml(file_name: str) -> (List[Place], List[Transition], List[Arc]):
     arcs: List[Arc] = []
 
     for transition in root.findall("transition"):
-        transitions.append(Transition(transition.find("id").text))
+        transitions.append(Transition(transition.find("id").text, transition.find("label").text))
 
     for place in root.findall("place"):
         places.append(Place(place.find("id").text, int(place.find("tokens").text)))
@@ -51,3 +51,13 @@ def read_xml(file_name: str) -> (List[Place], List[Transition], List[Arc]):
                 ))
 
     return places, transitions, arcs
+
+
+def list_is_greater(list1, list2):
+    is_greater = False
+    for i, x in enumerate(list1):
+        if x > list2[i]:
+            is_greater = True
+        if x < list2[i]:
+            return False
+    return is_greater

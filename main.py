@@ -3,7 +3,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 from PetriNet import PetriNet
-from functions import read_xml
+from functions import read_xml, list_is_greater
 from Rpn import Rpn
 
 
@@ -26,7 +26,10 @@ def main():
                         M.append(Rpn(new_m))
                     H.append((m.state, t, new_m))
             m.visited = True
-
+            for old_m in [a.state for a in M]:
+                if list_is_greater([a.state for a in M][-1], old_m):
+                    print("Siet je neohranicena")
+                    return 0
 
     for m in M:
         print(m.state)
@@ -52,7 +55,7 @@ def main():
     nx.draw(
         G, pos, edge_color='black', width=1, linewidths=1,
         node_size=200, alpha=0.8,
-        labels={node: node for node in G.nodes()}
+        labels={node: f'm{i}' for i, node in enumerate(G.nodes())}
     )
     nx.draw_networkx_edge_labels(
         G, pos,
@@ -61,6 +64,9 @@ def main():
     )
     plt.axis('off')
     plt.show()
+
+    for i, node in enumerate(G.nodes()):
+        print(f'm{i}: {node}')
 
 
 if __name__ == '__main__':
