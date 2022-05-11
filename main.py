@@ -30,9 +30,8 @@ def main():
                 if list_is_greater([a.state for a in M][-1], old_m):
                     print("Siet je neohranicena")
                     return 0
-
-    for m in M:
-        print(m.state)
+    print("Siet je ohranicena")
+    print("Postup:")
     for h in H:
         print(h[0], h[1].name, h[2])
 
@@ -42,13 +41,9 @@ def main():
     for m in M:
         G.add_node(str(m.state))
 
-    print(G.nodes())
-
     for h in H:
         G.add_edge(str(h[0]), str(h[2]))
         edges[(str(h[0]), str(h[2]))] = h[1].name
-
-    print(G.edges())
 
     pos = nx.circular_layout(G)
     plt.figure()
@@ -65,6 +60,7 @@ def main():
     plt.axis('off')
     plt.show()
 
+    print("Znackovanie:")
     for i, node in enumerate(G.nodes()):
         print(f'm{i}: {node}')
 
