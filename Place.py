@@ -6,6 +6,7 @@ class Place:
         self.id = id
         self.tokens: float = tokens
         self.name: str = name
+        self.label: str = name
 
     def getId(self):
         return self.name

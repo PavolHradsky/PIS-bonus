@@ -17,25 +17,59 @@ def loading_data(name_file):
 
 
 def net_solvable(net):
-    M: List[Rpn] = []
-    H: List = []
-    M.append(Rpn(net.M0))
     G = nx.DiGraph()
     edges = {}
     places = net.getPlaces()
     transitions = net.getTransitions()
+    names = []
+    places_list = []
+    transitions_list = []
     for arc in net.getArcs():
         G.add_edge(arc.getSourceId(), arc.getDestinationId())
+        if arc.src.__class__ == Place:
+            places_list.append(arc.getSourceId())
+        else:
+            transitions_list.append(arc.getSourceId())
+        if arc.dest.__class__ == Place:
+            places_list.append(arc.getDestinationId())
+        else:
+            transitions_list.append(arc.getDestinationId())
+        # if arc.getSourceId() not in names:
+        #     names.append(arc.getSourceId())
+        # if arc.getDestinationId() not in names:
+        #     names.append(arc.getDestinationId())
         edges[(arc.getSourceId(), arc.getDestinationId())] = arc.getMultiplicity()
     pos = nx.circular_layout(G)
     plt.figure()
-    nx.draw(G, pos, with_labels=True, arrows=True, node_size=1000, node_color='white', font_size=10,
-            labels={node: f'{place.name}' for i, node in enumerate(G.nodes()) for j, place in enumerate(places) if i == j}
-            )
-
+    nx.draw_networkx_nodes(G, pos, places_list)
+    nx.draw_networkx_nodes(G, pos, transitions,
+                           node_shape='s', node_color='#ff0000')
+    nx.draw_networkx_labels(
+        G, pos,  labels={n: n.label for n in G}
+    )
+    nx.draw_networkx_edges(G, pos)
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edges)
     plt.axis('off')
     plt.show()
+    # M: List[Rpn] = []
+    # H: List = []
+    # M.append(Rpn(net.M0))
+    # G = nx.DiGraph()
+    # edges = {}
+    # places = net.getPlaces()
+    # transitions = net.getTransitions()
+    # for arc in net.getArcs():
+    #     G.add_edge(arc.getSourceId(), arc.getDestinationId())
+    #     edges[(arc.getSourceId(), arc.getDestinationId())] = arc.getMultiplicity()
+    # pos = nx.circular_layout(G)
+    # plt.figure()
+    # nx.draw(G, pos, with_labels=True, arrows=True, node_size=1000, node_color='white', font_size=10,
+    #         labels={node: f'{place.name}' for i, node in enumerate(G.nodes()) for j, place in enumerate(places) if i == j}
+    #         )
+    #
+    # nx.draw_networkx_edge_labels(G, pos, edge_labels=edges)
+    # plt.axis('off')
+    # plt.show()
 
 
 """"
@@ -190,8 +224,10 @@ def fuzzy_petri_net(net, M):
 
 
 if __name__ == '__main__':
-    net = loading_data(input("Zadaj nazov suboru: ") + ".xml")
-    option = input("Vyber z možností: \n 1. Logická Petriho sieť \n 2. Fuzzy Petriho sieť \n")
+    # net = loading_data(input("Zadaj nazov suboru: ") + ".xml")
+    # option = input("Vyber z možností: \n 1. Logická Petriho sieť \n 2. Fuzzy Petriho sieť \n")
+    net = loading_data("logical_model.xml")
+    option = "1"
     if option == "1":
         M = net_solvable(net)
         if M is not None:
