@@ -1,0 +1,691 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>reštaurácia</id>
+	<initials>process</initials>
+	<title>správa reštaurácie</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<roleRef>
+		<id>Čašník</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<role>
+		<id>Vedúci</id>
+		<title>Vedúci</title>
+	</role>
+	<role>
+		<id>Kuchár</id>
+		<title>Kuchár</title>
+	</role>
+	<role>
+		<id>Čašník</id>
+		<title>Čašník</title>
+	</role>
+	<role>
+		<id>Zákazník</id>
+		<title>Zákazník</title>
+	</role>
+	<role>
+		<id>Kuchynský personál</id>
+		<title>Kuchynský personál</title>
+	</role>
+	<data type="text">
+		<id>text_0</id>
+		<title/>
+		<init>Rezervácia</init>
+	</data>
+	<data type="text">
+		<id>text_1</id>
+		<title>Meno</title>
+	</data>
+	<data type="number">
+		<id>number_0</id>
+		<title>Počet osôb</title>
+	</data>
+	<data type="dateTime">
+		<id>dateTime_0</id>
+		<title>Čas rezervácie</title>
+		<init>2022-05-06T17:49:34.916Z</init>
+	</data>
+	<data type="text">
+		<id>text_2</id>
+		<title/>
+		<init>Platba</init>
+	</data>
+	<data type="text">
+		<id>text_3</id>
+		<title>Cena</title>
+		<init>100</init>
+	</data>
+	<data type="text">
+		<id>text_4</id>
+		<title>Číslo karty</title>
+	</data>
+	<data type="text">
+		<id>text_5</id>
+		<title>Dátum platnosti</title>
+	</data>
+	<data type="date">
+		<id>date_0</id>
+		<title>Dátum platnosti</title>
+		<init>2022-05-06T17:52:45.544Z</init>
+	</data>
+	<data type="number">
+		<id>number_1</id>
+		<title>CV</title>
+	</data>
+	<data type="text">
+		<id>text_6</id>
+		<title/>
+	</data>
+	<data type="user">
+		<id>user_0</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>text_7</id>
+		<title/>
+		<init>Nápojový lístok</init>
+	</data>
+	<data type="multichoice">
+		<id>multichoice_0</id>
+		<title>Druh nápoja</title>
+		<options>
+			<option key="aperitívy">aperitívy</option>
+			<option key="destiláty">destiláty</option>
+			<option key="likéry">likéry</option>
+			<option key="miešané nápoje alkoholické">miešané nápoje alkoholické</option>
+			<option key="miešané nápoje nealkoholické">miešané nápoje nealkoholické</option>
+			<option key="pivo">pivo</option>
+			<option key="teplé nápoje">teplé nápoje</option>
+			<option key="nealkoholické nápoje">nealkoholické nápoje</option>
+			<option key="minerálne vody">minerálne vody</option>
+		</options>
+	</data>
+	<data type="text">
+		<id>text_8</id>
+		<title/>
+		<init>Ponuka jedál</init>
+	</data>
+	<data type="multichoice">
+		<id>multichoice_1</id>
+		<title>Jedlo</title>
+		<options>
+			<option key="predjedlá">predjedlá</option>
+			<option key="polievky">polievky</option>
+			<option key="šaláty">šaláty</option>
+			<option key="hlavné jedlá">hlavné jedlá</option>
+			<option key="omáčky">omáčky</option>
+			<option key="tradičné slovenské jedlá">tradičné slovenské jedlá</option>
+			<option key="špeciality &quot;z dvora&quot;">špeciality "z dvora"</option>
+			<option key="ryby">ryby</option>
+			<option key="cestoviny, špagety, rizotá">cestoviny, špagety, rizotá</option>
+			<option key="chuťovky k nápojom">chuťovky k nápojom</option>
+			<option key="dezerty">dezerty</option>
+			<option key="key12">value</option>
+		</options>
+	</data>
+	<data type="multichoice">
+		<id>multichoice_2</id>
+		<title>Jedlo</title>
+		<options>
+			<option key="predjedlá">predjedlá</option>
+			<option key="polievky">polievky</option>
+			<option key="šaláty">šaláty</option>
+			<option key="hlavné jedlá">hlavné jedlá</option>
+			<option key="omáčky">omáčky</option>
+			<option key="tradičné slovenské jedlá">tradičné slovenské jedlá</option>
+			<option key="špeciality &quot;z dvora&quot;">špeciality "z dvora"</option>
+			<option key="ryby">ryby</option>
+			<option key="cestoviny, špagety, rizotá">cestoviny, špagety, rizotá</option>
+			<option key="chuťovky k nápojom">chuťovky k nápojom</option>
+			<option key="dezerty">dezerty</option>
+			<option key="prílohy k jedlu">prílohy k jedlu</option>
+		</options>
+	</data>
+	<data type="text">
+		<id>text_9</id>
+		<title/>
+		<init>Objednávka</init>
+	</data>
+	<data type="text">
+		<id>text_10</id>
+		<title/>
+		<init>Vaša objednávka je hotová</init>
+	</data>
+	<data type="text">
+		<id>text_11</id>
+		<title/>
+		<init>Nákup nápoja</init>
+	</data>
+	<data type="multichoice">
+		<id>multichoice_3</id>
+		<title>Položka</title>
+		<options>
+			<option key="pivo">pivo</option>
+			<option key="minerálne vody">minerálne vody</option>
+			<option key="alkoholické">alkoholické</option>
+			<option key="nealkoholické">nealkoholické</option>
+		</options>
+	</data>
+	<data type="multichoice_map">
+		<id>multichoice_map_0</id>
+		<title>Položka</title>
+		<options>
+			<option key="key1">value</option>
+		</options>
+		<inits>
+			<init>key1</init>
+		</inits>
+	</data>
+	<data type="multichoice_map">
+		<id>multichoice_map_1</id>
+		<title/>
+		<options>
+			<option key="key2">value</option>
+		</options>
+		<inits>
+			<init>key2</init>
+		</inits>
+	</data>
+	<data type="enumeration_map">
+		<id>enumeration_map_0</id>
+		<title/>
+		<options>
+			<option key="sadad">5</option>
+			<option key="key8">value</option>
+		</options>
+		<init>key8</init>
+	</data>
+	<data type="text">
+		<id>text_12</id>
+		<title>Počet</title>
+	</data>
+	<data type="text">
+		<id>text_13</id>
+		<title/>
+		<init>Nákup surovín</init>
+	</data>
+	<data type="multichoice">
+		<id>multichoice_4</id>
+		<title>Surovina</title>
+		<options>
+			<option key="zelenina">zelenina</option>
+			<option key="mäso">mäso</option>
+			<option key="cestoviny">cestoviny</option>
+			<option key="ryža">ryža</option>
+			<option key="zemiaky">zemiaky</option>
+		</options>
+	</data>
+	<data type="text">
+		<id>text_14</id>
+		<title/>
+		<init>Výber menu</init>
+	</data>
+	<data type="multichoice">
+		<id>multichoice_5</id>
+		<title>Menu</title>
+		<options>
+			<option key="Menu1">Menu1</option>
+			<option key="Menu2">Menu2</option>
+			<option key="Menu3">Menu3</option>
+			<option key="Menu4">Menu4</option>
+		</options>
+	</data>
+	<data type="number">
+		<id>number_2</id>
+		<title>Počet</title>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>1380</x>
+		<y>820</y>
+		<label>príchod čašníka</label>
+		<roleRef>
+			<id>Čašník</id>
+			<logic>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+				<delegate>true</delegate>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>1660</x>
+		<y>1140</y>
+		<label>objednanie menu</label>
+		<roleRef>
+			<id>Zákazník</id>
+			<logic>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+				<delegate>true</delegate>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t2_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_14</id>
+				<logic>
+					<behavior>forbidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_5</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>number_2</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>6</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t2_assign</id>
+		</event>
+		<event type="finish">
+			<id>t2_finish</id>
+		</event>
+		<event type="cancel">
+			<id>t2_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>t2_delegate</id>
+		</event>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>1420</x>
+		<y>980</y>
+		<label>objednanie jedla</label>
+		<roleRef>
+			<id>Zákazník</id>
+			<logic>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+				<delegate>true</delegate>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t3_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_8</id>
+				<logic>
+					<behavior>forbidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_2</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t3_assign</id>
+		</event>
+		<event type="finish">
+			<id>t3_finish</id>
+		</event>
+		<event type="cancel">
+			<id>t3_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>t3_delegate</id>
+		</event>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>1540</x>
+		<y>1140</y>
+		<label>objednanie nápoja</label>
+		<roleRef>
+			<id>Zákazník</id>
+			<logic>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+				<delegate>true</delegate>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t4_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_7</id>
+				<logic>
+					<behavior>forbidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t4_assign</id>
+		</event>
+		<event type="finish">
+			<id>t4_finish</id>
+		</event>
+		<event type="cancel">
+			<id>t4_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>t4_delegate</id>
+		</event>
+	</transition>
+	<transition>
+		<id>t5</id>
+		<x>1540</x>
+		<y>740</y>
+		<label>odchod zákazníka</label>
+		<roleRef>
+			<id>Zákazník</id>
+			<logic>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+				<delegate>true</delegate>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+	</transition>
+	<transition>
+		<id>t6</id>
+		<x>1700</x>
+		<y>820</y>
+		<label>ukončenie objednávania</label>
+		<roleRef>
+			<id>Zákazník</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>1220</x>
+		<y>740</y>
+		<label>zákazník v reštaurácii</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>1380</x>
+		<y>740</y>
+		<label>čašník</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>1540</x>
+		<y>820</y>
+		<label>objednávajúci si zákazník</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p4</id>
+		<x>1860</x>
+		<y>820</y>
+		<label>zákazník čakajúci na jedlo</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p5</id>
+		<x>1660</x>
+		<y>1300</y>
+		<label>objednané menu</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p7</id>
+		<x>1420</x>
+		<y>1260</y>
+		<label>objednané jedlá</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p8</id>
+		<x>1540</x>
+		<y>1380</y>
+		<label>objednané nápoje</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p21</id>
+		<x>1740</x>
+		<y>1220</y>
+		<label>menu</label>
+		<tokens>3</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p38</id>
+		<x>1980</x>
+		<y>1180</y>
+		<label>nenachystaná objednávka</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>regular</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a11</id>
+		<type>regular</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a12</id>
+		<type>regular</type>
+		<sourceId>t6</sourceId>
+		<destinationId>p4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a13</id>
+		<type>regular</type>
+		<sourceId>t5</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>regular</type>
+		<sourceId>t4</sourceId>
+		<destinationId>p8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a15</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a16</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a33</id>
+		<type>read</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a34</id>
+		<type>read</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a35</id>
+		<type>read</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a58</id>
+		<type>regular</type>
+		<sourceId>p21</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a94</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p38</destinationId>
+		<multiplicity>1</multiplicity>
+		<breakpoint>
+			<x>1780</x>
+			<y>980</y>
+		</breakpoint>
+	</arc>
+	<arc>
+		<id>a95</id>
+		<type>regular</type>
+		<sourceId>t4</sourceId>
+		<destinationId>p38</destinationId>
+		<multiplicity>1</multiplicity>
+		<breakpoint>
+			<x>1700</x>
+			<y>1060</y>
+		</breakpoint>
+	</arc>
+	<arc>
+		<id>a96</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p38</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a151</id>
+		<type>read</type>
+		<sourceId>p38</sourceId>
+		<destinationId>t6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

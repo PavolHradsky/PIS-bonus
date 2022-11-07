@@ -1,10 +1,13 @@
 from Item import Item
 
 
-class Transition(Item):
+class Transition:
     def __init__(self, name: str, label: str):
-        super().__init__(name)
+        self.name = name
         self.label = label
 
     def __str__(self):
         return f'Transition(Name: {self.name})'
+
+    def getId(self):
+        return self.name

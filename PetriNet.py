@@ -3,10 +3,11 @@ from typing import List
 from Place import Place
 from Transition import Transition
 from Arc import Arc
+from Role import Role
 
 
 class PetriNet:
-    def __init__(self, places: List[Place], transitions: List[Transition], arcs: List[Arc]):
+    def __init__(self, places: List[Place], transitions: List[Transition], arcs: List[Arc], roles: List[Role]):
         """
         class PetriNet represents petri net in form PN=(P, T, F, W, M0) where
             P is set of places
@@ -23,9 +24,38 @@ class PetriNet:
         """
         self.P: List[Place] = places
         self.T: List[Transition] = transitions
+        self.R: List[Role] = roles
         self.F: List[str] = [i.src.name + i.dest.name for i in arcs]
         self.W: List[Arc] = arcs
         self.M0: List[int] = [i.tokens for i in places]
+        self.inputMatrix = None
+        self.outputMatrix = None
+        self.incidenceMatrix = None
+
+    def getPlaces(self):
+        return self.P
+
+    def getTransitions(self):
+        return self.T
+
+    def getArcs(self):
+        return self.W
+
+    def getRoles(self):
+        return self.R
+
+    def getPlaceById(self, id):
+        for obj in self.getPlaces():
+            if obj.getId() == id.name:
+
+                return obj
+        return None
+
+    def getTransitionById(self, id):
+        for obj in self.getTransitions():
+            if obj.getId() == id.name:
+                return obj
+        return None
 
     def step(self, tr: Transition, m: List[int]):
         """
