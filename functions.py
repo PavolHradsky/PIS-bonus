@@ -25,7 +25,7 @@ def get_item_by_name(transitions: List[Transition], places: List[Place], name: s
             return item
 
 
-def read_xml(file_name: str) -> (List[Place], List[Transition], List[Arc]):
+def read_xml(file_name: str, fuzzy_flag) -> (List[Place], List[Transition], List[Arc]):
     """
     This function parse xml file to lists of objects: places, transitions and arcs
     :param file_name: name of file
@@ -47,11 +47,18 @@ def read_xml(file_name: str) -> (List[Place], List[Transition], List[Arc]):
         roles.append(Role(role.find("id").text, role.find("title").text))
 
     for arc in root.findall("arc"):
-        arcs.append(
-            Arc(arc.find("id").text, get_item_by_name(transitions, places, arc.find("sourceId").text),
-                get_item_by_name(transitions, places, arc.find("destinationId").text),
-                int(arc.find("multiplicity").text)
-                ))
+        if fuzzy_flag and arc.find("sourceId").text[0] == 'p' and arc.find("destinationId").text[0] == 't':
+            arcs.append(
+                Arc(arc.find("id").text, get_item_by_name(transitions, places, arc.find("sourceId").text),
+                    get_item_by_name(transitions, places, arc.find("destinationId").text),
+                    round(float(arc.find("multiplicity").text), 2)
+                    ))
+        else:
+            arcs.append(
+                Arc(arc.find("id").text, get_item_by_name(transitions, places, arc.find("sourceId").text),
+                    get_item_by_name(transitions, places, arc.find("destinationId").text),
+                    float(arc.find("multiplicity").text)
+                    ))
 
     return places, transitions, arcs, roles
 

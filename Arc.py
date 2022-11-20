@@ -2,11 +2,11 @@ from Item import Item
 
 
 class Arc:
-    def __init__(self, id, src: Item, dest: Item, multiplicity=1):
+    def __init__(self, id, src: Item, dest: Item, multiplicity):
         self.id = id
         self.src: Item = src
         self.dest: Item = dest
-        self.multiplicity: int = multiplicity
+        self.multiplicity: float = multiplicity
 
     def getId(self):
         return self.id

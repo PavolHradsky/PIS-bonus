@@ -11,7 +11,7 @@ dict_roles = {}
 dict_places = {}
 dict_transitions = {}
 
-places, transitions, arcs, roles = read_xml("reštaurácia_varenie.xml")
+places, transitions, arcs, roles = read_xml("reštaurácia_varenie.xml",0)
 
 j = 0
 for i in roles:

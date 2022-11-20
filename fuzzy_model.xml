@@ -111,7 +111,7 @@
 		<type>regular</type>
 		<sourceId>p1</sourceId>
 		<destinationId>t1</destinationId>
-		<multiplicity>1</multiplicity>
+		<multiplicity>0.3</multiplicity>
 	</arc>
 	<arc>
 		<id>a2</id>
@@ -125,7 +125,7 @@
 		<type>regular</type>
 		<sourceId>p2</sourceId>
 		<destinationId>t2</destinationId>
-		<multiplicity>1</multiplicity>
+		<multiplicity>0.5</multiplicity>
 	</arc>
 	<arc>
 		<id>a4</id>
@@ -139,14 +139,14 @@
 		<type>regular</type>
 		<sourceId>p3</sourceId>
 		<destinationId>t1</destinationId>
-		<multiplicity>1</multiplicity>
+		<multiplicity>0.3</multiplicity>
 	</arc>
 	<arc>
 		<id>a6</id>
 		<type>regular</type>
 		<sourceId>p2</sourceId>
 		<destinationId>t3</destinationId>
-		<multiplicity>1</multiplicity>
+		<multiplicity>0.6</multiplicity>
 	</arc>
 	<arc>
 		<id>a7</id>
@@ -160,7 +160,7 @@
 		<type>regular</type>
 		<sourceId>p4</sourceId>
 		<destinationId>t5</destinationId>
-		<multiplicity>1</multiplicity>
+		<multiplicity>0.9</multiplicity>
 	</arc>
 	<arc>
 		<id>a9</id>
@@ -174,7 +174,7 @@
 		<type>regular</type>
 		<sourceId>p5</sourceId>
 		<destinationId>t4</destinationId>
-		<multiplicity>1</multiplicity>
+		<multiplicity>0.6</multiplicity>
 	</arc>
 	<arc>
 		<id>a11</id>
@@ -188,7 +188,7 @@
 		<type>regular</type>
 		<sourceId>p6</sourceId>
 		<destinationId>t6</destinationId>
-		<multiplicity>1</multiplicity>
+		<multiplicity>0.6</multiplicity>
 	</arc>
 	<arc>
 		<id>a13</id>
