@@ -13,6 +13,8 @@ from Transition import Transition
 from functions import read_xml, list_is_greater
 from Rpn import Rpn
 import tkinter as tk
+from PySide6 import QtCore, QtWidgets, QtGui
+import sys
 
 
 def loading_data(name_file, fuzzy_flag):
@@ -38,7 +40,8 @@ def draw_net(net):
             places_list.append(arc.getDestinationId())
         else:
             transitions_list.append(arc.getDestinationId())
-        edges[(arc.getSourceId(), arc.getDestinationId())] = arc.getMultiplicity()
+        edges[(arc.getSourceId(), arc.getDestinationId())
+              ] = arc.getMultiplicity()
     pos = nx.circular_layout(G)
     plt.figure()
     nx.draw_networkx_nodes(G, pos, places)
@@ -66,8 +69,10 @@ def logical_petri_net(net, M):
     print("Počiatočné ohodnotenie: ", Wo)
     nRows = len(net.getPlaces())
     nColumns = len(net.getTransitions())
-    inputMatrix = np.array([[0 for _ in range(nColumns)] for _ in range(nRows)])
-    outputMatrix = np.array([[0 for _ in range(nColumns)] for _ in range(nRows)])
+    inputMatrix = np.array([[0 for _ in range(nColumns)]
+                           for _ in range(nRows)])
+    outputMatrix = np.array([[0 for _ in range(nColumns)]
+                            for _ in range(nRows)])
 
     # fill each matrix with the proper data
     for arc in net.getArcs():
@@ -85,12 +90,14 @@ def logical_petri_net(net, M):
         if type(source) == Place:
             sourceIdInNetList = net.getPlaces().index(source)
             destinationIdInNetList = net.getTransitions().index(destination)
-            inputMatrix[sourceIdInNetList, destinationIdInNetList] = arc.getMultiplicity()
+            inputMatrix[sourceIdInNetList,
+                        destinationIdInNetList] = arc.getMultiplicity()
 
         if type(source) == Transition:
             sourceIdInNetList = net.getTransitions().index(source)
             destinationIdInNetList = net.getPlaces().index(destination)
-            outputMatrix[destinationIdInNetList, sourceIdInNetList] = arc.getMultiplicity()
+            outputMatrix[destinationIdInNetList,
+                         sourceIdInNetList] = arc.getMultiplicity()
     Wk = []
     i = 0
     while not np.array_equal(Wo, Wk):
@@ -109,7 +116,7 @@ def logical_petri_net(net, M):
             Vo.append(float(max(sub_result)))
             sub_result = []
 
-        #Vo = transponse_array @ neg_Wo
+        # Vo = transponse_array @ neg_Wo
         for i in range(len(Vo)):
             if Vo[i] > 1:
                 Vo[i] = 1.0
@@ -132,7 +139,9 @@ def logical_petri_net(net, M):
                 if arc.getSourceId().__class__ == Place:
                     previous_place = net.getPlaceById(arc.getSourceId()).label
                 if arc.dest.name == place.name and changed_places[count_place - 1]:
-                    print(previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens)
+                    print(previous_place, " -> ", arc.src.label,
+                          " -> ", arc.dest.name, " : ", place.tokens)
+        draw_net(net)
         print("Wk: ", Wk)
     return net
 
@@ -142,8 +151,10 @@ def fuzzy_petri_net(net, M):
     print("Počiatočné ohodnotenie: ", Wo)
     nRows = len(net.getPlaces())
     nColumns = len(net.getTransitions())
-    inputMatrix = np.array([[0 for _ in range(nColumns)] for _ in range(nRows)])
-    outputMatrix = np.array([[0 for _ in range(nColumns)] for _ in range(nRows)])
+    inputMatrix = np.array([[0 for _ in range(nColumns)]
+                           for _ in range(nRows)])
+    outputMatrix = np.array([[0 for _ in range(nColumns)]
+                            for _ in range(nRows)])
     # fill each matrix with the proper data
     for arc in net.getArcs():
         sourceId = arc.getSourceId()
@@ -159,11 +170,13 @@ def fuzzy_petri_net(net, M):
         if type(source) == Place:
             sourceIdInNetList = net.getPlaces().index(source)
             destinationIdInNetList = net.getTransitions().index(destination)
-            inputMatrix[sourceIdInNetList, destinationIdInNetList] = arc.getMultiplicity()
+            inputMatrix[sourceIdInNetList,
+                        destinationIdInNetList] = arc.getMultiplicity()
         if type(source) == Transition:
             sourceIdInNetList = net.getTransitions().index(source)
             destinationIdInNetList = net.getPlaces().index(destination)
-            outputMatrix[destinationIdInNetList, sourceIdInNetList] = arc.getMultiplicity()
+            outputMatrix[destinationIdInNetList,
+                         sourceIdInNetList] = arc.getMultiplicity()
     Wk = []
     i = 0
     while not np.array_equal(Wo, Wk):
@@ -216,7 +229,9 @@ def fuzzy_petri_net(net, M):
                 if arc.getSourceId().__class__ == Place:
                     previous_place = net.getPlaceById(arc.getSourceId()).label
                 if arc.dest.name == place.name and changed_places[count_place - 1]:
-                    print(previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens)
+                    print(previous_place, " -> ", arc.src.label,
+                          " -> ", arc.dest.name, " : ", place.tokens)
+        draw_net(net)
         print("Wk: ", Wk)
     return net
 
@@ -268,17 +283,21 @@ def set_initial_marking(net, root, fuzzy, file_name):
     mainFrame.grid(column=1, row=1)
 
     entries = {}
-    ttk.Label(mainFrame, text="Miesta", font=("Arial", 11, 'bold')).grid(column=1, row=1)
+    ttk.Label(mainFrame, text="Miesta", font=(
+        "Arial", 11, 'bold')).grid(column=1, row=1)
     for i, key in enumerate(dict_places):
-        ttk.Label(mainFrame, text=key, font=("Arial", 10, 'bold')).grid(column=1, row=i + 2)
+        ttk.Label(mainFrame, text=key, font=(
+            "Arial", 10, 'bold')).grid(column=1, row=i + 2)
         entries[key] = ttk.Entry(mainFrame, width=10)
         entries[key].grid(column=2, row=i + 2)
         # clear entry field after button click
         ttk.Button(mainFrame, text="OK", command=lambda: set_marking(entries, dict_places), width=5).grid(column=3,
                                                                                                           row=i + 2)
-    ttk.Label(mainFrame, text="Prechody", font=("Arial", 11, 'bold')).grid(column=4, row=1)
+    ttk.Label(mainFrame, text="Prechody", font=(
+        "Arial", 11, 'bold')).grid(column=4, row=1)
     for i, key in enumerate(dict_transitions):
-        ttk.Label(mainFrame, text=dict_transitions[key], font=("Arial", 10, 'bold')).grid(column=4, row=i + 2)
+        ttk.Label(mainFrame, text=dict_transitions[key], font=(
+            "Arial", 10, 'bold')).grid(column=4, row=i + 2)
     # draw petri net into tkinter window
     figure1 = plt.Figure(figsize=(2, 2), dpi=100)
 
@@ -296,7 +315,8 @@ def set_initial_marking(net, root, fuzzy, file_name):
                     value.text = str(int(net.M0[l]))
                 l += 1
 
-    tree.write(file_name + "_marking.xml", encoding="UTF-8", xml_declaration=True)
+    tree.write(file_name + "_marking.xml",
+               encoding="UTF-8", xml_declaration=True)
     print("Počiatočné označkovanie: ", net.M0)
 
 
@@ -305,8 +325,10 @@ def fuzzy_petri_net_with_weights(net, M):
     print("Počiatočné ohodnotenie: ", Wo)
     nRows = len(net.getPlaces())
     nColumns = len(net.getTransitions())
-    inputMatrix = np.array([[0.0 for _ in range(nColumns)] for _ in range(nRows)])
-    outputMatrix = np.array([[0.0 for _ in range(nColumns)] for _ in range(nRows)])
+    inputMatrix = np.array([[0.0 for _ in range(nColumns)]
+                           for _ in range(nRows)])
+    outputMatrix = np.array([[0.0 for _ in range(nColumns)]
+                            for _ in range(nRows)])
 
     # fill each matrix with the proper data
     for arc in net.getArcs():
@@ -323,11 +345,13 @@ def fuzzy_petri_net_with_weights(net, M):
         if type(source) == Place:
             sourceIdInNetList = net.getPlaces().index(source)
             destinationIdInNetList = net.getTransitions().index(destination)
-            inputMatrix[sourceIdInNetList, destinationIdInNetList] = arc.getMultiplicity()
+            inputMatrix[sourceIdInNetList,
+                        destinationIdInNetList] = arc.getMultiplicity()
         if type(source) == Transition:
             sourceIdInNetList = net.getTransitions().index(source)
             destinationIdInNetList = net.getPlaces().index(destination)
-            outputMatrix[destinationIdInNetList, sourceIdInNetList] = arc.getMultiplicity()
+            outputMatrix[destinationIdInNetList,
+                         sourceIdInNetList] = arc.getMultiplicity()
     Wk = []
     i = 0
     while not np.array_equal(Wo, Wk):
@@ -377,7 +401,8 @@ def fuzzy_petri_net_with_weights(net, M):
                 if arc.getSourceId().__class__ == Place:
                     previous_place = net.getPlaceById(arc.getSourceId()).label
                 if arc.dest.name == place.name and changed_places[count_place - 1]:
-                    print(previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens)
+                    print(previous_place, " -> ", arc.src.label,
+                          " -> ", arc.dest.name, " : ", place.tokens)
         print("Wk: ", Wk)
     return net
 
@@ -388,8 +413,10 @@ def fuzzy_petri_net_with_weights_thresholds(net, M):
     print("Počiatočné označkovanie: ", M[0].state)
     nRows = len(net.getPlaces())
     nColumns = len(net.getTransitions())
-    inputMatrix = np.array([[0.0 for _ in range(nColumns)] for _ in range(nRows)])
-    outputMatrix = np.array([[0.0 for _ in range(nColumns)] for _ in range(nRows)])
+    inputMatrix = np.array([[0.0 for _ in range(nColumns)]
+                           for _ in range(nRows)])
+    outputMatrix = np.array([[0.0 for _ in range(nColumns)]
+                            for _ in range(nRows)])
 
     # fill each matrix with the proper data
     for arc in net.getArcs():
@@ -406,11 +433,13 @@ def fuzzy_petri_net_with_weights_thresholds(net, M):
         if type(source) == Place:
             sourceIdInNetList = net.getPlaces().index(source)
             destinationIdInNetList = net.getTransitions().index(destination)
-            inputMatrix[sourceIdInNetList, destinationIdInNetList] = arc.getMultiplicity()
+            inputMatrix[sourceIdInNetList,
+                        destinationIdInNetList] = arc.getMultiplicity()
         if type(source) == Transition:
             sourceIdInNetList = net.getTransitions().index(source)
             destinationIdInNetList = net.getPlaces().index(destination)
-            outputMatrix[destinationIdInNetList, sourceIdInNetList] = arc.getMultiplicity()
+            outputMatrix[destinationIdInNetList,
+                         sourceIdInNetList] = arc.getMultiplicity()
     Wk = []
     i = 0
     while not np.array_equal(Wo, Wk):
@@ -467,12 +496,42 @@ def fuzzy_petri_net_with_weights_thresholds(net, M):
                 if arc.getSourceId().__class__ == Place:
                     previous_place = net.getPlaceById(arc.getSourceId()).label
                 if arc.dest.name == place.name and changed_places[count_place - 1]:
-                    print(previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens)
+                    print(previous_place, " -> ", arc.src.label,
+                          " -> ", arc.dest.name, " : ", place.tokens)
+
         print("Wk: ", Wk)
     return net
 
 
+class MyWidget(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
+
+        self.button = QtWidgets.QPushButton("Click me!")
+        self.text = QtWidgets.QLabel("Hello World",
+                                     alignment=QtCore.Qt.AlignCenter)
+
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.addWidget(self.text)
+        self.layout.addWidget(self.button)
+
+        self.button.clicked.connect(self.magic)
+
+    @QtCore.Slot()
+    def magic(self):
+        self.text.setText(random.choice(self.hello))
+
+
 if __name__ == '__main__':
+    #app = QtWidgets.QApplication([])
+
+    #widget = MyWidget()
+    #widget.resize(800, 600)
+    #widget.show()
+
+    #sys.exit(app.exec())
     file_name = input("Zadaj nazov suboru: ") + ".xml"
     tree = ET.parse(file_name)
     root = tree.getroot()
@@ -491,7 +550,8 @@ if __name__ == '__main__':
         if M is not None:
             draw_net(net)
             net = logical_petri_net(net, M)
-            tree.write(file_name.split('.')[0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+            tree.write(file_name.split('.')[
+                       0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
             draw_net(net)
         else:
             print("Siet je neohranicena")
@@ -500,7 +560,8 @@ if __name__ == '__main__':
         if M is not None:
             draw_net(net)
             net = fuzzy_petri_net(net, M)
-            tree.write(file_name.split('.')[0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+            tree.write(file_name.split('.')[
+                       0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
             draw_net(net)
         else:
             print("Siet je neohranicena")
@@ -509,7 +570,8 @@ if __name__ == '__main__':
         if M is not None:
             draw_net(net)
             net = fuzzy_petri_net_with_weights(net, M)
-            tree.write(file_name.split('.')[0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+            tree.write(file_name.split('.')[
+                       0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
             draw_net(net)
         else:
             print("Siet je neohranicena")
@@ -518,7 +580,8 @@ if __name__ == '__main__':
         if M is not None:
             draw_net(net)
             net = fuzzy_petri_net_with_weights_thresholds(net, M)
-            tree.write(file_name.split('.')[0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+            tree.write(file_name.split('.')[
+                       0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
             draw_net(net)
         else:
             print("Siet je neohranicena")
