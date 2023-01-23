@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>new_model</id>
 	<initials>NEW</initials>
@@ -47,7 +48,7 @@
 		<x>260</x>
 		<y>140</y>
 		<label>prve miesto</label>
-		<tokens>0.4</tokens>
+		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -55,7 +56,7 @@
 		<x>260</x>
 		<y>300</y>
 		<label>druhe miesto</label>
-		<tokens>0.7</tokens>
+		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -118,7 +119,7 @@
 		<type>regular</type>
 		<sourceId>t1</sourceId>
 		<destinationId>p5</destinationId>
-		<multiplicity>0.3</multiplicity>
+		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a3</id>
@@ -132,7 +133,7 @@
 		<type>regular</type>
 		<sourceId>t2</sourceId>
 		<destinationId>p3</destinationId>
-		<multiplicity>0.5</multiplicity>
+		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a5</id>
@@ -167,7 +168,7 @@
 		<type>regular</type>
 		<sourceId>t5</sourceId>
 		<destinationId>p7</destinationId>
-		<multiplicity>0.9</multiplicity>
+		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a10</id>
@@ -181,7 +182,7 @@
 		<type>regular</type>
 		<sourceId>t4</sourceId>
 		<destinationId>p6</destinationId>
-		<multiplicity>0.6</multiplicity>
+		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a12</id>
@@ -195,6 +196,6 @@
 		<type>regular</type>
 		<sourceId>t6</sourceId>
 		<destinationId>p8</destinationId>
-		<multiplicity>0.6</multiplicity>
+		<multiplicity>1</multiplicity>
 	</arc>
 </document>

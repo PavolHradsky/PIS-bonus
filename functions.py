@@ -42,7 +42,11 @@ def read_xml(file_name: str, fuzzy_flag) -> (List[Place], List[Transition], List
         transitions.append(Transition(transition.find("id").text, transition.find("label").text))
 
     for place in root.findall("place"):
-        places.append(Place(place.find("id").text, float(place.find("tokens").text), place.find("label").text))
+        if place.find("label") is None:
+            label = place.find("id").text
+            places.append(Place(place.find("id").text, float(place.find("tokens").text), label))
+        else:
+            places.append(Place(place.find("id").text, float(place.find("tokens").text), place.find("label").text))
     for role in root.findall("role"):
         roles.append(Role(role.find("id").text, role.find("title").text))
 
