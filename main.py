@@ -6,6 +6,8 @@ import numpy as np
 import xml.etree.ElementTree as ET
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from PyQt6.QtWidgets import QMainWindow, QApplication, QPushButton, QFileDialog
+import sys
 
 from PetriNet import PetriNet
 from Place import Place
@@ -16,8 +18,9 @@ import tkinter as tk
 from PySide6 import QtCore, QtWidgets, QtGui
 import sys
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QFile, QIODevice
+from PyQt6 import uic
 
 def loading_data(name_file, fuzzy_flag):
     places, transitions, arcs, role = read_xml(name_file, fuzzy_flag)
@@ -505,47 +508,95 @@ def fuzzy_petri_net_with_weights_thresholds(net, M):
     return net
 
 
-class MyWidget(QtWidgets.QWidget):
-    def __init__(self):
-        super().__init__()
+class MainWindow(QtWidgets.QMainWindow):
 
-        self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        uic.loadUi("mainwindow.ui", self)
 
-        self.button = QtWidgets.QPushButton("Click me!")
-        self.text = QtWidgets.QLabel("Hello World",
-                                     alignment=QtCore.Qt.AlignCenter)
 
-        self.layout = QtWidgets.QVBoxLayout(self)
-        self.layout.addWidget(self.text)
-        self.layout.addWidget(self.button)
+def run_logical(net,tree,file_name):
+    M = reachability(net)
+    if M is not None:
+        draw_net(net)
+        net = logical_petri_net(net, M)
+        tree.write(file_name.split('.')[
+                    0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+        draw_net(net)
+    else:
+        print("Siet je neohranicena")
 
-        self.button.clicked.connect(self.magic)
+def run_fuzzy(net,tree,file_name):
+    M = reachability(net)
+    if M is not None:
+        draw_net(net)
+        net = fuzzy_petri_net(net, M)
+        tree.write(file_name.split('.')[
+                    0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+        draw_net(net)
+    else:
+        print("Siet je neohranicena")
 
-    @QtCore.Slot()
-    def magic(self):
-        self.text.setText(random.choice(self.hello))
+def run_fuzzy_with_weights(net,tree,file_name):
+    M = reachability(net)
+    if M is not None:
+        draw_net(net)
+        net = fuzzy_petri_net_with_weights(net, M)
+        tree.write(file_name.split('.')[
+                    0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+        draw_net(net)
+    else:
+        print("Siet je neohranicena")
 
+def run_fuzzy_with_weights_thresholds(net,tree,file_name):
+    M = reachability(net)
+    if M is not None:
+        draw_net(net)
+        net = fuzzy_petri_net_with_weights_thresholds(net, M)
+        tree.write(file_name.split('.')[
+                    0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+        draw_net(net)
+    else:
+        print("Siet je neohranicena")
+
+def get(input):
+    text = input.text()
+    print(text)
+
+file_name = None
+def open_dialog(self):
+        fname = QFileDialog.getOpenFileName(
+            self,
+            "Open File",
+            "${HOME}",
+            "All Files (*);; Python Files (*.py);; PNG Files (*.png)",
+        )
+        file_name = fname[0].split('/')[-1]
+        print(file_name)
+        
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
+    window = uic.loadUi("mainwindow.ui")
+    # obtain text from textEdit
+    #window.label.setText("Hello World!")
 
-    ui_file_name = "mainwindow.ui"
-    ui_file = QFile(ui_file_name)
-    if not ui_file.open(QIODevice.ReadOnly):
-        print(f"Cannot open {ui_file_name}: {ui_file.errorString()}")
-        sys.exit(-1)
-    loader = QUiLoader()
-    window = loader.load(ui_file)
-    ui_file.close()
-    if not window:
-        print(loader.errorString())
-        sys.exit(-1)
+    window.label.setText("Hello World!")
+    
     window.show()
+    
+    """
+    app =  QtWidgets.QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    try: 
+        sys.exit(app.exec())
+    except SystemExit:
+        print('Closing Window...')
     # add action to button
-    window.pushButton.clicked.connect(lambda: loading_data(window.lineEdit.text(), window.checkBox.isChecked()))
-
-
+    
     sys.exit(app.exec())
+    """
     #app = QtWidgets.QApplication([])
 
     #widget = MyWidget()
@@ -553,6 +604,13 @@ if __name__ == '__main__':
     #widget.show()
 
     #sys.exit(app.exec())
+    # add text to label
+    window.label.setText("Vyber subor: ")
+ 
+    window.pushButton_3.clicked.connect(lambda : open_dialog(window.lineEdit))
+
+    window.pushButton_2.clicked.connect(lambda: get())
+
     file_name = input("Zadaj nazov suboru: ") + ".xml"
     tree = ET.parse(file_name)
     root = tree.getroot()
@@ -563,48 +621,18 @@ if __name__ == '__main__':
     net = loading_data(file_name, fuzzy)
     set_initial_marking(net, root, fuzzy, file_name.split('.')[0] + "_initial")
     net = loading_data(file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
-    option = input(
-        "Vyber z možností: \n 1. Logická Petriho sieť \n 2. Fuzzy Petriho sieť \n 3. Fuzzy Petriho sieť s váhami pravidiel\n"
-        "4. Fuzzy Petriho sieť s váhami a prahmi pravidiel\n")
-    if option == "1":
-        M = reachability(net)
-        if M is not None:
-            draw_net(net)
-            net = logical_petri_net(net, M)
-            tree.write(file_name.split('.')[
-                       0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
-            draw_net(net)
-        else:
-            print("Siet je neohranicena")
-    elif option == "2":
-        M = reachability(net)
-        if M is not None:
-            draw_net(net)
-            net = fuzzy_petri_net(net, M)
-            tree.write(file_name.split('.')[
-                       0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
-            draw_net(net)
-        else:
-            print("Siet je neohranicena")
-    elif option == "3":
-        M = reachability(net)
-        if M is not None:
-            draw_net(net)
-            net = fuzzy_petri_net_with_weights(net, M)
-            tree.write(file_name.split('.')[
-                       0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
-            draw_net(net)
-        else:
-            print("Siet je neohranicena")
-    elif option == "4":
-        M = reachability(net)
-        if M is not None:
-            draw_net(net)
-            net = fuzzy_petri_net_with_weights_thresholds(net, M)
-            tree.write(file_name.split('.')[
-                       0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
-            draw_net(net)
-        else:
-            print("Siet je neohranicena")
-    else:
-        print("Zle zadana moznost")
+  
+    if window.comboBox.currentText() == "Logická Petriho sieť":
+        print(window.comboBox.currentText())
+        window.pushButton.clicked.connect(lambda: run_logical(net,tree,file_name))
+    elif window.comboBox.currentText() == "Fuzzy Petriho sieť":
+        print(window.comboBox.currentText())
+        window.pushButton.clicked.connect(lambda: run_fuzzy(net,tree,file_name))
+    elif window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
+        print(window.comboBox.currentText())
+        window.pushButton.clicked.connect(lambda: run_fuzzy_with_weights(net,tree,file_name))
+    elif window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
+        print(window.comboBox.currentText())
+        window.pushButton.clicked.connect(lambda: run_fuzzy_with_weights_thresholds(net,tree,file_name))    
+    
+    app.exec()
