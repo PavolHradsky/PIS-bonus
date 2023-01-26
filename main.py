@@ -49,8 +49,10 @@ def draw_net(net):
         edges[(arc.getSourceId(), arc.getDestinationId())
               ] = arc.getMultiplicity()
     pos = nx.circular_layout(G)
+    
     plt.figure()
     nx.draw_networkx_nodes(G, pos, places)
+    
     nx.draw_networkx_labels(
         G, pos, labels={n: n.tokens for n in places_list}, font_size=6
     )
@@ -59,15 +61,18 @@ def draw_net(net):
     nx.draw_networkx_labels(
         G, pos, labels={n: n.label for n in transitions}, font_size=6
     )
+    
     for l in pos:  # raise text positions
         pos[l][1] += 0.08  # probably small value enough
     nx.draw_networkx_labels(
         G, pos, labels={n: n.label for n in places}, font_size=6
     )
+   
     nx.draw_networkx_edges(G, pos)
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edges)
     plt.axis('off')
     plt.show()
+    
 
 
 def logical_petri_net(net, M):
@@ -262,7 +267,7 @@ def reachability(net):
     return M
 
 
-def set_marking(entries, marking):
+def set_marking(entries, marking,net):
     for key, value in entries.items():
         marking[key] = value.get()
     net.M0 = [float(i) if i != '' else 0.0 for i in marking.values()]
@@ -272,7 +277,7 @@ def clear_text(text):
     text.delete(1, tk.END)
 
 
-def set_initial_marking(net, root, fuzzy, file_name):
+def set_initial_marking(net, root, fuzzy, file_name,tree):
     dict_roles = {}
     dict_places = {}
     dict_transitions = {}
@@ -297,7 +302,7 @@ def set_initial_marking(net, root, fuzzy, file_name):
         entries[key] = ttk.Entry(mainFrame, width=10)
         entries[key].grid(column=2, row=i + 2)
         # clear entry field after button click
-        ttk.Button(mainFrame, text="OK", command=lambda: set_marking(entries, dict_places), width=5).grid(column=3,
+        ttk.Button(mainFrame, text="OK", command=lambda: set_marking(entries, dict_places,net), width=5).grid(column=3,
                                                                                                           row=i + 2)
     ttk.Label(mainFrame, text="Prechody", font=(
         "Arial", 11, 'bold')).grid(column=4, row=1)
@@ -525,6 +530,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.window.setWindowTitle("Petri nets")
         self.window.show()
 
+
         # bind events to buttons
         self.window.loadFile.clicked.connect(self.open_dialog)
         # comboBox
@@ -559,7 +565,7 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 fuzzy = 0
             net = loading_data(self.file_name, fuzzy)
-            set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial")
+            set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree)
             net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
 
             if self.window.comboBox.currentText() == "Logická Petriho sieť":
@@ -624,64 +630,7 @@ def get(input):
 
 
 
-        
-
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    window = MainWindow()
-    #window = loader.load("mainwindow.ui")
-    # obtain text from textEdit
-    #window.label.setText("Hello World!")
-
-    #window.label.setText("Hello World!")
-    
-    """
-    app =  QtWidgets.QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    try: 
-        sys.exit(app.exec())
-    except SystemExit:
-        print('Closing Window...')
-    # add action to button
-    
-    sys.exit(app.exec())
-    """
-    #app = QtWidgets.QApplication([])
-
-    #widget = MyWidget()
-    #widget.resize(800, 600)
-    #widget.show()
-
-    #sys.exit(app.exec())
-    # add text to label
-    # window.label.setText("Vyber subor: ")
- 
-    # window.pushButton_3.clicked.connect(lambda : open_dialog(window.lineEdit))
-
-    # window.pushButton_2.clicked.connect(lambda: get())
-
-    # file_name = input("Zadaj nazov suboru: ") + ".xml"
-    # tree = ET.parse(file_name)
-    # root = tree.getroot()
-    # if "fuzzy" in file_name:
-    #     fuzzy = 1
-    # else:
-    #     fuzzy = 0
-    # net = loading_data(file_name, fuzzy)
-    # set_initial_marking(net, root, fuzzy, file_name.split('.')[0] + "_initial")
-    # net = loading_data(file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
-  
-    # if window.comboBox.currentText() == "Logická Petriho sieť":
-    #     print(window.comboBox.currentText())
-    #     window.pushButton.clicked.connect(lambda: run_logical(net,tree,file_name))
-    # elif window.comboBox.currentText() == "Fuzzy Petriho sieť":
-    #     print(window.comboBox.currentText())
-    #     window.pushButton.clicked.connect(lambda: run_fuzzy(net,tree,file_name))
-    # elif window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
-    #     print(window.comboBox.currentText())
-    #     window.pushButton.clicked.connect(lambda: run_fuzzy_with_weights(net,tree,file_name))
-    # elif window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
-    #     print(window.comboBox.currentText())
-    #     window.pushButton.clicked.connect(lambda: run_fuzzy_with_weights_thresholds(net,tree,file_name))    
+    window = MainWindow()  
     sys.exit(app.exec())
