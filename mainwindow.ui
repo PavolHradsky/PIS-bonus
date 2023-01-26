@@ -14,7 +14,10 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton">
+   <property name="styleSheet">
+    <string notr="true">background: #bdbdbd;</string>
+   </property>
+   <widget class="QPushButton" name="runButton">
     <property name="geometry">
      <rect>
       <x>650</x>
@@ -63,32 +66,12 @@
    <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
-      <x>650</x>
-      <y>210</y>
-      <width>69</width>
+      <x>600</x>
+      <y>430</y>
+      <width>131</width>
       <height>22</height>
      </rect>
     </property>
-    <item>
-     <property name="text">
-      <string>Logická Petriho sieť</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Fuzzy Petriho sieť</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Fuzzy Petriho sieť s váhami pravidiel</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Fuzzy Petriho sieť s váhami a prahmi pravidiel</string>
-     </property>
-    </item>
    </widget>
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
@@ -116,7 +99,7 @@
      <string>CommandLinkButton</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_3">
+   <widget class="QPushButton" name="loadFile">
     <property name="geometry">
      <rect>
       <x>650</x>
@@ -127,6 +110,22 @@
     </property>
     <property name="text">
      <string>Open file</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="fileNameLabel">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>400</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: white;</string>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

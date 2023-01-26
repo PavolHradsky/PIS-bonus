@@ -4,9 +4,9 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import xml.etree.ElementTree as ET
+import re
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from PyQt6.QtWidgets import QMainWindow, QApplication, QPushButton, QFileDialog
 import sys
 
 from PetriNet import PetriNet
@@ -18,9 +18,10 @@ import tkinter as tk
 from PySide6 import QtCore, QtWidgets, QtGui
 import sys
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtCore import QFile, QIODevice
-from PyQt6 import uic
+
+
 
 def loading_data(name_file, fuzzy_flag):
     places, transitions, arcs, role = read_xml(name_file, fuzzy_flag)
@@ -509,81 +510,130 @@ def fuzzy_petri_net_with_weights_thresholds(net, M):
 
 
 class MainWindow(QtWidgets.QMainWindow):
+    loader = QUiLoader()
+    file_path = None
+    file_name = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi("mainwindow.ui", self)
+        self.ui = QFile("mainwindow.ui")
+        self.ui.open(QFile.ReadOnly)
+        self.window = self.loader.load(self.ui)
+        self.ui.close()
+        self.window.setGeometry(200, 200, 800, 600)
+        self.window.setFixedSize(800, 600)
+        self.window.setWindowTitle("Petri nets")
+        self.window.show()
 
+        # bind events to buttons
+        self.window.loadFile.clicked.connect(self.open_dialog)
+        # comboBox
+        self.window.comboBox.addItems(["Logická Petriho sieť", 
+                                       "Fuzzy Petriho sieť", 
+                                       "Fuzzy Petriho sieť s váhami pravidiel", 
+                                       "Fuzzy Petriho sieť s váhami a prahmi pravidiel"])
+        self.window.comboBox.currentIndexChanged.connect(self.combo_changed)
+        self.window.runButton.clicked.connect(self.run)
 
-def run_logical(net,tree,file_name):
-    M = reachability(net)
-    if M is not None:
-        draw_net(net)
-        net = logical_petri_net(net, M)
-        tree.write(file_name.split('.')[
-                    0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
-        draw_net(net)
-    else:
-        print("Siet je neohranicena")
+    def open_dialog(self):
+        fname = QFileDialog.getOpenFileName(
+            self, 'Open file', 'c:\\', "XML files (*.xml)")
+        if fname[0]:
+            self.file_name = re.search(r'[^/\\&\?]+\.\w+$', fname[0]).group(0)
+            self.window.fileNameLabel.setText(self.file_name)
+            self.file_path = fname[0]
+        else:
+            self.window.fileNameLabel.setText("No file selected")
+            self.file_path = None
+            self.file_name = None
 
-def run_fuzzy(net,tree,file_name):
-    M = reachability(net)
-    if M is not None:
-        draw_net(net)
-        net = fuzzy_petri_net(net, M)
-        tree.write(file_name.split('.')[
-                    0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
-        draw_net(net)
-    else:
-        print("Siet je neohranicena")
+    def combo_changed(self):
+        print(self.window.comboBox.currentText())
 
-def run_fuzzy_with_weights(net,tree,file_name):
-    M = reachability(net)
-    if M is not None:
-        draw_net(net)
-        net = fuzzy_petri_net_with_weights(net, M)
-        tree.write(file_name.split('.')[
-                    0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
-        draw_net(net)
-    else:
-        print("Siet je neohranicena")
+    def run(self):
+        if self.file_path:
+            tree = ET.parse(self.file_path)
+            root = tree.getroot()
+            if "fuzzy" in self.file_name:
+                fuzzy = 1
+            else:
+                fuzzy = 0
+            net = loading_data(self.file_name, fuzzy)
+            set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial")
+            net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
 
-def run_fuzzy_with_weights_thresholds(net,tree,file_name):
-    M = reachability(net)
-    if M is not None:
-        draw_net(net)
-        net = fuzzy_petri_net_with_weights_thresholds(net, M)
-        tree.write(file_name.split('.')[
-                    0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
-        draw_net(net)
-    else:
-        print("Siet je neohranicena")
+            if self.window.comboBox.currentText() == "Logická Petriho sieť":
+                self.run_logical(net, tree, self.file_path)
+            elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť":
+                self.run_fuzzy(net, tree, self.file_path)
+            elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
+                self.run_fuzzy_with_weights(net, tree, self.file_path)
+            elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
+                self.run_fuzzy_with_weights_and_thresholds(net, tree, self.file_path)
+        else:
+            self.tree = None
+            print("No file selected")
+
+    def run_logical(self, net, tree, file_name):
+        M = reachability(net)
+        if M is not None:
+            draw_net(net)
+            net = logical_petri_net(net, M)
+            tree.write(file_name.split('.')[
+                        0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+            draw_net(net)
+        else:
+            print("Siet je neohranicena")
+
+    def run_fuzzy(self, net, tree, file_name):
+        M = reachability(net)
+        if M is not None:
+            draw_net(net)
+            net = fuzzy_petri_net(net, M)
+            tree.write(file_name.split('.')[
+                        0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+            draw_net(net)
+        else:
+            print("Siet je neohranicena")
+
+    def run_fuzzy_with_weights(self, net, tree, file_name):
+        M = reachability(net)
+        if M is not None:
+            draw_net(net)
+            net = fuzzy_petri_net_with_weights(net, M)
+            tree.write(file_name.split('.')[
+                        0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+            draw_net(net)
+        else:
+            print("Siet je neohranicena")
+
+    def run_fuzzy_with_weights_and_thresholds(self, net, tree, file_name):
+        M = reachability(net)
+        if M is not None:
+            draw_net(net)
+            net = fuzzy_petri_net_with_weights_thresholds(net, M)
+            tree.write(file_name.split('.')[
+                        0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+            draw_net(net)
+        else:
+            print("Siet je neohranicena")
 
 def get(input):
     text = input.text()
     print(text)
 
-file_name = None
-def open_dialog(self):
-        fname = QFileDialog.getOpenFileName(
-            self,
-            "Open File",
-            "${HOME}",
-            "All Files (*);; Python Files (*.py);; PNG Files (*.png)",
-        )
-        file_name = fname[0].split('/')[-1]
-        print(file_name)
+
+
         
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    window = uic.loadUi("mainwindow.ui")
+    window = MainWindow()
+    #window = loader.load("mainwindow.ui")
     # obtain text from textEdit
     #window.label.setText("Hello World!")
 
-    window.label.setText("Hello World!")
-    
-    window.show()
+    #window.label.setText("Hello World!")
     
     """
     app =  QtWidgets.QApplication(sys.argv)
@@ -605,34 +655,33 @@ if __name__ == '__main__':
 
     #sys.exit(app.exec())
     # add text to label
-    window.label.setText("Vyber subor: ")
+    # window.label.setText("Vyber subor: ")
  
-    window.pushButton_3.clicked.connect(lambda : open_dialog(window.lineEdit))
+    # window.pushButton_3.clicked.connect(lambda : open_dialog(window.lineEdit))
 
-    window.pushButton_2.clicked.connect(lambda: get())
+    # window.pushButton_2.clicked.connect(lambda: get())
 
-    file_name = input("Zadaj nazov suboru: ") + ".xml"
-    tree = ET.parse(file_name)
-    root = tree.getroot()
-    if "fuzzy" in file_name:
-        fuzzy = 1
-    else:
-        fuzzy = 0
-    net = loading_data(file_name, fuzzy)
-    set_initial_marking(net, root, fuzzy, file_name.split('.')[0] + "_initial")
-    net = loading_data(file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
+    # file_name = input("Zadaj nazov suboru: ") + ".xml"
+    # tree = ET.parse(file_name)
+    # root = tree.getroot()
+    # if "fuzzy" in file_name:
+    #     fuzzy = 1
+    # else:
+    #     fuzzy = 0
+    # net = loading_data(file_name, fuzzy)
+    # set_initial_marking(net, root, fuzzy, file_name.split('.')[0] + "_initial")
+    # net = loading_data(file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
   
-    if window.comboBox.currentText() == "Logická Petriho sieť":
-        print(window.comboBox.currentText())
-        window.pushButton.clicked.connect(lambda: run_logical(net,tree,file_name))
-    elif window.comboBox.currentText() == "Fuzzy Petriho sieť":
-        print(window.comboBox.currentText())
-        window.pushButton.clicked.connect(lambda: run_fuzzy(net,tree,file_name))
-    elif window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
-        print(window.comboBox.currentText())
-        window.pushButton.clicked.connect(lambda: run_fuzzy_with_weights(net,tree,file_name))
-    elif window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
-        print(window.comboBox.currentText())
-        window.pushButton.clicked.connect(lambda: run_fuzzy_with_weights_thresholds(net,tree,file_name))    
-    
-    app.exec()
+    # if window.comboBox.currentText() == "Logická Petriho sieť":
+    #     print(window.comboBox.currentText())
+    #     window.pushButton.clicked.connect(lambda: run_logical(net,tree,file_name))
+    # elif window.comboBox.currentText() == "Fuzzy Petriho sieť":
+    #     print(window.comboBox.currentText())
+    #     window.pushButton.clicked.connect(lambda: run_fuzzy(net,tree,file_name))
+    # elif window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
+    #     print(window.comboBox.currentText())
+    #     window.pushButton.clicked.connect(lambda: run_fuzzy_with_weights(net,tree,file_name))
+    # elif window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
+    #     print(window.comboBox.currentText())
+    #     window.pushButton.clicked.connect(lambda: run_fuzzy_with_weights_thresholds(net,tree,file_name))    
+    sys.exit(app.exec())
