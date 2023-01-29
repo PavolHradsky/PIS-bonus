@@ -19,6 +19,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtCore import QFile, QIODevice
 from PyQt6.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QMessageBox, QLabel, QListWidget
 import os
+import glob
 
 def loading_data(name_file, fuzzy_flag):
     places, transitions, arcs, role = read_xml(name_file, fuzzy_flag)
@@ -134,6 +135,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.window.marking.setText("abc")
         self.window.marking.hide()
         self.window.marking.show()
+        self.image_dict = {}
+        self.step_dict = {}
         
 
     def open_dialog(self):
@@ -221,6 +224,7 @@ class MainWindow(QtWidgets.QMainWindow):
         plt.axis('off')
         plt.show()
         fig.savefig('./images/' + str(self.image_number) + '.png')
+        self.image_dict[self.image_number] = "./images/' + str(self.image_number) + '.png'"
     
     def logical_petri_net(self,net, M):
         Wo = M[0].state
@@ -300,8 +304,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     if arc.getSourceId().__class__ == Place:
                         previous_place = net.getPlaceById(arc.getSourceId()).label
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
-                        print(previous_place, " -> ", arc.src.label,
-                            " -> ", arc.dest.name, " : ", place.tokens)
+                        result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
+                        self.step_dict[self.image_number] = str(result_string)
+                        print(result_string)
             self.draw_net(net)
             self.image_number += 1
             print("Wk: ", Wk)
@@ -394,8 +399,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     if arc.getSourceId().__class__ == Place:
                         previous_place = net.getPlaceById(arc.getSourceId()).label
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
-                        print(previous_place, " -> ", arc.src.label,
-                            " -> ", arc.dest.name, " : ", place.tokens)
+                        result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
+                        self.step_dict[self.image_number] = str(result_string)
+                        print(result_string)
             self.draw_net(net)
             self.image_number += 1
             listToStr = ' '.join([str(elem) for i,elem in enumerate(Wk)])
@@ -489,8 +495,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     if arc.getSourceId().__class__ == Place:
                         previous_place = net.getPlaceById(arc.getSourceId()).label
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
-                        print(previous_place, " -> ", arc.src.label,
-                            " -> ", arc.dest.name, " : ", place.tokens)
+                        result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
+                        self.step_dict[self.image_number] = str(result_string)
+                        print(result_string)
             self.draw_net(net)
             self.image_number += 1
             print("Wk: ", Wk)
@@ -589,8 +596,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     if arc.getSourceId().__class__ == Place:
                         previous_place = net.getPlaceById(arc.getSourceId()).label
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
-                        print(previous_place, " -> ", arc.src.label,
-                            " -> ", arc.dest.name, " : ", place.tokens)
+                        result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
+                        self.step_dict[self.image_number] = str(result_string)
+                        print(result_string)
             self.draw_net(net)
             self.image_number += 1
             print("Wk: ", Wk)
@@ -599,6 +607,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def run_logical(self, net, tree, file_name):
         self.image_number = 1
+        self.image_dict = {}
+        self.step_dict = {}
+        files = glob.glob('./images/*')
+        for f in files:
+            os.remove(f)
         M = reachability(net)
         if M is not None:
             self.draw_net(net)
@@ -615,6 +628,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def run_fuzzy(self, net, tree, file_name):
         self.image_number = 1
+        self.image_dict = {}
+        self.step_dict = {}
+        files = glob.glob('./images/*')
+        for f in files:
+            os.remove(f)
         M = reachability(net)
         if M is not None:
             self.draw_net(net)
@@ -632,6 +650,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def run_fuzzy_with_weights(self, net, tree, file_name):
         self.image_number = 1
+        self.image_dict = {}
+        self.step_dict = {}
+        files = glob.glob('./images/*')
+        for f in files:
+            os.remove(f)
         M = reachability(net)
         if M is not None:
             self.draw_net(net)
@@ -647,6 +670,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def run_fuzzy_with_weights_and_thresholds(self, net, tree, file_name):
         self.image_number = 1
+        self.image_dict = {}
+        self.step_dict = {}
+        files = glob.glob('./images/*')
+        for f in files:
+            os.remove(f)
         M = reachability(net)
         if M is not None:
             image_number = 1
