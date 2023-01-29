@@ -14,23 +14,15 @@ from functions import read_xml, list_is_greater
 from Rpn import Rpn
 import tkinter as tk
 from PySide6 import QtCore, QtWidgets, QtGui
-import sys
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtCore import QFile, QIODevice
-from PyQt6.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QMessageBox
-
+from PyQt6.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QMessageBox, QLabel, QListWidget
 
 def loading_data(name_file, fuzzy_flag):
     places, transitions, arcs, role = read_xml(name_file, fuzzy_flag)
     net: PetriNet = PetriNet(places, transitions, arcs, role)
     return net
-
-
-
-
-
-
 
 def reachability(net):
     M = []
@@ -133,7 +125,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.window.setWindowTitle("Petri nets")
         self.window.show()
 
-
         # bind events to buttons
         self.window.loadFile.clicked.connect(self.open_dialog)
         # comboBox
@@ -143,6 +134,7 @@ class MainWindow(QtWidgets.QMainWindow):
                                        "Fuzzy Petriho sieť s váhami a prahmi pravidiel"])
         self.window.comboBox.currentIndexChanged.connect(self.combo_changed)
         self.window.runButton.clicked.connect(self.run)
+        
 
     def open_dialog(self):
         fname = QFileDialog.getOpenFileName(
@@ -314,6 +306,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def fuzzy_petri_net(self, net, M):
         Wo = M[0].state
         print("Počiatočné ohodnotenie: ", Wo)
+        self.window.label.setText(' '.join([str(elem) for i,elem in enumerate(Wo)]))
+        
+
         nRows = len(net.getPlaces())
         nColumns = len(net.getTransitions())
         inputMatrix = np.array([[0 for _ in range(nColumns)]
@@ -397,8 +392,13 @@ class MainWindow(QtWidgets.QMainWindow):
                         print(previous_place, " -> ", arc.src.label,
                             " -> ", arc.dest.name, " : ", place.tokens)
             self.draw_net(net)
+            listToStr = ' '.join([str(elem) for i,elem in enumerate(Wk)])
+            # add listToStr to Qlabel to window
+        
+            print(listToStr)
             print("Wk: ", Wk)
         return net
+    
     def fuzzy_petri_net_with_weights(net, M):
         Wo = M[0].state
         print("Počiatočné ohodnotenie: ", Wo)
