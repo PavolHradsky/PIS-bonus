@@ -18,6 +18,7 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtCore import QFile, QIODevice
 from PyQt6.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QMessageBox, QLabel, QListWidget
+import os
 
 def loading_data(name_file, fuzzy_flag):
     places, transitions, arcs, role = read_xml(name_file, fuzzy_flag)
@@ -86,11 +87,6 @@ def set_initial_marking(net, root, fuzzy, file_name,tree):
     for i, key in enumerate(dict_transitions):
         ttk.Label(mainFrame, text=dict_transitions[key], font=(
             "Arial", 10, 'bold')).grid(column=4, row=i + 2)
-    # draw petri net into tkinter window
-    figure1 = plt.Figure(figsize=(2, 2), dpi=100)
-
-    canvas = FigureCanvasTkAgg(figure1, mainFrame)
-    canvas.get_tk_widget().grid(column=5, row=10, rowspan=10)
 
     win.mainloop()
     l = 0
@@ -124,6 +120,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.window.setFixedSize(800, 600)
         self.window.setWindowTitle("Petri nets")
         self.window.show()
+        self.image_number = 1
 
         # bind events to buttons
         self.window.loadFile.clicked.connect(self.open_dialog)
@@ -134,6 +131,9 @@ class MainWindow(QtWidgets.QMainWindow):
                                        "Fuzzy Petriho sieť s váhami a prahmi pravidiel"])
         self.window.comboBox.currentIndexChanged.connect(self.combo_changed)
         self.window.runButton.clicked.connect(self.run)
+        self.window.marking.setText("abc")
+        self.window.marking.hide()
+        self.window.marking.show()
         
 
     def open_dialog(self):
@@ -198,7 +198,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 ] = arc.getMultiplicity()
         pos = nx.circular_layout(G)
         
-        plt.figure()
+        fig = plt.figure()
         nx.draw_networkx_nodes(G, pos, places)
         
         nx.draw_networkx_labels(
@@ -220,10 +220,14 @@ class MainWindow(QtWidgets.QMainWindow):
         nx.draw_networkx_edge_labels(G, pos, edge_labels=edges)
         plt.axis('off')
         plt.show()
+        fig.savefig('./images/' + str(self.image_number) + '.png')
     
     def logical_petri_net(self,net, M):
         Wo = M[0].state
-        print("Počiatočné ohodnotenie: ", Wo)
+        # print("Počiatočné ohodnotenie: ", Wo)
+        self.window.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
+        self.window.marking.adjustSize()
+
         nRows = len(net.getPlaces())
         nColumns = len(net.getTransitions())
         inputMatrix = np.array([[0 for _ in range(nColumns)]
@@ -299,16 +303,17 @@ class MainWindow(QtWidgets.QMainWindow):
                         print(previous_place, " -> ", arc.src.label,
                             " -> ", arc.dest.name, " : ", place.tokens)
             self.draw_net(net)
+            self.image_number += 1
             print("Wk: ", Wk)
         return net
 
 
     def fuzzy_petri_net(self, net, M):
         Wo = M[0].state
-        print("Počiatočné ohodnotenie: ", Wo)
-        self.window.label.setText(' '.join([str(elem) for i,elem in enumerate(Wo)]))
+        # print("Počiatočné ohodnotenie: ", Wo)
+        self.window.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
+        self.window.marking.adjustSize()
         
-
         nRows = len(net.getPlaces())
         nColumns = len(net.getTransitions())
         inputMatrix = np.array([[0 for _ in range(nColumns)]
@@ -392,6 +397,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         print(previous_place, " -> ", arc.src.label,
                             " -> ", arc.dest.name, " : ", place.tokens)
             self.draw_net(net)
+            self.image_number += 1
             listToStr = ' '.join([str(elem) for i,elem in enumerate(Wk)])
             # add listToStr to Qlabel to window
         
@@ -399,9 +405,12 @@ class MainWindow(QtWidgets.QMainWindow):
             print("Wk: ", Wk)
         return net
     
-    def fuzzy_petri_net_with_weights(net, M):
+    def fuzzy_petri_net_with_weights(self, net, M):
         Wo = M[0].state
-        print("Počiatočné ohodnotenie: ", Wo)
+        # print("Počiatočné ohodnotenie: ", Wo)
+        self.window.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
+        self.window.marking.adjustSize()
+
         nRows = len(net.getPlaces())
         nColumns = len(net.getTransitions())
         inputMatrix = np.array([[0.0 for _ in range(nColumns)]
@@ -482,6 +491,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         print(previous_place, " -> ", arc.src.label,
                             " -> ", arc.dest.name, " : ", place.tokens)
+            self.draw_net(net)
+            self.image_number += 1
             print("Wk: ", Wk)
         return net
 
@@ -489,7 +500,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def fuzzy_petri_net_with_weights_thresholds(self, net, M):
         Wo = M[0].state
         TR = [0.0, 0.8, 0.2, 0.0, 0.0, 0.0]
-        print("Počiatočné označkovanie: ", M[0].state)
+        # print("Počiatočné označkovanie: ", M[0].state)
+        self.window.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
+        self.window.marking.adjustSize()
+
         nRows = len(net.getPlaces())
         nColumns = len(net.getTransitions())
         inputMatrix = np.array([[0.0 for _ in range(nColumns)]
@@ -577,15 +591,18 @@ class MainWindow(QtWidgets.QMainWindow):
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         print(previous_place, " -> ", arc.src.label,
                             " -> ", arc.dest.name, " : ", place.tokens)
-
+            self.draw_net(net)
+            self.image_number += 1
             print("Wk: ", Wk)
         return net
     
 
     def run_logical(self, net, tree, file_name):
+        self.image_number = 1
         M = reachability(net)
         if M is not None:
             self.draw_net(net)
+            self.image_number += 1
             net = self.logical_petri_net(net, M)
             tree.write(file_name.split('.')[
                         0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
@@ -597,12 +614,16 @@ class MainWindow(QtWidgets.QMainWindow):
             
 
     def run_fuzzy(self, net, tree, file_name):
+        self.image_number = 1
         M = reachability(net)
         if M is not None:
             self.draw_net(net)
+            self.image_number += 1
+            print(self.image_number)
             net = self.fuzzy_petri_net(net, M)
             tree.write(file_name.split('.')[
                         0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+            print(self.image_number)
             self.draw_net(net)
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
@@ -610,9 +631,11 @@ class MainWindow(QtWidgets.QMainWindow):
             ret = dialog.exec()   # Stores the return value for the button pressed
 
     def run_fuzzy_with_weights(self, net, tree, file_name):
+        self.image_number = 1
         M = reachability(net)
         if M is not None:
             self.draw_net(net)
+            self.image_number += 1
             net = self.fuzzy_petri_net_with_weights(net, M)
             tree.write(file_name.split('.')[
                         0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
@@ -623,13 +646,16 @@ class MainWindow(QtWidgets.QMainWindow):
             ret = dialog.exec()   # Stores the return value for the button pressed
 
     def run_fuzzy_with_weights_and_thresholds(self, net, tree, file_name):
+        self.image_number = 1
         M = reachability(net)
         if M is not None:
-            self.draw_net(net)
-            net = self.fuzzy_petri_net_with_weights_thresholds(net, M)
+            image_number = 1
+            self.draw_net(net,image_number)
+            image_number +=1
+            net = self.fuzzy_petri_net_with_weights_thresholds(net, M, image_number)
             tree.write(file_name.split('.')[
                         0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
-            self.draw_net(net)
+            self.draw_net(net,image_number)
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
             dialog.setWindowTitle("Message Dialog")
@@ -638,7 +664,6 @@ class MainWindow(QtWidgets.QMainWindow):
 def get(input):
     text = input.text()
     print(text)
-
 
 
 if __name__ == '__main__':
