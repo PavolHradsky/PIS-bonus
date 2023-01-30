@@ -20,7 +20,7 @@ from PySide6.QtCore import QFile, QIODevice
 from PyQt6.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QMessageBox, QLabel, QListWidget
 import os
 import glob
-
+from PyQt6.QtGui import QPixmap
 def loading_data(name_file, fuzzy_flag):
     places, transitions, arcs, role = read_xml(name_file, fuzzy_flag)
     net: PetriNet = PetriNet(places, transitions, arcs, role)
@@ -132,11 +132,20 @@ class MainWindow(QtWidgets.QMainWindow):
                                        "Fuzzy Petriho sieť s váhami a prahmi pravidiel"])
         self.window.comboBox.currentIndexChanged.connect(self.combo_changed)
         self.window.runButton.clicked.connect(self.run)
+        self.window.prevButton.clicked.connect(self.prev)
+        self.window.nextButton.clicked.connect(self.next)
         self.window.marking.setText("abc")
         self.window.marking.hide()
         self.window.marking.show()
+        self.window.actual_marking.setText("abc")
+        self.window.actual_marking.hide()
+        self.window.actual_marking.show()
+        self.window.initialMarkingSet.setText("abc")
+        self.window.initialMarkingSet.hide()
+        self.window.actual_marking.show()
         self.image_dict = {}
         self.step_dict = {}
+        self.actual_marking_dict = {}
         
 
     def open_dialog(self):
@@ -179,7 +188,25 @@ class MainWindow(QtWidgets.QMainWindow):
             dialog = QMessageBox(text="Nevybrali ste žiadny súbor")
             dialog.setWindowTitle("Message Dialog")
             ret = dialog.exec()   # Stores the return value for the button pressed
-            
+
+
+    def prev(self):
+        if self.image_number > 1:
+            self.image_number -= 1
+            print(self.image_dict[self.image_number])
+            pixmap = QPixmap(self.image_dict[self.image_number])
+            self.window.initialMarkingSet.setPixmap(pixmap)
+            self.window.actual_marking.setText(self.actual_marking_dict[self.image_number])
+            self.window.steps.setText(self.step_dict[self.image_number])
+    def next(self):
+        if self.image_number < len(self.image_dict):
+            self.image_number += 1
+            print(self.image_dict[self.image_number])
+            pixmap = QPixmap(self.image_dict[self.image_number])
+            self.window.initialMarkingSet.setPixmap(pixmap)
+            self.window.actual_marking.setText(self.actual_marking_dict[self.image_number])
+            self.window.steps.setText(self.step_dict[self.image_number])
+        
     def draw_net(self, net):
         G = nx.DiGraph()
         edges = {}
@@ -223,8 +250,11 @@ class MainWindow(QtWidgets.QMainWindow):
         nx.draw_networkx_edge_labels(G, pos, edge_labels=edges)
         plt.axis('off')
         plt.show()
-        fig.savefig('./images/' + str(self.image_number) + '.png')
-        self.image_dict[self.image_number] = "./images/' + str(self.image_number) + '.png'"
+        path = './images/' + str(self.image_number) + '.png'
+        fig.savefig(path)
+        
+        self.image_dict[self.image_number] = path
+        print("path: ", path)
     
     def logical_petri_net(self,net, M):
         Wo = M[0].state
@@ -307,9 +337,13 @@ class MainWindow(QtWidgets.QMainWindow):
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         self.step_dict[self.image_number] = str(result_string)
                         print(result_string)
+            actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
+            self.actual_marking_dict[self.image_number] = actual_step_marking
             self.draw_net(net)
             self.image_number += 1
             print("Wk: ", Wk)
+            self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
+            self.window.actual_marking.adjustSize()
         return net
 
 
@@ -402,13 +436,14 @@ class MainWindow(QtWidgets.QMainWindow):
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         self.step_dict[self.image_number] = str(result_string)
                         print(result_string)
+
+            actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
+            self.actual_marking_dict[self.image_number] = actual_step_marking
             self.draw_net(net)
             self.image_number += 1
-            listToStr = ' '.join([str(elem) for i,elem in enumerate(Wk)])
-            # add listToStr to Qlabel to window
-        
-            print(listToStr)
             print("Wk: ", Wk)
+            #self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
+            #self.window.actual_marking.adjustSize()
         return net
     
     def fuzzy_petri_net_with_weights(self, net, M):
@@ -498,9 +533,13 @@ class MainWindow(QtWidgets.QMainWindow):
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         self.step_dict[self.image_number] = str(result_string)
                         print(result_string)
+            actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
+            self.actual_marking_dict[self.image_number] = actual_step_marking
             self.draw_net(net)
             self.image_number += 1
             print("Wk: ", Wk)
+            self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
+            self.window.actual_marking.adjustSize()
         return net
 
 
@@ -599,9 +638,13 @@ class MainWindow(QtWidgets.QMainWindow):
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         self.step_dict[self.image_number] = str(result_string)
                         print(result_string)
+            actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
+            self.actual_marking_dict[self.image_number] = actual_step_marking
             self.draw_net(net)
             self.image_number += 1
             print("Wk: ", Wk)
+            self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
+            self.window.actual_marking.adjustSize()
         return net
     
 
