@@ -139,15 +139,18 @@
      <rect>
       <x>510</x>
       <y>360</y>
-      <width>191</width>
-      <height>111</height>
+      <width>281</width>
+      <height>221</height>
      </rect>
     </property>
     <property name="text">
      <string>TextLabelasd</string>
     </property>
     <property name="scaledContents">
-     <bool>false</bool>
+     <bool>true</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
     </property>
     <property name="wordWrap">
      <bool>true</bool>
@@ -177,6 +180,12 @@
     </property>
     <property name="text">
      <string>TextLabel</string>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
     </property>
     <property name="wordWrap">
      <bool>true</bool>

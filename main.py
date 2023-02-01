@@ -193,20 +193,36 @@ class MainWindow(QtWidgets.QMainWindow):
     def prev(self):
         if self.image_number > 1:
             self.image_number -= 1
-            print(self.image_dict[self.image_number])
-            pixmap = QPixmap(self.image_dict[self.image_number])
-            self.window.initialMarkingSet.setPixmap(pixmap)
+            #print(self.image_dict[self.image_number])
+            #self.pixmap = QPixmap(self.image_dict[self.image_number])
+            #print(self.pixmap)
+            #self.window.initialMarkingSet.setPixmap(self.pixmap)
+            print(self.actual_marking_dict[self.image_number])
             self.window.actual_marking.setText(self.actual_marking_dict[self.image_number])
+            self.window.actual_marking.adjustSize()
             self.window.steps.setText(self.step_dict[self.image_number])
+            # remove step
+            self.window.steps.setText("<br>".join([self.step_dict[i] for i in range(1, self.image_number)]))
+
+        else:
+            self.image_number = 1
+
+
     def next(self):
         if self.image_number < len(self.image_dict):
             self.image_number += 1
-            print(self.image_dict[self.image_number])
-            pixmap = QPixmap(self.image_dict[self.image_number])
-            self.window.initialMarkingSet.setPixmap(pixmap)
+           # print(self.image_dict[self.image_number])
+           # pixmap = QPixmap(self.image_dict[self.image_number])
+           # self.window.initialMarkingSet.setPixmap(pixmap)
+            print(self.actual_marking_dict[self.image_number])
             self.window.actual_marking.setText(self.actual_marking_dict[self.image_number])
-            self.window.steps.setText(self.step_dict[self.image_number])
+            self.window.actual_marking.adjustSize()
+            #add step
+            self.window.steps.setText("<br>".join([self.step_dict[i] for i in range(1, self.image_number)]))
+        else:
+            self.image_number = len(self.image_dict)
         
+
     def draw_net(self, net):
         G = nx.DiGraph()
         edges = {}
@@ -342,8 +358,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.draw_net(net)
             self.image_number += 1
             print("Wk: ", Wk)
-            self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
-            self.window.actual_marking.adjustSize()
+            #self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
+            #self.window.actual_marking.adjustSize()
         return net
 
 
@@ -538,8 +554,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.draw_net(net)
             self.image_number += 1
             print("Wk: ", Wk)
-            self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
-            self.window.actual_marking.adjustSize()
+            #self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
+            #self.window.actual_marking.adjustSize()
         return net
 
 
@@ -643,8 +659,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.draw_net(net)
             self.image_number += 1
             print("Wk: ", Wk)
-            self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
-            self.window.actual_marking.adjustSize()
+            #self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
+            #self.window.actual_marking.adjustSize()
         return net
     
 
