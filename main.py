@@ -20,7 +20,8 @@ from PySide6.QtCore import QFile, QIODevice
 from PyQt6.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QMessageBox, QLabel, QListWidget
 import os
 import glob
-from PyQt6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap, QImage
+
 def loading_data(name_file, fuzzy_flag):
     places, transitions, arcs, role = read_xml(name_file, fuzzy_flag)
     net: PetriNet = PetriNet(places, transitions, arcs, role)
@@ -134,19 +135,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.window.runButton.clicked.connect(self.run)
         self.window.prevButton.clicked.connect(self.prev)
         self.window.nextButton.clicked.connect(self.next)
-        self.window.marking.setText("abc")
-        self.window.marking.hide()
-        self.window.marking.show()
-        self.window.actual_marking.setText("abc")
-        self.window.actual_marking.hide()
-        self.window.actual_marking.show()
-        self.window.initialMarkingSet.setText("abc")
-        self.window.initialMarkingSet.hide()
-        self.window.actual_marking.show()
+
         self.image_dict = {}
         self.step_dict = {}
         self.actual_marking_dict = {}
-        
 
     def open_dialog(self):
         fname = QFileDialog.getOpenFileName(
@@ -191,35 +183,48 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def prev(self):
+        print("prev", self.image_number)
+        print(self.actual_marking_dict)
+        print(self.image_dict)
+        print(self.step_dict)
         if self.image_number > 1:
+            #   set button active
+            self.window.nextButton.setEnabled(True)
             self.image_number -= 1
-            #print(self.image_dict[self.image_number])
-            #self.pixmap = QPixmap(self.image_dict[self.image_number])
-            #print(self.pixmap)
-            #self.window.initialMarkingSet.setPixmap(self.pixmap)
-            print(self.actual_marking_dict[self.image_number])
-            self.window.actual_marking.setText(self.actual_marking_dict[self.image_number])
+            prem = QImage(self.image_dict[self.image_number])
+            pixmap = QPixmap.fromImage(prem)
+            self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+            self.window.actual_marking.setText(self.actual_marking_dict[self.image_number-1])
             self.window.actual_marking.adjustSize()
-            self.window.steps.setText(self.step_dict[self.image_number])
             # remove step
-            self.window.steps.setText("<br>".join([self.step_dict[i] for i in range(1, self.image_number)]))
-
+            self.window.steps.takeItem(self.image_number-1)
+            
         else:
+            # set button inactive
+            self.window.prevButton.setEnabled(False)
             self.image_number = 1
 
 
     def next(self):
+        print("next", self.image_number)
+        print(self.actual_marking_dict)
+        print(self.image_dict)
+        print(self.step_dict)
         if self.image_number < len(self.image_dict):
+            # set button active
+            self.window.prevButton.setEnabled(True)
             self.image_number += 1
-           # print(self.image_dict[self.image_number])
-           # pixmap = QPixmap(self.image_dict[self.image_number])
-           # self.window.initialMarkingSet.setPixmap(pixmap)
-            print(self.actual_marking_dict[self.image_number])
-            self.window.actual_marking.setText(self.actual_marking_dict[self.image_number])
+            prem = QImage(self.image_dict[self.image_number])
+            pixmap = QPixmap.fromImage(prem)
+            self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+            self.window.actual_marking.setText(self.actual_marking_dict[self.image_number-1])
             self.window.actual_marking.adjustSize()
             #add step
-            self.window.steps.setText("<br>".join([self.step_dict[i] for i in range(1, self.image_number)]))
+            self.window.steps.addItem(self.step_dict[self.image_number-1])
+            
         else:
+            # set button inactive
+            self.window.nextButton.setEnabled(False)
             self.image_number = len(self.image_dict)
         
 
@@ -265,7 +270,7 @@ class MainWindow(QtWidgets.QMainWindow):
         nx.draw_networkx_edges(G, pos)
         nx.draw_networkx_edge_labels(G, pos, edge_labels=edges)
         plt.axis('off')
-        plt.show()
+        #plt.show()
         path = './images/' + str(self.image_number) + '.png'
         fig.savefig(path)
         
@@ -358,8 +363,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.draw_net(net)
             self.image_number += 1
             print("Wk: ", Wk)
-            #self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
-            #self.window.actual_marking.adjustSize()
+        self.image_number = 1
+        prem = QImage(self.image_dict[self.image_number])
+        pixmap = QPixmap.fromImage(prem)
+        self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
         return net
 
 
@@ -458,8 +465,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.draw_net(net)
             self.image_number += 1
             print("Wk: ", Wk)
-            #self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
-            #self.window.actual_marking.adjustSize()
+        self.image_number = 1
+        prem = QImage(self.image_dict[self.image_number])
+        pixmap = QPixmap.fromImage(prem)
+        self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
         return net
     
     def fuzzy_petri_net_with_weights(self, net, M):
@@ -554,8 +563,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.draw_net(net)
             self.image_number += 1
             print("Wk: ", Wk)
-            #self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
-            #self.window.actual_marking.adjustSize()
+        self.image_number = 1
+        prem = QImage(self.image_dict[self.image_number])
+        pixmap = QPixmap.fromImage(prem)
+        self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
         return net
 
 
@@ -659,8 +670,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.draw_net(net)
             self.image_number += 1
             print("Wk: ", Wk)
-            #self.window.actual_marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )")
-            #self.window.actual_marking.adjustSize()
+        self.image_number = 1
+        prem = QImage(self.image_dict[self.image_number])
+        pixmap = QPixmap.fromImage(prem)
+        self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
         return net
     
 

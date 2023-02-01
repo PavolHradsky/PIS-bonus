@@ -72,8 +72,8 @@
    <widget class="QPushButton" name="nextButton">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>510</y>
+      <x>260</x>
+      <y>430</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -85,8 +85,8 @@
    <widget class="QLabel" name="initial_marking_label">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>260</y>
+      <x>20</x>
+      <y>460</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -98,7 +98,7 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>510</x>
+      <x>470</x>
       <y>320</y>
       <width>111</width>
       <height>16</height>
@@ -111,8 +111,8 @@
    <widget class="QPushButton" name="prevButton">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>510</y>
+      <x>150</x>
+      <y>430</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -124,8 +124,8 @@
    <widget class="QLabel" name="marking">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>290</y>
+      <x>20</x>
+      <y>480</y>
       <width>141</width>
       <height>16</height>
      </rect>
@@ -134,52 +134,20 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="steps">
-    <property name="geometry">
-     <rect>
-      <x>510</x>
-      <y>360</y>
-      <width>281</width>
-      <height>221</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>TextLabelasd</string>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-    </property>
-    <property name="wordWrap">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="accept">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>290</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>OK</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="initialMarkingSet">
+   <widget class="QLabel" name="photo">
     <property name="geometry">
      <rect>
       <x>40</x>
       <y>20</y>
-      <width>351</width>
-      <height>251</height>
+      <width>421</width>
+      <height>331</height>
      </rect>
     </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
+    </property>
     <property name="text">
-     <string>TextLabel</string>
+     <string/>
     </property>
     <property name="scaledContents">
      <bool>false</bool>
@@ -194,8 +162,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>540</y>
+      <x>20</x>
+      <y>510</y>
       <width>141</width>
       <height>16</height>
      </rect>
@@ -207,14 +175,33 @@
    <widget class="QLabel" name="actual_marking">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>570</y>
+      <x>20</x>
+      <y>530</y>
       <width>131</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="steps">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>350</y>
+      <width>321</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <property name="horizontalScrollBarPolicy">
+     <enum>Qt::ScrollBarAlwaysOff</enum>
+    </property>
+    <property name="sizeAdjustPolicy">
+     <enum>QAbstractScrollArea::AdjustToContents</enum>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::NoSelection</enum>
     </property>
    </widget>
   </widget>
