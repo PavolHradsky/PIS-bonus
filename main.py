@@ -135,10 +135,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.window.runButton.clicked.connect(self.run)
         self.window.prevButton.clicked.connect(self.prev)
         self.window.nextButton.clicked.connect(self.next)
-
         self.image_dict = {}
         self.step_dict = {}
         self.actual_marking_dict = {}
+        if self.image_number == 1:
+            self.window.prevButton.setEnabled(False)
+        if self.image_number == len(self.image_dict):
+            self.window.nextButton.setEnabled(False)
 
     def open_dialog(self):
         fname = QFileDialog.getOpenFileName(
@@ -184,9 +187,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def prev(self):
         print("prev", self.image_number)
-        print(self.actual_marking_dict)
-        print(self.image_dict)
-        print(self.step_dict)
         if self.image_number > 1:
             #   set button active
             self.window.nextButton.setEnabled(True)
@@ -207,9 +207,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def next(self):
         print("next", self.image_number)
-        print(self.actual_marking_dict)
-        print(self.image_dict)
-        print(self.step_dict)
         if self.image_number < len(self.image_dict):
             # set button active
             self.window.prevButton.setEnabled(True)
@@ -220,7 +217,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.window.actual_marking.setText(self.actual_marking_dict[self.image_number-1])
             self.window.actual_marking.adjustSize()
             #add step
-            self.window.steps.addItem(self.step_dict[self.image_number-1])
+            for i in self.step_dict[self.image_number-1]:
+                self.window.steps.addItem(str(i))
             
         else:
             # set button inactive
@@ -371,6 +369,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def fuzzy_petri_net(self, net, M):
+        array_steps = []
         Wo = M[0].state
         # print("Počiatočné ohodnotenie: ", Wo)
         self.window.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
@@ -457,8 +456,12 @@ class MainWindow(QtWidgets.QMainWindow):
                         previous_place = net.getPlaceById(arc.getSourceId()).label
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
-                        self.step_dict[self.image_number] = str(result_string)
+                        array_steps.append(result_string)
+                        
                         print(result_string)
+            self.step_dict[self.image_number] = array_steps
+            print( self.step_dict[self.image_number])
+            array_steps = []
 
             actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
             self.actual_marking_dict[self.image_number] = actual_step_marking
@@ -472,6 +475,7 @@ class MainWindow(QtWidgets.QMainWindow):
         return net
     
     def fuzzy_petri_net_with_weights(self, net, M):
+        array_steps = []
         Wo = M[0].state
         # print("Počiatočné ohodnotenie: ", Wo)
         self.window.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
@@ -556,8 +560,12 @@ class MainWindow(QtWidgets.QMainWindow):
                         previous_place = net.getPlaceById(arc.getSourceId()).label
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
-                        self.step_dict[self.image_number] = str(result_string)
+                        
+                        array_steps.append(result_string)
                         print(result_string)
+            self.step_dict[self.image_number] = array_steps
+            print("array_steps: ", array_steps)
+            array_steps = []
             actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
             self.actual_marking_dict[self.image_number] = actual_step_marking
             self.draw_net(net)
