@@ -197,7 +197,9 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.image_number == 2:
                 self.window.prevButton.setEnabled(False)
             self.image_number -= 1
+            print(self.image_dict)
             prem = QImage(self.image_dict[self.image_number])
+            
             pixmap = QPixmap.fromImage(prem)
             self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
             print(self.actual_marking_dict)
@@ -255,7 +257,6 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.window.marking != None:
             self.window.marking.clear()
         self.window.prevButton.setEnabled(False)
-        self.window.nextButton.setEnabled(False)
         self.window.clearAll.setEnabled(False)
 
 
@@ -314,7 +315,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # print("Počiatočné ohodnotenie: ", Wo)
         self.window.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
         self.window.marking.adjustSize()
-
+        self.actual_marking_dict[0] = "( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )"
+        
         nRows = len(net.getPlaces())
         nColumns = len(net.getTransitions())
         inputMatrix = np.array([[0 for _ in range(nColumns)]
@@ -390,13 +392,14 @@ class MainWindow(QtWidgets.QMainWindow):
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
                         print(result_string)
-            self.step_dict[self.image_number] = array_steps
-            array_steps = []
-            actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
-            self.actual_marking_dict[self.image_number] = actual_step_marking
-            self.draw_net(net)
-            self.image_number += 1
-            print("Wk: ", Wk)
+            if Wk != Wo:
+                self.step_dict[self.image_number-1] = array_steps
+                array_steps = []
+                actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
+                self.actual_marking_dict[self.image_number-1] = actual_step_marking
+                self.draw_net(net)
+                self.image_number += 1
+                print("Wk: ", Wk)
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
@@ -410,7 +413,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # print("Počiatočné ohodnotenie: ", Wo)
         self.window.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
         self.window.marking.adjustSize()
-        
+        self.actual_marking_dict[0] = "( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )"
+
         nRows = len(net.getPlaces())
         nColumns = len(net.getTransitions())
         inputMatrix = np.array([[0 for _ in range(nColumns)]
@@ -494,14 +498,14 @@ class MainWindow(QtWidgets.QMainWindow):
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
                         print(result_string)
-            self.step_dict[self.image_number] = array_steps
-            array_steps = []
-
-            actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
-            self.actual_marking_dict[self.image_number] = actual_step_marking
-            self.draw_net(net)
-            self.image_number += 1
-            print("Wk: ", Wk)
+            if Wk != Wo:
+                self.step_dict[self.image_number-1] = array_steps
+                array_steps = []
+                actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
+                self.actual_marking_dict[self.image_number-1] = actual_step_marking
+                self.draw_net(net)
+                self.image_number += 1
+                print("Wk: ", Wk)
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
@@ -619,6 +623,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # print("Počiatočné označkovanie: ", M[0].state)
         self.window.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
         self.window.marking.adjustSize()
+        self.actual_marking_dict[0] = "( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )"
 
         nRows = len(net.getPlaces())
         nColumns = len(net.getTransitions())
@@ -708,14 +713,14 @@ class MainWindow(QtWidgets.QMainWindow):
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
                         print(result_string)
-                      
-            self.step_dict[self.image_number] = array_steps
-            array_steps = []
-            actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
-            self.actual_marking_dict[self.image_number] = actual_step_marking
-            self.draw_net(net)
-            self.image_number += 1
-            print("Wk: ", Wk)
+            if Wk != Wo:          
+                self.step_dict[self.image_number-1] = array_steps
+                array_steps = []
+                actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
+                self.actual_marking_dict[self.image_number-1] = actual_step_marking
+                self.draw_net(net)
+                self.image_number += 1
+                print("Wk: ", Wk)
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
@@ -737,7 +742,7 @@ class MainWindow(QtWidgets.QMainWindow):
             net = self.logical_petri_net(net, M)
             tree.write(file_name.split('.')[
                         0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
-            self.draw_net(net)
+            #self.draw_net(net)
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
             dialog.setWindowTitle("Message Dialog")
@@ -755,12 +760,12 @@ class MainWindow(QtWidgets.QMainWindow):
         if M is not None:
             self.draw_net(net)
             self.image_number += 1
-            print(self.image_number)
+            #print(self.image_number)
             net = self.fuzzy_petri_net(net, M)
             tree.write(file_name.split('.')[
                         0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
-            print(self.image_number)
-            self.draw_net(net)
+            #print(self.image_number)
+            #self.draw_net(net)
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
             dialog.setWindowTitle("Message Dialog")
@@ -781,7 +786,7 @@ class MainWindow(QtWidgets.QMainWindow):
             net = self.fuzzy_petri_net_with_weights(net, M)
             tree.write(file_name.split('.')[
                         0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
-            self.draw_net(net)
+            #self.draw_net(net)
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
             dialog.setWindowTitle("Message Dialog")
@@ -802,7 +807,7 @@ class MainWindow(QtWidgets.QMainWindow):
             net = self.fuzzy_petri_net_with_weights_thresholds(net, M, image_number)
             tree.write(file_name.split('.')[
                         0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
-            self.draw_net(net,image_number)
+            #self.draw_net(net,image_number)
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
             dialog.setWindowTitle("Message Dialog")
