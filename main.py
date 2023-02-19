@@ -17,7 +17,7 @@ from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtCore import QFile, QIODevice
-from PyQt6.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QMessageBox, QLabel, QListWidget
+from PyQt6.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QMessageBox, QLabel, QListWidget, QVBoxLayout
 import os
 import glob
 from PySide6.QtGui import QPixmap, QImage
@@ -53,9 +53,56 @@ def set_marking(entries, marking,net):
     net.M0 = [float(i) if i != '' else 0.0 for i in marking.values()]
 
 
-def clear_text(text):
-    text.delete(1, tk.END)
 
+class AnotherWindow(QWidget):
+    """
+    This "window" is a QWidget. If it has no parent, it
+    will appear as a free-floating window as we want.
+    """
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+        self.label = QLabel("Another Window")
+        layout.addWidget(self.label)
+        self.setLayout(layout)
+
+
+# rewrite  set_initial_marking to anotherWindow in pyqt6 and add to another window
+def set_marking_initial(net, root, fuzzy, file_name, tree):
+    dict_roles = {}
+    dict_places = {}
+    dict_transitions = {}
+    for place in net.getPlaces():
+        dict_places[place.label] = place.tokens
+    for transition in net.getTransitions():
+        dict_transitions[transition.getId()] = transition.label
+    for role in net.getRoles():
+        dict_roles[role.getId()] = role.name
+    # make entry for each key in dict_places in another window
+
+    w = AnotherWindow()
+    w.setGeometry(300, 300, 300, 200)
+    w.show()
+
+
+
+    l = 0
+    for rank in root.iter('place'):
+        for value in rank:
+            if value.tag == 'tokens':
+                if fuzzy:
+                    value.text = str(float(net.M0[l]))
+                else:
+                    value.text = str(int(net.M0[l]))
+                l += 1
+
+    tree.write(file_name + "_marking.xml",
+               encoding="UTF-8", xml_declaration=True)
+    print("Počiatočné označkovanie: ", net.M0)
+
+def delete_text(entries):
+    for key, value in entries.items():
+        value.delete(0, 'end')
 
 def set_initial_marking(net, root, fuzzy, file_name,tree):
     dict_roles = {}
@@ -82,7 +129,7 @@ def set_initial_marking(net, root, fuzzy, file_name,tree):
         entries[key] = ttk.Entry(mainFrame, width=10)
         entries[key].grid(column=2, row=i + 2)
         # clear entry field after button click
-        ttk.Button(mainFrame, text="OK", command=lambda: set_marking(entries, dict_places,net), width=5).grid(column=3,
+        ttk.Button(mainFrame, text="OK", command=lambda: [set_marking(entries, dict_places,net), delete_text(entries)], width=5).grid(column=3,
                                                                                                           row=i + 2)
     ttk.Label(mainFrame, text="Prechody", font=(
         "Arial", 11, 'bold')).grid(column=4, row=1)
@@ -106,7 +153,6 @@ def set_initial_marking(net, root, fuzzy, file_name,tree):
     print("Počiatočné označkovanie: ", net.M0)
 
 
-
 class MainWindow(QtWidgets.QMainWindow):
     loader = QUiLoader()
     file_path = None
@@ -114,9 +160,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ui = QFile("mainwindow.ui")
+        self.ui = QFile(".\gui\mainwindow.ui")
         self.ui.open(QFile.ReadOnly)
         self.window = self.loader.load(self.ui)
+        self.window.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\icon.jpg'))
         self.ui.close()
         self.window.setGeometry(200, 200, 800, 600)
         self.window.setFixedSize(800, 600)
@@ -171,6 +218,7 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 fuzzy = 0
             net = loading_data(self.file_name, fuzzy)
+            set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree)
             set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree)
             net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
 
@@ -190,29 +238,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def prev(self):
-        print("prev", self.image_number)
         if self.image_number > 1:
             #   set button active
             self.window.nextButton.setEnabled(True)
             if self.image_number == 2:
                 self.window.prevButton.setEnabled(False)
             self.image_number -= 1
-            print(self.image_dict)
             prem = QImage(self.image_dict[self.image_number])
-            
             pixmap = QPixmap.fromImage(prem)
             self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-            print(self.actual_marking_dict)
             self.window.actual_marking.setText(self.actual_marking_dict[self.image_number-1])
             self.window.actual_marking.adjustSize()
-            # remove s
-            print(self.step_dict)
             for i in range(0, len(self.step_dict[self.image_number])):
-                print(i)
                 self.window.steps.takeItem(self.image_number+1-i-self.k)
-                if i>0:
+                if i > 0:
                     self.k += 1
-            
         else:
             # set button inactive
             self.window.prevButton.setEnabled(False)
@@ -221,8 +261,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def next(self):
         self.k = 0
-        print("next", self.image_number)
-      
         if self.image_number < len(self.image_dict):
             # set button active
             self.window.prevButton.setEnabled(True)
@@ -234,12 +272,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
             self.window.actual_marking.setText(self.actual_marking_dict[self.image_number-1])
             self.window.actual_marking.adjustSize()
-            #add step
-            print(self.step_dict)
             for i in self.step_dict[self.image_number-1]:
-                print(i)
                 self.window.steps.addItem(str(i))
-            
         else:
             # set button inactive
             self.window.nextButton.setEnabled(False)
@@ -257,6 +291,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.window.marking != None:
             self.window.marking.clear()
         self.window.prevButton.setEnabled(False)
+        self.window.nextButton.setEnabled(True)
         self.window.clearAll.setEnabled(False)
 
 
