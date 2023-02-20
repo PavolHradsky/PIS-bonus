@@ -53,52 +53,45 @@ def set_marking(entries, marking,net):
     net.M0 = [float(i) if i != '' else 0.0 for i in marking.values()]
 
 
-
+# another window 
 class AnotherWindow(QWidget):
-    """
-    This "window" is a QWidget. If it has no parent, it
-    will appear as a free-floating window as we want.
-    """
-    def __init__(self):
-        super().__init__()
-        layout = QVBoxLayout()
-        self.label = QLabel("Another Window")
-        layout.addWidget(self.label)
-        self.setLayout(layout)
+    loader = QUiLoader()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ui = QFile(".\\gui\\anotherwindow.ui")
+        self.ui.open(QFile.ReadOnly)
+        self.window = self.loader.load(self.ui)
+        self.window.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\icon.jpg'))
+        self.window.setGeometry(200, 200, 800, 600)
+        self.window.setFixedSize(800, 600)
+        self.window.setWindowTitle("Initial marking")
+        self.ui.close()
 
+    # rewrite  set_initial_marking to anotherWindow in pyqt6 and add to another window
+    def set_marking_initial(self,net, root, fuzzy, file_name, tree):
+        dict_roles = {}
+        dict_places = {}
+        dict_transitions = {}
+        for place in net.getPlaces():
+            dict_places[place.label] = place.tokens
+        for transition in net.getTransitions():
+            dict_transitions[transition.getId()] = transition.label
+        for role in net.getRoles():
+            dict_roles[role.getId()] = role.name
+        self.window.show()
+        l = 0
+        for rank in root.iter('place'):
+            for value in rank:
+                if value.tag == 'tokens':
+                    if fuzzy:
+                        value.text = str(float(net.M0[l]))
+                    else:
+                        value.text = str(int(net.M0[l]))
+                    l += 1
 
-# rewrite  set_initial_marking to anotherWindow in pyqt6 and add to another window
-def set_marking_initial(net, root, fuzzy, file_name, tree):
-    dict_roles = {}
-    dict_places = {}
-    dict_transitions = {}
-    for place in net.getPlaces():
-        dict_places[place.label] = place.tokens
-    for transition in net.getTransitions():
-        dict_transitions[transition.getId()] = transition.label
-    for role in net.getRoles():
-        dict_roles[role.getId()] = role.name
-    # make entry for each key in dict_places in another window
-
-    w = AnotherWindow()
-    w.setGeometry(300, 300, 300, 200)
-    w.show()
-
-
-
-    l = 0
-    for rank in root.iter('place'):
-        for value in rank:
-            if value.tag == 'tokens':
-                if fuzzy:
-                    value.text = str(float(net.M0[l]))
-                else:
-                    value.text = str(int(net.M0[l]))
-                l += 1
-
-    tree.write(file_name + "_marking.xml",
-               encoding="UTF-8", xml_declaration=True)
-    print("Počiatočné označkovanie: ", net.M0)
+        tree.write(file_name + "_marking.xml",
+                encoding="UTF-8", xml_declaration=True)
+        print("Počiatočné označkovanie: ", net.M0)
 
 def delete_text(entries):
     for key, value in entries.items():
@@ -162,6 +155,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
         self.ui = QFile(".\gui\mainwindow.ui")
         self.ui.open(QFile.ReadOnly)
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowMaximizeButtonHint)
         self.window = self.loader.load(self.ui)
         self.window.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\icon.jpg'))
         self.ui.close()
@@ -218,7 +212,8 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 fuzzy = 0
             net = loading_data(self.file_name, fuzzy)
-            set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree)
+            w = AnotherWindow()
+            w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree)
             set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree)
             net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
 
