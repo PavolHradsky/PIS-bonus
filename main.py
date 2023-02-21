@@ -67,6 +67,7 @@ class AnotherWindow(QWidget):
         self.window.setWindowTitle("Initial marking")
         self.ui.close()
         self.window.enter.clicked.connect(self.window.close)
+        self.window.label = QLabel("place", self)
 
     # rewrite  set_initial_marking to anotherWindow in pyqt6 and add to another window
     def set_marking_initial(self,net, root, fuzzy, file_name, tree):
@@ -84,17 +85,32 @@ class AnotherWindow(QWidget):
         
         # TODO same as tkinter (similar function set_initial_marking)
         entries = {}
-        self.window.label_2.setText("Miesta")
+        counter = 0
+        self.window.places.setText("Miesta")
+
+        """
         for i, key in enumerate(dict_places):
-            self.window.label_2.setText(key)
+            self.label = QLabel("place", self.window)
+            self.label.setText("New Text is Here")
+            self.label.move(100+counter,100)
+            counter += 2
+            #self.window.places.setText(key)
             entries[key] = self.window.lineEdit
             self.window.enter.clicked.connect(lambda: [set_marking(entries, dict_places,net), delete_text(entries)])
-
+        """
         # list also tranistions
-        self.window.label_3.setText("Prechody")
+        # add labels for each place to window 
+        for i, key in enumerate(dict_places):
+            self.window.label.setText(key)
+            self.window.label.move(100+counter,100)
+            #entries[key] = self.window.lineEdit
+            counter += 1
+
+        # add labels for each transition to window
+        self.window.transitions.setText("Prechody")
         for i, key in enumerate(dict_transitions):
-            self.window.label_3.setText(key)
-    
+            self.window.transitions.setText(key)
+        
         l = 0
         for rank in root.iter('place'):
             for value in rank:
@@ -169,14 +185,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ui = QFile(".\gui\mainwindow.ui")
+        self.ui = QFile(".\\responsive.ui")
         self.ui.open(QFile.ReadOnly)
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowMaximizeButtonHint)
         self.window = self.loader.load(self.ui)
         self.window.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\icon.jpg'))
         self.ui.close()
         self.window.setGeometry(200, 200, 800, 600)
-        self.window.setFixedSize(800, 600)
         self.window.setWindowTitle("Petri nets")
         self.window.show()
         self.image_number = 1
@@ -280,7 +295,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.image_number += 1
             prem = QImage(self.image_dict[self.image_number])
             pixmap = QPixmap.fromImage(prem)
+            # set alignment of photo to the centre
             self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+            
             self.window.actual_marking.setText(self.actual_marking_dict[self.image_number-1])
             self.window.actual_marking.adjustSize()
             for i in self.step_dict[self.image_number-1]:
