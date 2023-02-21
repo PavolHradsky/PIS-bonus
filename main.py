@@ -66,6 +66,7 @@ class AnotherWindow(QWidget):
         self.window.setFixedSize(800, 600)
         self.window.setWindowTitle("Initial marking")
         self.ui.close()
+        self.window.enter.clicked.connect(self.window.close)
 
     # rewrite  set_initial_marking to anotherWindow in pyqt6 and add to another window
     def set_marking_initial(self,net, root, fuzzy, file_name, tree):
@@ -79,6 +80,28 @@ class AnotherWindow(QWidget):
         for role in net.getRoles():
             dict_roles[role.getId()] = role.name
         self.window.show()
+        # make entry label for each key in dict_places in window
+        entries = {}
+        self.window.label_2.setText("Miesta")
+        for i, key in enumerate(dict_places):
+            self.window.label_2.setText(key)
+            entries[key] = self.window.lineEdit
+            self.window.enter.clicked.connect(lambda: [set_marking(entries, dict_places,net), delete_text(entries)])
+
+        # list also tranistions
+        self.window.label_3.setText("Prechody")
+        for i, key in enumerate(dict_transitions):
+            self.window.label_3.setText(key)
+    
+    def delete_text(self, entries):
+        for key, value in entries.items():
+            value.delete(0, 'end')
+    
+    def set_marking(self, entries, marking,net):
+        for key, value in entries.items():
+            marking[key] = value.get()
+        net.M0 = [float(i) if i != '' else 0.0 for i in marking.values()]
+
         l = 0
         for rank in root.iter('place'):
             for value in rank:
