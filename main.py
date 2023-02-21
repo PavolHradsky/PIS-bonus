@@ -81,6 +81,8 @@ class AnotherWindow(QWidget):
             dict_roles[role.getId()] = role.name
         self.window.show()
         # make entry label for each key in dict_places in window
+        
+        # TODO same as tkinter (similar function set_initial_marking)
         entries = {}
         self.window.label_2.setText("Miesta")
         for i, key in enumerate(dict_places):
@@ -93,15 +95,6 @@ class AnotherWindow(QWidget):
         for i, key in enumerate(dict_transitions):
             self.window.label_3.setText(key)
     
-    def delete_text(self, entries):
-        for key, value in entries.items():
-            value.delete(0, 'end')
-    
-    def set_marking(self, entries, marking,net):
-        for key, value in entries.items():
-            marking[key] = value.get()
-        net.M0 = [float(i) if i != '' else 0.0 for i in marking.values()]
-
         l = 0
         for rank in root.iter('place'):
             for value in rank:
