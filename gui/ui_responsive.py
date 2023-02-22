@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(880, 662)
+        MainWindow.resize(1130, 789)
         MainWindow.setStyleSheet(u"background: #bdbdbd;")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -38,8 +38,9 @@ class Ui_MainWindow(object):
         self.photo.setEnabled(True)
         self.photo.setMinimumSize(QSize(400, 400))
         self.photo.setFrameShape(QFrame.Box)
+        self.photo.setLineWidth(0)
 
-        self.horizontalLayout.addWidget(self.photo, 0, Qt.AlignHCenter|Qt.AlignVCenter)
+        self.horizontalLayout.addWidget(self.photo)
 
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
@@ -195,7 +196,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
-        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
 
         self.verticalLayout_4.addWidget(self.label)
 
@@ -207,7 +208,7 @@ class Ui_MainWindow(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.steps.sizePolicy().hasHeightForWidth())
         self.steps.setSizePolicy(sizePolicy1)
-        self.steps.setMinimumSize(QSize(400, 75))
+        self.steps.setMinimumSize(QSize(500, 75))
         self.steps.setMaximumSize(QSize(500, 200))
 
         self.verticalLayout_4.addWidget(self.steps)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>880</width>
-    <height>662</height>
+    <width>1130</width>
+    <height>789</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
       <property name="spacing">
        <number>10</number>
       </property>
-      <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+      <item>
        <widget class="QLabel" name="photo">
         <property name="enabled">
          <bool>true</bool>
@@ -36,6 +36,9 @@
         </property>
         <property name="frameShape">
          <enum>QFrame::Box</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
         </property>
         <property name="text">
          <string/>
@@ -340,7 +343,7 @@
                <string>Postupnosť krokov</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -357,7 +360,7 @@
               </property>
               <property name="minimumSize">
                <size>
-                <width>400</width>
+                <width>500</width>
                 <height>75</height>
                </size>
               </property>

@@ -20,7 +20,7 @@ from PySide6.QtCore import QFile, QIODevice
 from PyQt6.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QMessageBox, QLabel, QListWidget, QVBoxLayout
 import os
 import glob
-from PySide6.QtGui import QPixmap, QImage
+from PySide6.QtGui import QPixmap, QImage, QResizeEvent
 
 def loading_data(name_file, fuzzy_flag):
     places, transitions, arcs, role = read_xml(name_file, fuzzy_flag)
@@ -182,17 +182,19 @@ class MainWindow(QtWidgets.QMainWindow):
     loader = QUiLoader()
     file_path = None
     file_name = None
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.ui = QFile(".\\responsive.ui")
+    
+    def __init__(self):
+        super().__init__()
+        self.ui = QFile(".\\gui\\responsive.ui")
         self.ui.open(QFile.ReadOnly)
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowMaximizeButtonHint)
         self.window = self.loader.load(self.ui)
+        #self.window.resizeEvent = self.resizeEvent
         self.window.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\icon.jpg'))
         self.ui.close()
         self.window.setGeometry(200, 200, 800, 600)
         self.window.setWindowTitle("Petri nets")
+       
         self.window.show()
         self.image_number = 1
 
@@ -215,9 +217,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.k = 0
         if self.image_number == 1:
             self.window.prevButton.setEnabled(False)
-        
-       
 
+  
+        
     def open_dialog(self):
         fname = QFileDialog.getOpenFileName(
             self, 'Open file', 'c:\\', "XML files (*.xml)")
@@ -273,12 +275,14 @@ class MainWindow(QtWidgets.QMainWindow):
             prem = QImage(self.image_dict[self.image_number])
             pixmap = QPixmap.fromImage(prem)
             self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+            self.window.photo.setAlignment(QtCore.Qt.AlignCenter)
             self.window.actual_marking.setText(self.actual_marking_dict[self.image_number-1])
             self.window.actual_marking.adjustSize()
+            counter = 0
             for i in range(0, len(self.step_dict[self.image_number])):
-                self.window.steps.takeItem(self.image_number+1-i-self.k)
-                if i > 0:
-                    self.k += 1
+                counter += 1
+                self.window.steps.takeItem(self.k-1-i)
+            self.k -= counter
         else:
             # set button inactive
             self.window.prevButton.setEnabled(False)
@@ -286,7 +290,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def next(self):
-        self.k = 0
         if self.image_number < len(self.image_dict):
             # set button active
             self.window.prevButton.setEnabled(True)
@@ -297,10 +300,11 @@ class MainWindow(QtWidgets.QMainWindow):
             pixmap = QPixmap.fromImage(prem)
             # set alignment of photo to the centre
             self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-            
+            self.window.photo.setAlignment(QtCore.Qt.AlignCenter)
             self.window.actual_marking.setText(self.actual_marking_dict[self.image_number-1])
             self.window.actual_marking.adjustSize()
             for i in self.step_dict[self.image_number-1]:
+                self.k += 1
                 self.window.steps.addItem(str(i))
         else:
             # set button inactive
@@ -467,6 +471,7 @@ class MainWindow(QtWidgets.QMainWindow):
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
         self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+        self.window.photo.setAlignment(QtCore.Qt.AlignCenter)
         return net
 
 
@@ -573,6 +578,7 @@ class MainWindow(QtWidgets.QMainWindow):
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
         self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+        self.window.photo.setAlignment(QtCore.Qt.AlignCenter)
         return net
     
     def fuzzy_petri_net_with_weights(self, net, M):
@@ -676,6 +682,7 @@ class MainWindow(QtWidgets.QMainWindow):
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
         self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+        self.window.photo.setAlignment(QtCore.Qt.AlignCenter)
         return net
 
 
@@ -788,6 +795,7 @@ class MainWindow(QtWidgets.QMainWindow):
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
         self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+        self.window.photo.setAlignment(QtCore.Qt.AlignCenter)
         return net
     
 
@@ -876,14 +884,9 @@ class MainWindow(QtWidgets.QMainWindow):
             dialog.setWindowTitle("Message Dialog")
             ret = dialog.exec()   # Stores the return value for the button pressed
 
-def get(input):
-    text = input.text()
-    print(text)
-
-
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()  
-    
+    #window.show()
     sys.exit(app.exec())
     
