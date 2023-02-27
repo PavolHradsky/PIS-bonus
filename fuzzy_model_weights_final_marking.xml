@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>new_model</id>
 	<initials>NEW</initials>
@@ -11,37 +12,37 @@
 		<x>380</x>
 		<y>140</y>
 		<label>prvy prechod</label>
-	</transition>
+	<treshold>0</treshold></transition>
 	<transition>
 		<id>t2</id>
 		<x>300</x>
 		<y>260</y>
 		<label>druhy prechod</label>
-	</transition>
+	<treshold>0</treshold></transition>
 	<transition>
 		<id>t3</id>
 		<x>380</x>
 		<y>300</y>
 		<label>treti prechod</label>
-	</transition>
+	<treshold>0</treshold></transition>
 	<transition>
 		<id>t4</id>
 		<x>540</x>
 		<y>140</y>
 		<label>stvrty prechod</label>
-	</transition>
+	<treshold>0</treshold></transition>
 	<transition>
 		<id>t5</id>
 		<x>580</x>
 		<y>300</y>
 		<label>piaty prechod</label>
-	</transition>
+	<treshold>0</treshold></transition>
 	<transition>
 		<id>t6</id>
 		<x>660</x>
 		<y>140</y>
 		<label>siesty prechod</label>
-	</transition>
+	<treshold>0</treshold></transition>
 	<place>
 		<id>p1</id>
 		<x>260</x>
@@ -63,7 +64,7 @@
 		<x>380</x>
 		<y>180</y>
 		<label>tretie miesto</label>
-		<tokens>0</tokens>
+		<tokens>0.0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -71,7 +72,7 @@
 		<x>460</x>
 		<y>260</y>
 		<label>stvrte miesto</label>
-		<tokens>0</tokens>
+		<tokens>0.0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -79,7 +80,7 @@
 		<x>460</x>
 		<y>140</y>
 		<label>piate miesto</label>
-		<tokens>0</tokens>
+		<tokens>0.0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -87,7 +88,7 @@
 		<x>620</x>
 		<y>140</y>
 		<label>sieste miesto</label>
-		<tokens>0</tokens>
+		<tokens>0.0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -95,7 +96,7 @@
 		<x>700</x>
 		<y>300</y>
 		<label>siedme miesto</label>
-		<tokens>0</tokens>
+		<tokens>0.0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -103,7 +104,7 @@
 		<x>740</x>
 		<y>140</y>
 		<label>osme miesto</label>
-		<tokens>0</tokens>
+		<tokens>0.0</tokens>
 		<static>false</static>
 	</place>
 	<arc>

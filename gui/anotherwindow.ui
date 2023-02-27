@@ -14,26 +14,13 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="enter">
-    <property name="geometry">
-     <rect>
-      <x>690</x>
-      <y>550</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>SAVE</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="places">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>30</y>
-      <width>101</width>
-      <height>21</height>
+      <x>9</x>
+      <y>9</y>
+      <width>16</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
@@ -43,14 +30,33 @@
    <widget class="QLabel" name="transitions">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>40</y>
-      <width>131</width>
-      <height>21</height>
+      <x>9</x>
+      <y>289</y>
+      <width>16</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="enter">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>568</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>100</width>
+      <height>16777215</height>
+     </size>
+    </property>
+    <property name="text">
+     <string>SAVE</string>
     </property>
    </widget>
   </widget>
