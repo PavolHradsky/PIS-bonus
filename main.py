@@ -56,13 +56,11 @@ class AnotherWindow(QWidget):
         self.window = self.loader.load(self.ui)
         self.window.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\icon.jpg'))
         self.window.setGeometry(200, 200, 800, 600)
-        self.window.setFixedSize(800, 600)
+        self.window.setFixedSize(1280, 720)
         self.window.setWindowTitle("Initial marking")
         self.ui.close()
-        
-        #self.window.enter.clicked.connect(self.window.close)
-        #self.window.label = QLabel("place", self)
-        #self.window.bla = QVBoxLayout()
+        self.window.enter.clicked.connect(self.window.close)
+        self.window.show()
        
     def set_marking_initial(self, net, root, fuzzy, file_name, tree, weights, tresholds):
         dict_weights = {}
@@ -75,15 +73,13 @@ class AnotherWindow(QWidget):
             dict_transitions[transition.getId()] = transition.label
         for i, arc in net.getMultiplicities().items():
             dict_weights[i] = arc
-        # add QVBoxLayout to the window
-        mainLayout = QtWidgets.QVBoxLayout()
 
         entries = {}
         entries2 = {}
         entries3 = {}
         placesLabel = QtWidgets.QLabel("Miesta")
         placesLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
-        mainLayout.addWidget(placesLabel)
+        self.window.main.addWidget(placesLabel) 
      
         placesLayout = QtWidgets.QVBoxLayout()
         for i, key in enumerate(dict_places):
@@ -92,17 +88,19 @@ class AnotherWindow(QWidget):
             entry = QtWidgets.QLineEdit()
             entries[key] = entry
             okButton = QtWidgets.QPushButton("OK")
-            okButton.clicked.connect(lambda _, e=entry, d=dict_places, n=net: [set_marking(e, d, n), e.clear()])
+            okButton.clicked.connect(lambda: [set_marking(entries, dict_places, net), delete_text(entries)])
+            #okButton.clicked.connect(lambda _, e=entry, d=dict_places, n=net: [set_marking(e, d, n), e.clear()])
             placeLayout = QtWidgets.QHBoxLayout()
             placeLayout.addWidget(placeLabel)
             placeLayout.addWidget(entry)
             placeLayout.addWidget(okButton)
             placesLayout.addLayout(placeLayout)
-        mainLayout.addLayout(placesLayout)
-
+        
+        self.window.main.addLayout(placesLayout)
+        
         transitionsLabel = QtWidgets.QLabel("Prechody")
         transitionsLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
-        mainLayout.addWidget(transitionsLabel)
+        self.window.main.addWidget(transitionsLabel)
 
         transitionsLayout = QtWidgets.QVBoxLayout()
         for i, key in enumerate(dict_transitions):
@@ -120,12 +118,12 @@ class AnotherWindow(QWidget):
                 transitionsLayout.addLayout(transitionLayout)
             else:
                 transitionsLayout.addWidget(transitionLabel)
-        mainLayout.addLayout(transitionsLayout)
-
+        self.window.main.addLayout(transitionsLayout)
+        
         if weights or tresholds:
             weightsLabel = QtWidgets.QLabel("Váhy")
             weightsLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
-            mainLayout.addWidget(weightsLabel)
+            self.window.main.addWidget(weightsLabel)
 
             weightsLayout = QtWidgets.QVBoxLayout()
             for i, key in enumerate(dict_weights):
@@ -140,8 +138,9 @@ class AnotherWindow(QWidget):
                 weightLayout.addWidget(entry3)
                 weightLayout.addWidget(okButton3)
                 weightsLayout.addLayout(weightLayout)
-            mainLayout.addLayout(weightsLayout)
-        self.window.setLayout(mainLayout)
+            self.window.main.addLayout(weightsLayout)
+        #self.setLayout(mainLayout)
+        
     """
     # rewrite  set_initial_marking to anotherWindow in pyqt6 and add to another window
     def set_marking_initial(self,net, root, fuzzy, file_name, tree):
@@ -392,28 +391,24 @@ class MainWindow(QtWidgets.QMainWindow):
             net = loading_data(self.file_name, fuzzy)
             if self.window.comboBox.currentText() == "Logická Petriho sieť":
                 w = AnotherWindow()
-                self.window.show()
                 w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,0,0)
                 set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,0,0)
                 net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
                 self.run_logical(net, tree, self.file_path)
             elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť":
                 w = AnotherWindow()
-                self.window.show()
                 w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,0,0)
                 set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,0,0)
                 net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
                 self.run_fuzzy(net, tree, self.file_path)
             elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
                 w = AnotherWindow()
-                self.window.show()
                 w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,1,0)
                 set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,1,0)
                 net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
                 self.run_fuzzy_with_weights(net, tree, self.file_path)
             elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
                 w = AnotherWindow()
-                self.window.show()
                 w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,1,1)
                 set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,1,1)
                 self.TR = net.tresholds

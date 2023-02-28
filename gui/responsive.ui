@@ -69,13 +69,13 @@
            <widget class="QLabel" name="fileNameLabel">
             <property name="minimumSize">
              <size>
-              <width>150</width>
+              <width>200</width>
               <height>25</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>150</width>
+              <width>200</width>
               <height>25</height>
              </size>
             </property>
@@ -120,13 +120,13 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>150</width>
+              <width>200</width>
               <height>25</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>150</width>
+              <width>200</width>
               <height>25</height>
              </size>
             </property>
@@ -199,7 +199,7 @@
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>20</width>
+            <width>30</width>
             <height>40</height>
            </size>
           </property>

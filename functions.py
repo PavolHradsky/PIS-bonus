@@ -31,6 +31,11 @@ def read_xml(file_name: str, fuzzy_flag) -> (List[Place], List[Transition], List
     :param file_name: name of file
     :return: lists of objects
     """
+    """
+    script_path = os.path.dirname(os.path.realpath(__file__))
+
+    path_to_file = os.path.join(script_path, 'petri nets', file_name)
+    """
     tree = ET.parse(file_name)
     root = tree.getroot()
     roles: List[Role] = []
