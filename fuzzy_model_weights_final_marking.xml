@@ -48,7 +48,7 @@
 		<x>260</x>
 		<y>140</y>
 		<label>prve miesto</label>
-		<tokens>0.5</tokens>
+		<tokens>0.4</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -56,7 +56,7 @@
 		<x>260</x>
 		<y>300</y>
 		<label>druhe miesto</label>
-		<tokens>0.2</tokens>
+		<tokens>0.7</tokens>
 		<static>false</static>
 	</place>
 	<place>
