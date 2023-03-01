@@ -16,9 +16,8 @@ from Rpn import Rpn
 import tkinter as tk
 from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QMessageBox
 from PySide6.QtCore import QFile, QIODevice
-from PyQt6.QtWidgets import QLineEdit, QApplication, QWidget, QComboBox, QPushButton, QMessageBox, QLabel, QListWidget, QVBoxLayout
 import os
 import glob
 from PySide6.QtGui import QPixmap, QImage, QResizeEvent
@@ -61,7 +60,7 @@ class AnotherWindow(QWidget):
         self.window.setWindowTitle("Initial marking")
         self.ui.close()
         self.window.show()
-        self.window.enter.clicked.connect(MainWindow.run_final)
+        self.window.enter.clicked.connect(MainAplication.run_final)
        
     def set_marking_initial(self, net, root, fuzzy, file_name, tree, weights, tresholds):
         dict_weights = {}
@@ -317,39 +316,42 @@ def set_initial_marking(net, root, fuzzy, file_name,tree, weights,tresholds):
     print("Počiatočné označkovanie: ", net.M0)
 
 
-class MainWindow(QtWidgets.QMainWindow):
+class MainAplication(QtWidgets.QMainWindow):
     loader = QUiLoader()
     file_path = None
     file_name = None
+    anotherWindow = None
     
     def __init__(self):
         super().__init__()
+        self.main_layout = QWidget()
         self.ui = QFile(".\\gui\\responsive.ui")
         self.ui.open(QFile.ReadOnly)
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowMaximizeButtonHint)
-        self.window = self.loader.load(self.ui)
-        #self.window.resizeEvent = self.resizeEvent
-        self.window.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\icon.jpg'))
+        self.main_layout = self.loader.load(self.ui)
         self.ui.close()
-        self.window.setGeometry(200, 200, 800, 600)
-        self.window.setWindowTitle("Petri nets")
+        self.setCentralWidget(self.main_layout)
+
+
+        self.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\icon.jpg'))
+        self.setGeometry(200, 200, 800, 600)
+        self.setWindowTitle("Petri nets")
        
-        self.window.show()
+        #self.window.show()
         self.image_number = 1
 
         # bind events to buttons
-        self.window.loadFile.clicked.connect(self.open_dialog)
+        self.main_layout.loadFile.clicked.connect(self.open_dialog)
         # comboBox
-        self.window.comboBox.addItems(["Logická Petriho sieť", 
+        self.main_layout.comboBox.addItems(["Logická Petriho sieť", 
                                        "Fuzzy Petriho sieť", 
                                        "Fuzzy Petriho sieť s váhami pravidiel", 
                                        "Fuzzy Petriho sieť s váhami a prahmi pravidiel"])
-        self.window.comboBox.currentIndexChanged.connect(self.combo_changed)
-        self.window.runButton.clicked.connect(self.run)
-        self.window.prevButton.clicked.connect(self.prev)
-        self.window.nextButton.clicked.connect(self.next)
-        self.window.clearAll.clicked.connect(self.clear)
-        self.window.clearAll.setEnabled(False)
+        self.main_layout.comboBox.currentIndexChanged.connect(self.combo_changed)
+        self.main_layout.runButton.clicked.connect(self.run)
+        self.main_layout.prevButton.clicked.connect(self.prev)
+        self.main_layout.nextButton.clicked.connect(self.next)
+        self.main_layout.clearAll.clicked.connect(self.clear)
+        self.main_layout.clearAll.setEnabled(False)
         self.image_dict = {}
         self.step_dict = {}
         self.actual_marking_dict = {}
@@ -362,29 +364,28 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tree = None
 
         if self.image_number == 1:
-            self.window.prevButton.setEnabled(False)
+            self.main_layout.prevButton.setEnabled(False)
 
     # resize event
     def resizeEvent(self, event):
-        self.window.resize(event.size())
         print("resize")
-
+        event.accept()
 
     def open_dialog(self):
         fname = QFileDialog.getOpenFileName(
             self, 'Open file', 'c:\\', "XML files (*.xml)")
         if fname[0]:
             self.file_name = re.search(r'[^/\\&\?]+\.\w+$', fname[0]).group(0)
-            self.window.fileNameLabel.setText(self.file_name)
+            self.main_layout.fileNameLabel.setText(self.file_name)
             self.file_path = fname[0]
         else:
-            self.window.fileNameLabel.setText("No file selected")
+            self.main_layout.fileNameLabel.setText("No file selected")
             self.file_path = None
             self.file_name = None
-        self.window.clearAll.setEnabled(True)
+        self.main_layout.clearAll.setEnabled(True)
 
     def combo_changed(self):
-        print(self.window.comboBox.currentText())
+        print(self.main_layout.comboBox.currentText())
 
     def run(self):
         if self.file_path:
@@ -395,31 +396,31 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 fuzzy = 0
             net = loading_data(self.file_name, fuzzy)
-            if self.window.comboBox.currentText() == "Logická Petriho sieť":
+            if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = 1
-                w = AnotherWindow()
-                w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,0,0)
+                self.anotherWindow = AnotherWindow()
+                self.anotherWindow.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,0,0)
                 
                 #set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,0,0)
        
-            elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť":
+            elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť":
                 self.fuzzy_flag = 1
-                w = AnotherWindow()
-                w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,0,0)
+                self.anotherWindow = AnotherWindow()
+                self.anotherWindow.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,0,0)
                 
                 #set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,0,0)
 
-            elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
+            elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
                 self.fuzzy_weights_flag = 1
-                w = AnotherWindow()
-                w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,1,0)
+                self.anotherWindow = AnotherWindow()
+                self.anotherWindow.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,1,0)
                 
                 #set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,1,0)
      
-            elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
+            elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
                 self.fuzzy_weights_tresholds_flag = 1
-                w = AnotherWindow()
-                w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,1,1)
+                self.anotherWindow = AnotherWindow()
+                self.anotherWindow.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,1,1)
                 #set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,1,1)
                 self.TR = net.tresholds
 
@@ -447,63 +448,63 @@ class MainWindow(QtWidgets.QMainWindow):
     def prev(self):
         if self.image_number > 1:
             #   set button active
-            self.window.nextButton.setEnabled(True)
+            self.main_layout.nextButton.setEnabled(True)
             if self.image_number == 2:
-                self.window.prevButton.setEnabled(False)
+                self.main_layout.prevButton.setEnabled(False)
             self.image_number -= 1
             prem = QImage(self.image_dict[self.image_number])
             pixmap = QPixmap.fromImage(prem)
-            self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-            self.window.photo.setAlignment(QtCore.Qt.AlignCenter)
-            self.window.actual_marking.setText(self.actual_marking_dict[self.image_number-1])
-            self.window.actual_marking.adjustSize()
+            self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+            self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+            self.main_layout.actual_marking.setText(self.actual_marking_dict[self.image_number-1])
+            self.main_layout.actual_marking.adjustSize()
             counter = 0
             for i in range(0, len(self.step_dict[self.image_number])):
                 counter += 1
-                self.window.steps.takeItem(self.k-1-i)
+                self.main_layout.steps.takeItem(self.k-1-i)
             self.k -= counter
         else:
             # set button inactive
-            self.window.prevButton.setEnabled(False)
+            self.main_layout.prevButton.setEnabled(False)
             self.image_number = 1
 
 
     def next(self):
         if self.image_number < len(self.image_dict):
             # set button active
-            self.window.prevButton.setEnabled(True)
+            self.main_layout.prevButton.setEnabled(True)
             if self.image_number == len(self.image_dict)-1:
-                self.window.nextButton.setEnabled(False)
+                self.main_layout.nextButton.setEnabled(False)
             self.image_number += 1
             prem = QImage(self.image_dict[self.image_number])
             pixmap = QPixmap.fromImage(prem)
             # set alignment of photo to the centre
-            self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-            self.window.photo.setAlignment(QtCore.Qt.AlignCenter)
-            self.window.actual_marking.setText(self.actual_marking_dict[self.image_number-1])
-            self.window.actual_marking.adjustSize()
+            self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+            self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+            self.main_layout.actual_marking.setText(self.actual_marking_dict[self.image_number-1])
+            self.main_layout.actual_marking.adjustSize()
             for i in self.step_dict[self.image_number-1]:
                 self.k += 1
-                self.window.steps.addItem(str(i))
+                self.main_layout.steps.addItem(str(i))
         else:
             # set button inactive
-            self.window.nextButton.setEnabled(False)
+            self.main_layout.nextButton.setEnabled(False)
             self.image_number -=1
 
 
     def clear(self):
-        self.window.fileNameLabel.setText("No file selected")
-        if self.window.steps != None:
-            self.window.steps.clear()
-        if self.window.photo != None:
-            self.window.photo.clear()
-        if self.window.actual_marking != None:
-            self.window.actual_marking.clear()
-        if self.window.marking != None:
-            self.window.marking.clear()
-        self.window.prevButton.setEnabled(False)
-        self.window.nextButton.setEnabled(True)
-        self.window.clearAll.setEnabled(False)
+        self.main_layout.fileNameLabel.setText("No file selected")
+        if self.main_layout.steps != None:
+            self.main_layout.steps.clear()
+        if self.main_layout.photo != None:
+            self.main_layout.photo.clear()
+        if self.main_layout.actual_marking != None:
+            self.main_layout.actual_marking.clear()
+        if self.main_layout.marking != None:
+            self.main_layout.marking.clear()
+        self.main_layout.prevButton.setEnabled(False)
+        self.main_layout.nextButton.setEnabled(True)
+        self.main_layout.clearAll.setEnabled(False)
 
 
     def draw_net(self, net,weights,thresholds):
@@ -564,8 +565,8 @@ class MainWindow(QtWidgets.QMainWindow):
         array_steps = []
         Wo = M[0].state
         # print("Počiatočné ohodnotenie: ", Wo)
-        self.window.marking.setText("( "+', '.join([str(int(elem)) for i,elem in enumerate(Wo)])+" )")
-        self.window.marking.adjustSize()
+        self.main_layout.marking.setText("( "+', '.join([str(int(elem)) for i,elem in enumerate(Wo)])+" )")
+        self.main_layout.marking.adjustSize()
         self.actual_marking_dict[0] = "( "+', '.join([str(int(elem)) for i,elem in enumerate(Wo)])+" )"
         
         nRows = len(net.getPlaces())
@@ -654,8 +655,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
-        self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-        self.window.photo.setAlignment(QtCore.Qt.AlignCenter)
+        self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+        self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
         return net
 
 
@@ -663,8 +664,8 @@ class MainWindow(QtWidgets.QMainWindow):
         array_steps = []
         Wo = M[0].state
         # print("Počiatočné ohodnotenie: ", Wo)
-        self.window.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
-        self.window.marking.adjustSize()
+        self.main_layout.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
+        self.main_layout.marking.adjustSize()
         self.actual_marking_dict[0] = "( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )"
 
         nRows = len(net.getPlaces())
@@ -761,15 +762,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
-        self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-        self.window.photo.setAlignment(QtCore.Qt.AlignCenter)
+        self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+        self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
         return net
     
     def fuzzy_petri_net_with_weights(self, net, M):
         array_steps = []
         Wo = M[0].state
-        self.window.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
-        self.window.marking.adjustSize()
+        self.main_layout.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
+        self.main_layout.marking.adjustSize()
         self.actual_marking_dict[0] = "( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )"
 
         nRows = len(net.getPlaces())
@@ -864,16 +865,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
-        self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-        self.window.photo.setAlignment(QtCore.Qt.AlignCenter)
+        self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+        self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
         return net
 
 
     def fuzzy_petri_net_with_weights_thresholds(self, net, M):
         array_steps = []
         Wo = M[0].state
-        self.window.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
-        self.window.marking.adjustSize()
+        self.main_layout.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
+        self.main_layout.marking.adjustSize()
         self.actual_marking_dict[0] = "( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )"
 
         nRows = len(net.getPlaces())
@@ -975,8 +976,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
-        self.window.photo.setPixmap(pixmap.scaled(self.window.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-        self.window.photo.setAlignment(QtCore.Qt.AlignCenter)
+        self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+        self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
         return net
     
 
@@ -1060,7 +1061,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    window = MainWindow()  
-    #window.show()
+    window = MainAplication()  
+    window.show()
     sys.exit(app.exec())
     
