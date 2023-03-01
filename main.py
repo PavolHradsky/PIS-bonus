@@ -60,8 +60,8 @@ class AnotherWindow(QWidget):
         self.window.setFixedSize(1280, 720)
         self.window.setWindowTitle("Initial marking")
         self.ui.close()
-        self.window.enter.clicked.connect(self.window.close)
         self.window.show()
+        self.window.enter.clicked.connect(MainWindow.run_final)
        
     def set_marking_initial(self, net, root, fuzzy, file_name, tree, weights, tresholds):
         dict_weights = {}
@@ -355,6 +355,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actual_marking_dict = {}
         self.TR = []
         self.k = 0
+        self.logical_flag = 0
+        self.fuzzy_flag = 0
+        self.fuzzy_weights_flag = 0
+        self.fuzzy_weights_tresholds_flag = 0
+        self.tree = None
+
         if self.image_number == 1:
             self.window.prevButton.setEnabled(False)
 
@@ -382,47 +388,60 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def run(self):
         if self.file_path:
-            tree = ET.parse(self.file_path)
-            root = tree.getroot()
+            self.tree = ET.parse(self.file_path)
+            root = self.tree.getroot()
             if "fuzzy" in self.file_name:
                 fuzzy = 1
             else:
                 fuzzy = 0
             net = loading_data(self.file_name, fuzzy)
             if self.window.comboBox.currentText() == "Logická Petriho sieť":
+                self.logical_flag = 1
                 w = AnotherWindow()
-                w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,0,0)
+                w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,0,0)
+                
                 #set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,0,0)
-                net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
-                self.run_logical(net, tree, self.file_path)
+       
             elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť":
+                self.fuzzy_flag = 1
                 w = AnotherWindow()
-                w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,0,0)
+                w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,0,0)
+                
                 #set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,0,0)
-                net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
-                self.run_fuzzy(net, tree, self.file_path)
-            elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
-                w = AnotherWindow()
-                w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,1,0)
-                #set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,1,0)
-                net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
-                self.run_fuzzy_with_weights(net, tree, self.file_path)
-            elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
-                w = AnotherWindow()
-                w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,1,1)
-                # do not continue while window w is open (wait for user to close it)
-                while w.isVisible():
-                    time.sleep(0.1)
 
+            elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
+                self.fuzzy_weights_flag = 1
+                w = AnotherWindow()
+                w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,1,0)
+                
+                #set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,1,0)
+     
+            elif self.window.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
+                self.fuzzy_weights_tresholds_flag = 1
+                w = AnotherWindow()
+                w.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,1,1)
                 #set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,1,1)
                 self.TR = net.tresholds
-                net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", fuzzy)
-                self.run_fuzzy_with_weights_and_thresholds(net, tree, self.file_path)
+
         else:
             self.tree = None
             dialog = QMessageBox(text="Nevybrali ste žiadny súbor")
             dialog.setWindowTitle("Message Dialog")
             ret = dialog.exec()   # Stores the return value for the button pressed
+
+    def run_final(self):
+        if self.logical_flag == 1:
+            net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 0)
+            self.run_logical(net, self.tree, self.file_path)
+        elif self.fuzzy_flag == 1:
+            net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1)
+            self.run_fuzzy(net, self.tree, self.file_path)
+        elif self.fuzzy_weights_flag == 1:
+            net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1) 
+            self.run_fuzzy_with_weights(net, self.tree, self.file_path)
+        elif self.fuzzy_weights_tresholds_flag == 1:
+            net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1)
+            self.run_fuzzy_with_weights_and_thresholds(net, self.tree, self.file_path)
 
 
     def prev(self):

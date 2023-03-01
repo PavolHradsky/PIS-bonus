@@ -12,37 +12,37 @@
 		<x>380</x>
 		<y>140</y>
 		<label>prvy prechod</label>
-	<treshold>0</treshold></transition>
+	</transition>
 	<transition>
 		<id>t2</id>
 		<x>300</x>
 		<y>260</y>
 		<label>druhy prechod</label>
-	<treshold>0</treshold></transition>
+	</transition>
 	<transition>
 		<id>t3</id>
 		<x>380</x>
 		<y>300</y>
 		<label>treti prechod</label>
-	<treshold>0</treshold></transition>
+	</transition>
 	<transition>
 		<id>t4</id>
 		<x>540</x>
 		<y>140</y>
 		<label>stvrty prechod</label>
-	<treshold>0</treshold></transition>
+	</transition>
 	<transition>
 		<id>t5</id>
 		<x>580</x>
 		<y>300</y>
 		<label>piaty prechod</label>
-	<treshold>0</treshold></transition>
+	</transition>
 	<transition>
 		<id>t6</id>
 		<x>660</x>
 		<y>140</y>
 		<label>siesty prechod</label>
-	<treshold>0</treshold></transition>
+	</transition>
 	<place>
 		<id>p1</id>
 		<x>260</x>
