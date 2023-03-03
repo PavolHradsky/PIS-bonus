@@ -48,285 +48,6 @@ def reachability(net):
                     return None
     return M
 
-# another window 
-class AnotherWindow(QWidget):
-    loader = QUiLoader()
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.ui = QFile(".\\gui\\anotherwindow.ui")
-        self.ui.open(QFile.ReadOnly)
-        self.window = self.loader.load(self.ui)
-        self.window.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\icon.jpg'))
-        self.window.setGeometry(200, 200, 800, 600)
-        self.window.setFixedSize(1280, 720)
-        self.window.setWindowTitle("Initial marking")
-        self.ui.close()
-        self.window.show()
-        self.logical_flag = False
-        self.fuzzy_flag = False
-        self.fuzzy_weights_flag = False
-        self.fuzzy_weights_tresholds_flag = False
-        self.window.enter.clicked.connect(MainAplication.run_final)
-       
-    def set_marking_initial(self, net, root, fuzzy, file_name, tree, weights, tresholds):
-        dict_weights = {}
-        dict_places = {}
-        dict_transitions = {}
-
-        for place in net.getPlaces():
-            dict_places[place.label] = place.tokens
-        for transition in net.getTransitions():
-            dict_transitions[transition.getId()] = transition.label
-        for i, arc in net.getMultiplicities().items():
-            dict_weights[i] = arc
-
-        entries = {}
-        entries2 = {}
-        entries3 = {}
-        placesLabel = QtWidgets.QLabel("Miesta")
-        placesLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
-        self.window.main.addWidget(placesLabel) 
-     
-        placesLayout = QtWidgets.QVBoxLayout()
-        for i, key in enumerate(dict_places):
-            placeLabel = QtWidgets.QLabel(key)
-            placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-            entry = QtWidgets.QLineEdit()
-            entries[key] = entry
-            okButton = QtWidgets.QPushButton("OK")
-            okButton.clicked.connect(lambda: [set_marking(entries, net,1), delete_text(entries,1)])
-            placeLayout = QtWidgets.QHBoxLayout()
-            placeLayout.addWidget(placeLabel)
-            placeLayout.addWidget(entry)
-            placeLayout.addWidget(okButton)
-            placesLayout.addLayout(placeLayout)
-        
-        self.window.main.addLayout(placesLayout)
-        
-        transitionsLabel = QtWidgets.QLabel("Prechody")
-        transitionsLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
-        self.window.main.addWidget(transitionsLabel)
-
-        transitionsLayout = QtWidgets.QVBoxLayout()
-        for i, key in enumerate(dict_transitions):
-            transitionLabel = QtWidgets.QLabel(dict_transitions[key])
-            transitionLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-            if tresholds:
-                entry2 = QtWidgets.QLineEdit()
-                entries2[key] = entry2
-                okButton2 = QtWidgets.QPushButton("OK")
-                okButton2.clicked.connect(lambda: [set_tresholds(entries2, net,1), delete_text(entries2,1)])
-                transitionLayout = QtWidgets.QHBoxLayout()
-                transitionLayout.addWidget(transitionLabel)
-                transitionLayout.addWidget(entry2)
-                transitionLayout.addWidget(okButton2)
-                transitionsLayout.addLayout(transitionLayout)
-            else:
-                transitionsLayout.addWidget(transitionLabel)
-        self.window.main.addLayout(transitionsLayout)
-        
-        if weights or tresholds:
-            weightsLabel = QtWidgets.QLabel("Váhy")
-            weightsLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
-            self.window.main.addWidget(weightsLabel)
-
-            weightsLayout = QtWidgets.QVBoxLayout()
-            for i, key in enumerate(dict_weights):
-                weightLabel = QtWidgets.QLabel(dict_weights[key])
-                weightLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-                entry3 = QtWidgets.QLineEdit()
-                entries3[key] = entry3
-                okButton3 = QtWidgets.QPushButton("OK")
-                okButton3.clicked.connect(lambda: [set_weights(entries3, net,1), delete_text(entries3,1)])
-                weightLayout = QtWidgets.QHBoxLayout()
-                weightLayout.addWidget(weightLabel)
-                weightLayout.addWidget(entry3)
-                weightLayout.addWidget(okButton3)
-                weightsLayout.addLayout(weightLayout)
-            self.window.main.addLayout(weightsLayout)
-
-        l = 0
-        for rank in root.iter('place'):
-            for value in rank:
-                if value.tag == 'tokens':
-                    if fuzzy:
-                        value.text = str(float(net.M0[l]))
-                    else:
-                        value.text = str(int(net.M0[l]))
-                    l += 1
-        if fuzzy:
-            if tresholds:
-                self.fuzzy_weights_tresholds_flag = True
-                if len(net.tresholds) == 0:
-                    net.tresholds = [0 for _ in range(len(dict_transitions))]
-                    # create new tag to xml to each transition
-                    for i, rank in enumerate(root.iter('transition')):
-                        # addd new tag
-                        new_tag = ET.SubElement(rank, 'treshold')
-                        # add value to new tag
-                        new_tag.text = str(net.tresholds[i])
-                else:
-                    # create new tag to xml to each transition
-                    for i, rank in enumerate(root.iter('transition')):
-                        # addd new tag
-                        new_tag = ET.SubElement(rank, 'treshold')
-                        # add value to new tag
-                        new_tag.text = str(net.tresholds[i])
-            if weights:
-                self.fuzzy_weights_flag = True
-                l = 0
-                if len(net.multiplicities) == 0:
-                    net.multiplicities = [1 for _ in range(len(dict_weights))]
-                    for rank in root.iter('arc'):
-                        for value in rank:
-                            if value.tag == 'multiplicity':
-                                value.text = str(net.multiplicities[l])
-                                l += 1
-                else:
-                    for rank in root.iter('arc'):
-                        for value in rank:
-                            if value.tag == 'multiplicity':
-                                value.text = str(net.multiplicities[l])
-                                l += 1
-            else:
-                self.fuzzy_flag = True
-        else:
-            self.logical_flag = True
-
-        tree.write(file_name + "_marking.xml",
-                encoding="UTF-8", xml_declaration=True)
-        print("Počiatočné označkovanie: ", net.M0)
-        
-
-def delete_text(entries,flag):
-    for _, value in entries.items():
-        if flag == 0:
-            value.delete(0, 'end')
-        else:
-            value.clear()
-
-
-def set_marking(entries,net, flag):
-    if flag == 0:
-        net.M0 = [float(value.get()) if value.get() != '' else 0.0 for _,value in entries.items()]
-    else:
-        net.M0 = [float(value.text()) if value.text() != '' else 0.0 for _,value in entries.items()]
-
-
-def set_tresholds(entries,net, flag):
-    if flag == 0:
-        net.tresholds = [float(value.get()) if value.get() != '' else 0.0 for _,value in entries.items()]
-    else:
-        net.tresholds = [float(value.text()) if value.text() != '' else 0.0 for _,value in entries.items()]
-    
-
-def set_weights(entries,net, flag):
-    if flag == 0:
-        net.multiplicities = [float(value.get()) if value.get() != '' else 1.0 for _,value in entries.items()]
-    else:
-        net.multiplicities = [float(value.text()) if value.text() != '' else 1.0 for _,value in entries.items()]
-
-
-def set_initial_marking(net, root, fuzzy, file_name,tree, weights,tresholds):
-    dict_weights = {}
-    dict_places = {}
-    dict_transitions = {}
-
-    for place in net.getPlaces():
-        dict_places[place.label] = place.tokens
-    for transition in net.getTransitions():
-        dict_transitions[transition.getId()] = transition.label
-    for i, arc in net.getMultiplicities().items():
-        dict_weights[i] = arc
-    # make entry for each key in dict_places in tkinter
-    win = tk.Tk()
-    win.geometry("600x400")
-    mainFrame = ttk.Frame(win)
-    mainFrame.grid(column=1, row=1)
-
-    entries = {}
-    entries2 = {}
-    entries3 = {}
-    ttk.Label(mainFrame, text="Miesta", font=(
-        "Arial", 11, 'bold')).grid(column=1, row=1)
-    for i, key in enumerate(dict_places):
-        ttk.Label(mainFrame, text=key, font=(
-            "Arial", 10, 'bold')).grid(column=1, row=i + 2)
-        
-        entry = ttk.Entry(mainFrame, width=10)
-    
-        entries[key] = entry
-        entries[key].grid(column=2, row=i + 2)
-        # clear entry field after button click
-        ttk.Button(mainFrame, text="OK", command=lambda: [set_marking(entries,net,0), delete_text(entries,0)], width=5).grid(column=3,
-                                                                                                          row=i + 2)
-    ttk.Label(mainFrame, text="Prechody", font=(
-        "Arial", 11, 'bold')).grid(column=4, row=1)
-    for i, key in enumerate(dict_transitions):
-        ttk.Label(mainFrame, text=dict_transitions[key], font=(
-            "Arial", 10, 'bold')).grid(column=4, row=i + 2)
-        if tresholds:
-            entries2[key] = ttk.Entry(mainFrame, width=10)
-            entries2[key].grid(column=5, row=i + 2)
-            ttk.Button(mainFrame, text="OK", command=lambda: [set_tresholds(entries2,net,0), delete_text(entries2,0)], width=5).grid(column=6,
-                                                                                                     row=i + 2)
-    if weights or tresholds:
-        ttk.Label(mainFrame, text="Váhy", font=(
-            "Arial", 11, 'bold')).grid(column=7, row=1)
-        for i, key in enumerate(dict_weights):
-            ttk.Label(mainFrame, text=dict_weights[key], font=(
-                "Arial", 10, 'bold')).grid(column=7, row=i + 2)
-            entries3[key] = ttk.Entry(mainFrame, width=10)
-            entries3[key].grid(column=8, row=i + 2)
-            ttk.Button(mainFrame, text="OK", command=lambda: [set_weights(entries3,net,0), delete_text(entries3,0)], width=5).grid(column=9,
-                                                                                                     row=i + 2)
-    win.mainloop()
-    l = 0
-    for rank in root.iter('place'):
-        for value in rank:
-            if value.tag == 'tokens':
-                if fuzzy:
-                    value.text = str(float(net.M0[l]))
-                else:
-                    value.text = str(int(net.M0[l]))
-                l += 1
-    if fuzzy:
-        if tresholds:
-            if len(net.tresholds) == 0:
-                net.tresholds = [0 for _ in range(len(dict_transitions))]
-                 # create new tag to xml to each transition
-                for i, rank in enumerate(root.iter('transition')):
-                    # addd new tag
-                    new_tag = ET.SubElement(rank, 'treshold')
-                    # add value to new tag
-                    new_tag.text = str(net.tresholds[i])
-            else:
-                # create new tag to xml to each transition
-                for i, rank in enumerate(root.iter('transition')):
-                    # addd new tag
-                    new_tag = ET.SubElement(rank, 'treshold')
-                    # add value to new tag
-                    new_tag.text = str(net.tresholds[i])
-        if weights:
-            l = 0
-            if len(net.multiplicities) == 0:
-                net.multiplicities = [1 for _ in range(len(dict_weights))]
-                for rank in root.iter('arc'):
-                    for value in rank:
-                        if value.tag == 'multiplicity':
-                            value.text = str(net.multiplicities[l])
-                            l += 1
-            else:
-                for rank in root.iter('arc'):
-                    for value in rank:
-                        if value.tag == 'multiplicity':
-                            value.text = str(net.multiplicities[l])
-                            l += 1
-
-    tree.write(file_name + "_marking.xml",
-               encoding="UTF-8", xml_declaration=True)
-    print("Počiatočné označkovanie: ", net.M0)
-
 
 class MainAplication(QtWidgets.QMainWindow):
     loader = QUiLoader()
@@ -342,8 +63,6 @@ class MainAplication(QtWidgets.QMainWindow):
         self.main_layout = self.loader.load(self.ui)
         self.ui.close()
         self.setCentralWidget(self.main_layout)
-
-
         self.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\icon.jpg'))
         self.setGeometry(200, 200, 800, 600)
         self.setWindowTitle("Petri nets")
@@ -374,7 +93,17 @@ class MainAplication(QtWidgets.QMainWindow):
         self.fuzzy_weights_flag = False
         self.fuzzy_weights_tresholds_flag = False
         self.tree = None
-        self.anotherWindow = AnotherWindow()
+
+        self.ui = QFile(".\\gui\\anotherwindow.ui")
+        self.ui.open(QFile.ReadOnly)
+        self.anotherWindow = self.loader.load(self.ui)
+        self.anotherWindow.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\icon.jpg'))
+        self.anotherWindow.setGeometry(200, 200, 800, 600)
+        self.anotherWindow.setFixedSize(1280, 720)
+        self.anotherWindow.setWindowTitle("Initial marking")
+        self.ui.close()
+        self.net = None
+       
         #self.tree = None
 
         if self.image_number == 1:
@@ -389,6 +118,7 @@ class MainAplication(QtWidgets.QMainWindow):
             pixmap = QPixmap.fromImage(prem)
             self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
             self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+            print("resize")
         event.accept()
     
     def open_dialog(self):
@@ -415,57 +145,190 @@ class MainAplication(QtWidgets.QMainWindow):
                 fuzzy = 1
             else:
                 fuzzy = 0
-            net = loading_data(self.file_name, fuzzy)
+            self.net = loading_data(self.file_name, fuzzy)
             if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = True
-                self.anotherWindow = AnotherWindow()
-                self.anotherWindow.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial", self.tree,0,0)
-                
-                #set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,0,0)
+                self.anotherWindow.show()
+                self.set_marking_initial(root, fuzzy, self.file_name.split('.')[0] + "_initial",0,0)
+                self.anotherWindow.enter.clicked.connect(self.run_final)
        
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť":
                 self.fuzzy_flag = True
-                self.anotherWindow = AnotherWindow()
-                self.anotherWindow.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,0,0)
-                
-                #set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,0,0)
+                self.anotherWindow.show()
+                self.set_marking_initial(root, fuzzy, self.file_name.split('.')[0] + "_initial",0,0)
+                self.anotherWindow.enter.clicked.connect(self.run_final)
 
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
                 self.fuzzy_weights_flag = True
-                self.anotherWindow = AnotherWindow()
-                self.anotherWindow.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,1,0)
-                
-                #set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,1,0)
-     
+                self.anotherWindow.show()
+                self.set_marking_initial(root, fuzzy, self.file_name.split('.')[0] + "_initial",1,0)
+                self.anotherWindow.enter.clicked.connect(self.run_final)
+        
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
-            
-                self.anotherWindow.set_marking_initial(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",self.tree,1,1)
-                #set_initial_marking(net, root, fuzzy, self.file_name.split('.')[0] + "_initial",tree,1,1)
-                self.TR = net.tresholds
-                #self.fuzzy_weights_tresholds_flag = True
-                #net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1)
-                #self.run_fuzzy_with_weights_and_thresholds(net, tree, self.file_path)
-
+                self.fuzzy_weights_tresholds_flag = True
+                self.anotherWindow.show()
+                self.set_marking_initial(root, fuzzy, self.file_name.split('.')[0] + "_initial",1,1)
+                self.TR = self.net.tresholds
+                self.anotherWindow.enter.clicked.connect(self.run_final)
         else:
-            #self.tree = None
+            self.tree = None
             dialog = QMessageBox(text="Nevybrali ste žiadny súbor")
             dialog.setWindowTitle("Message Dialog")
             ret = dialog.exec()   # Stores the return value for the button pressed
     
     def run_final(self):
-        if self.anotherWindow.logical_flag:
-            net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 0)
-            self.run_logical(net, self.tree, self.file_path)
-        elif self.anotherWindow.fuzzy_flag:
-            net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1)
-            self.run_fuzzy(net, self.tree, self.file_path)
-        elif self.anotherWindow.fuzzy_weights_flag:
-            net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1) 
-            self.run_fuzzy_with_weights(net, self.tree, self.file_path)
-        elif self.anotherWindow.fuzzy_weights_tresholds_flag:
-            net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1)
-            self.run_fuzzy_with_weights_and_thresholds(net, self.tree, self.file_path)
+        if self.logical_flag:
+            self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 0)
+            self.run_logical(self.net, self.tree, self.file_path)
+        elif self.fuzzy_flag:
+            self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1)
+            self.run_fuzzy(self.net, self.tree, self.file_path)
+        elif self.fuzzy_weights_flag:
+            self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1) 
+            self.run_fuzzy_with_weights(self.net, self.tree, self.file_path)
+        elif self.fuzzy_weights_tresholds_flag:
+            self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1)
+            self.run_fuzzy_with_weights_and_thresholds()
     
+    def set_marking_initial(self, root, fuzzy, file_name, weights, tresholds):
+        dict_weights = {}
+        dict_places = {}
+        dict_transitions = {}
+
+        for place in self.net.getPlaces():
+            dict_places[place.label] = place.tokens
+        for transition in self.net.getTransitions():
+            dict_transitions[transition.getId()] = transition.label
+        for i, arc in self.net.getMultiplicities().items():
+            dict_weights[i] = arc
+
+        entries = {}
+        entries2 = {}
+        entries3 = {}
+        placesLabel = QtWidgets.QLabel("Miesta")
+        placesLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
+        self.anotherWindow.main.addWidget(placesLabel) 
+     
+        placesLayout = QtWidgets.QVBoxLayout()
+        for i, key in enumerate(dict_places):
+            placeLabel = QtWidgets.QLabel(key)
+            placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+            entry = QtWidgets.QLineEdit()
+            entries[key] = entry
+            okButton = QtWidgets.QPushButton("OK")
+            okButton.clicked.connect(lambda: [self.set_marking(entries), self.delete_text(entries)])
+            placeLayout = QtWidgets.QHBoxLayout()
+            placeLayout.addWidget(placeLabel)
+            placeLayout.addWidget(entry)
+            placeLayout.addWidget(okButton)
+            placesLayout.addLayout(placeLayout)
+        
+        self.anotherWindow.main.addLayout(placesLayout)
+        
+        transitionsLabel = QtWidgets.QLabel("Prechody")
+        transitionsLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
+        self.anotherWindow.main.addWidget(transitionsLabel)
+
+        transitionsLayout = QtWidgets.QVBoxLayout()
+        for i, key in enumerate(dict_transitions):
+            transitionLabel = QtWidgets.QLabel(dict_transitions[key])
+            transitionLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+            if tresholds:
+                entry2 = QtWidgets.QLineEdit()
+                entries2[key] = entry2
+                okButton2 = QtWidgets.QPushButton("OK")
+                okButton2.clicked.connect(lambda: [self.set_tresholds(entries2), self.delete_text(entries2)])
+                transitionLayout = QtWidgets.QHBoxLayout()
+                transitionLayout.addWidget(transitionLabel)
+                transitionLayout.addWidget(entry2)
+                transitionLayout.addWidget(okButton2)
+                transitionsLayout.addLayout(transitionLayout)
+            else:
+                transitionsLayout.addWidget(transitionLabel)
+        self.anotherWindow.main.addLayout(transitionsLayout)
+        
+        if weights or tresholds:
+            weightsLabel = QtWidgets.QLabel("Váhy")
+            weightsLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
+            self.anotherWindow.main.addWidget(weightsLabel)
+
+            weightsLayout = QtWidgets.QVBoxLayout()
+            for i, key in enumerate(dict_weights):
+                weightLabel = QtWidgets.QLabel(dict_weights[key])
+                weightLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+                entry3 = QtWidgets.QLineEdit()
+                entries3[key] = entry3
+                okButton3 = QtWidgets.QPushButton("OK")
+                okButton3.clicked.connect(lambda: [self.set_weights(entries3,1), self.delete_text(entries3,1)])
+                weightLayout = QtWidgets.QHBoxLayout()
+                weightLayout.addWidget(weightLabel)
+                weightLayout.addWidget(entry3)
+                weightLayout.addWidget(okButton3)
+                weightsLayout.addLayout(weightLayout)
+            self.anotherWindow.main.addLayout(weightsLayout)
+
+        l = 0
+        for rank in root.iter('place'):
+            for value in rank:
+                if value.tag == 'tokens':
+                    if fuzzy:
+                        value.text = str(float(self.net.M0[l]))
+                    else:
+                        value.text = str(int(self.net.M0[l]))
+                    l += 1
+        if fuzzy:
+            if tresholds:
+                if len(self.net.tresholds) == 0:
+                    self.net.tresholds = [0 for _ in range(len(dict_transitions))]
+                    # create new tag to xml to each transition
+                    for i, rank in enumerate(root.iter('transition')):
+                        # addd new tag
+                        new_tag = ET.SubElement(rank, 'treshold')
+                        # add value to new tag
+                        new_tag.text = str(self.net.tresholds[i])
+                else:
+                    # create new tag to xml to each transition
+                    for i, rank in enumerate(root.iter('transition')):
+                        # addd new tag
+                        new_tag = ET.SubElement(rank, 'treshold')
+                        # add value to new tag
+                        new_tag.text = str(self.net.tresholds[i])
+            if weights:
+                l = 0
+                if len(self.net.multiplicities) == 0:
+                    self.net.multiplicities = [1 for _ in range(len(dict_weights))]
+                    for rank in root.iter('arc'):
+                        for value in rank:
+                            if value.tag == 'multiplicity':
+                                value.text = str(self.net.multiplicities[l])
+                                l += 1
+                else:
+                    for rank in root.iter('arc'):
+                        for value in rank:
+                            if value.tag == 'multiplicity':
+                                value.text = str(self.net.multiplicities[l])
+                                l += 1
+
+        self.tree.write(file_name + "_marking.xml",
+                encoding="UTF-8", xml_declaration=True)
+        print("Počiatočné označkovanie: ", self.net.M0)
+        
+
+    def delete_text(self,entries):
+        for _, value in entries.items():
+            value.clear()
+
+
+    def set_marking(self, entries):
+        self.net.M0 = [float(value.text()) if value.text() != '' else 0.0 for _,value in entries.items()]
+        print(self.net.M0)
+
+    def set_tresholds(self,entries):
+        self.net.tresholds = [float(value.text()) if value.text() != '' else 0.0 for _,value in entries.items()]
+
+    def set_weights(self, entries):
+        self.net.multiplicities = [float(value.text()) if value.text() != '' else 1.0 for _,value in entries.items()]
+
 
     def prev(self):
         if self.image_number > 1:
@@ -892,40 +755,40 @@ class MainAplication(QtWidgets.QMainWindow):
         return net
 
 
-    def fuzzy_petri_net_with_weights_thresholds(self, net, M):
+    def fuzzy_petri_net_with_weights_thresholds(self, M):
         array_steps = []
         Wo = M[0].state
         self.main_layout.marking.setText("( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )")
         self.main_layout.marking.adjustSize()
         self.actual_marking_dict[0] = "( "+', '.join([str(elem) for i,elem in enumerate(Wo)])+" )"
 
-        nRows = len(net.getPlaces())
-        nColumns = len(net.getTransitions())
+        nRows = len(self.net.getPlaces())
+        nColumns = len(self.net.getTransitions())
         inputMatrix = np.array([[0.0 for _ in range(nColumns)]
                             for _ in range(nRows)])
         outputMatrix = np.array([[0.0 for _ in range(nColumns)]
                                 for _ in range(nRows)])
 
         # fill each matrix with the proper data
-        for arc in net.getArcs():
+        for arc in self.net.getArcs():
             sourceId = arc.getSourceId()
             destinationId = arc.getDestinationId()
             source = None
             destination = None
-            if (net.getPlaceById(sourceId) is not None) and (net.getTransitionById(destinationId) is not None):
-                source = net.getPlaceById(sourceId)
-                destination = net.getTransitionById(destinationId)
-            elif (net.getTransitionById(sourceId) is not None) and (net.getPlaceById(destinationId) is not None):
-                source = net.getTransitionById(sourceId)
-                destination = net.getPlaceById(destinationId)
+            if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
+                source = self.net.getPlaceById(sourceId)
+                destination = self.net.getTransitionById(destinationId)
+            elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
+                source = self.net.getTransitionById(sourceId)
+                destination = self.net.getPlaceById(destinationId)
             if type(source) == Place:
-                sourceIdInNetList = net.getPlaces().index(source)
-                destinationIdInNetList = net.getTransitions().index(destination)
+                sourceIdInNetList = self.net.getPlaces().index(source)
+                destinationIdInNetList = self.net.getTransitions().index(destination)
                 inputMatrix[sourceIdInNetList,
                             destinationIdInNetList] = arc.getMultiplicity()
             if type(source) == Transition:
-                sourceIdInNetList = net.getTransitions().index(source)
-                destinationIdInNetList = net.getPlaces().index(destination)
+                sourceIdInNetList = self.net.getTransitions().index(source)
+                destinationIdInNetList = self.net.getPlaces().index(destination)
                 outputMatrix[destinationIdInNetList,
                             sourceIdInNetList] = arc.getMultiplicity()
         Wk = []
@@ -977,12 +840,12 @@ class MainAplication(QtWidgets.QMainWindow):
                     changed_places.append(False)
             previous_place = None
             count_place = 0
-            for place in net.getPlaces():
-                place.tokens = Wk[net.getPlaces().index(place)]
+            for place in self.net.getPlaces():
+                place.tokens = Wk[self.net.getPlaces().index(place)]
                 count_place += 1
-                for arc in net.getArcs():
+                for arc in self.net.getArcs():
                     if arc.getSourceId().__class__ == Place:
-                        previous_place = net.getPlaceById(arc.getSourceId()).label
+                        previous_place = self.net.getPlaceById(arc.getSourceId()).label
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
@@ -992,7 +855,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 array_steps = []
                 actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
                 self.actual_marking_dict[self.image_number-1] = actual_step_marking
-                self.draw_net(net,1,1)
+                self.draw_net(self.net,1,1)
                 self.image_number += 1
                 print("Wk: ", Wk)
         self.image_number = 1
@@ -1000,7 +863,7 @@ class MainAplication(QtWidgets.QMainWindow):
         pixmap = QPixmap.fromImage(prem)
         self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
         self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
-        return net
+        return self.net
     
 
     def run_logical(self, net, tree, file_name):
@@ -1062,19 +925,19 @@ class MainAplication(QtWidgets.QMainWindow):
             dialog.setWindowTitle("Message Dialog")
             ret = dialog.exec()   # Stores the return value for the button pressed
 
-    def run_fuzzy_with_weights_and_thresholds(self, net, tree, file_name):
+    def run_fuzzy_with_weights_and_thresholds(self):
         self.image_number = 1
         self.image_dict = {}
         self.step_dict = {}
         files = glob.glob('./images/*')
         for f in files:
             os.remove(f)
-        M = reachability(net)
+        M = reachability(self.net)
         if M is not None:
-            self.draw_net(net,1,1)
+            self.draw_net(self.net,1,1)
             self.image_number += 1
-            net = self.fuzzy_petri_net_with_weights_thresholds(net, M)
-            tree.write(file_name.split('.')[
+            self.net = self.fuzzy_petri_net_with_weights_thresholds(M)
+            self.tree.write(self.file_name.split('.')[
                         0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
