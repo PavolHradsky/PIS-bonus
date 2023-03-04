@@ -454,15 +454,16 @@ class MainAplication(QtWidgets.QMainWindow):
         self.main_layout.clearAll.setEnabled(False)
 
 
-    def draw_net(self, net,weights,thresholds):
+    def draw_net(self, weights,thresholds):
         G = nx.DiGraph()
         edges = {}
         places = self.net.getPlaces()
         transitions = self.net.getTransitions()
         places_list = []
         tresholds_list = self.net.getThresholds()
+        weights_list = self.net.getWeights()
         transitions_list = []
-        for arc in net.getArcs():
+        for arc in self.net.getArcs():
             G.add_edge(arc.getSourceId(), arc.getDestinationId())
             if arc.src.__class__ == Place:
                 places_list.append(arc.getSourceId())
@@ -592,7 +593,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 array_steps = []
                 actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
                 self.actual_marking_dict[self.image_number-1] = actual_step_marking
-                self.draw_net(self.net,0,0)
+                self.draw_net(0,0)
                 self.image_number += 1
                 print("Wk: ", Wk)
         self.image_number = 1
@@ -699,7 +700,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 array_steps = []
                 actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
                 self.actual_marking_dict[self.image_number-1] = actual_step_marking
-                self.draw_net(self.net,0,0)
+                self.draw_net(0,0)
                 self.image_number += 1
                 print("Wk: ", Wk)
         self.image_number = 1
@@ -803,7 +804,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 array_steps = []
                 actual_step_marking = "( "+', '.join([str(elem) for _,elem in enumerate(Wk)])+" )"
                 self.actual_marking_dict[self.image_number-1] = actual_step_marking
-                self.draw_net(self.net,1,0)
+                self.draw_net(1,0)
                 self.image_number += 1
                 print("Wk: ", Wk)
         self.image_number = 1
@@ -916,7 +917,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 array_steps = []
                 actual_step_marking = "( "+', '.join([str(elem) for i,elem in enumerate(Wk)])+" )"
                 self.actual_marking_dict[self.image_number-1] = actual_step_marking
-                self.draw_net(self.net,1,1)
+                self.draw_net(1,1)
                 self.image_number += 1
                 print("Wk: ", Wk)
         self.image_number = 1
@@ -935,7 +936,7 @@ class MainAplication(QtWidgets.QMainWindow):
             os.remove(f)
         M = reachability(self.net)
         if M is not None:
-            self.draw_net(self.net,0,0)
+            self.draw_net(0,0)
             self.image_number += 1
             self.net = self.logical_petri_net(M)
             self.tree.write(self.file_name.split('.')[
@@ -956,7 +957,7 @@ class MainAplication(QtWidgets.QMainWindow):
             os.remove(f)
         M = reachability(self.net)
         if M is not None:
-            self.draw_net(self.net,0,0)
+            self.draw_net(0,0)
             self.image_number += 1
             self.net = self.fuzzy_petri_net(M)
             self.tree.write(self.file_name.split('.')[
@@ -977,7 +978,7 @@ class MainAplication(QtWidgets.QMainWindow):
             os.remove(f)
         M = reachability(self.net)
         if M is not None:
-            self.draw_net(self.net,1,0)
+            self.draw_net(1,0)
             self.image_number += 1
             print(self.net.weights)
             self.net = self.fuzzy_petri_net_with_weights(M)
@@ -998,7 +999,7 @@ class MainAplication(QtWidgets.QMainWindow):
             os.remove(f)
         M = reachability(self.net)
         if M is not None:
-            self.draw_net(self.net,1,1)
+            self.draw_net(1,1)
             self.image_number += 1
             self.net = self.fuzzy_petri_net_with_weights_thresholds(M)
             self.tree.write(self.file_name.split('.')[
