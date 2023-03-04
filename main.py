@@ -126,7 +126,6 @@ class MainAplication(QtWidgets.QMainWindow):
             self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
         event.accept()
     
-    # TODO loading from directory petri net
     def open_dialog(self):
         fname = QFileDialog.getOpenFileName(
             self, 'Open file', 'c:\\', "XML files (*.xml)")
@@ -277,11 +276,12 @@ class MainAplication(QtWidgets.QMainWindow):
                         # add value to new tag
                         new_tag.text = str(self.net.weights[i])
 
-        self.tree.write(self.file_name.split('.')[0] + "_initial" + "_marking.xml",
+        dir_path = os.path.dirname(self.file_path)
+
+        self.tree.write(os.path.join(dir_path, self.file_name.split('.')[0] + "_initial" + "_marking.xml"),
                 encoding="UTF-8", xml_declaration=True)
         print("Počiatočné označkovanie: ", self.net.M0)
 
-        print(self.weights_flag, self.tresholds_flag, self.fuzzy_flag, self.logical_flag)
         if self.logical_flag and not self.fuzzy_flag and not self.weights_flag and not self.tresholds_flag:
             self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 0,0,0)
             self.run_logical()
@@ -455,8 +455,8 @@ class MainAplication(QtWidgets.QMainWindow):
         self.main_layout.nextButton.setEnabled(True)
         self.main_layout.clearAll.setEnabled(False)
 
-    # TODO add labels values to transitions for tresholds and weights due to "weights" and "tresholds" flags
-    def draw_net(self, weights,thresholds):
+
+    def draw_net(self, weights=False, thresholds=False):
         G = nx.DiGraph()
         edges = {}
         places = self.net.getPlaces()
@@ -481,29 +481,47 @@ class MainAplication(QtWidgets.QMainWindow):
         
         fig = plt.figure()
         nx.draw_networkx_nodes(G, pos, places)
-       
         nx.draw_networkx_labels(
-                G, pos, labels={n: n.tokens for n in places_list}, font_size=6
+            G, pos, labels={n: n.tokens for n in places_list}, font_size=6
+        )
+        
+        nx.draw_networkx_nodes(G, pos, transitions, node_shape='s', node_color='#ff0000')
+        if weights and not thresholds:
+            nx.draw_networkx_labels(
+                G, pos,
+                labels={
+                    n: f"{n.label}\nweight: {weights_list[transitions.index(n)]}"
+                    for n in transitions
+                },
+                font_size=6,
             )
-        
-        nx.draw_networkx_nodes(G, pos, transitions,
-                                node_shape='s', node_color='#ff0000')
-        nx.draw_networkx_labels(
-                G, pos, labels={n: n.label for n in transitions}, font_size=6)
-        
-        for l in pos:  # raise text positions
-            pos[l][1] += 0.08  # probably small value enough
+        elif weights and thresholds:
+            for l in pos:
+                pos[l][1] += 0.08
+            nx.draw_networkx_labels(
+                G, pos,
+                labels={
+                    n: f"{n.label}\nweight: {weights_list[transitions.index(n)]}\nthreshold: {tresholds_list[transitions.index(n)]}"
+                    for n in transitions
+                },
+                font_size=6,
+            )
+        else:
+            nx.draw_networkx_labels(
+                G, pos, labels={n: n.label for n in transitions}, font_size=6
+            )
+
+        for l in pos:
+            pos[l][1] += 0.08
         nx.draw_networkx_labels(
             G, pos, labels={n: n.label for n in places}, font_size=6
         )
-    
+
         nx.draw_networkx_edges(G, pos)
         nx.draw_networkx_edge_labels(G, pos, edge_labels=edges)
         plt.axis('off')
-        #plt.show()
         path = './images/' + str(self.image_number) + '.png'
         fig.savefig(path)
-        
         self.image_dict[self.image_number] = path
         print("path: ", path)
     
@@ -878,7 +896,6 @@ class MainAplication(QtWidgets.QMainWindow):
             Uo = []
             negVo = [round(abs(1 - i), 2) for i in Vo]
             for i in range(len(negVo)):
-                print(self.net.tresholds)
                 if negVo[i] >= self.net.tresholds[i]:
                     Uo.append(negVo[i])
                 else:
@@ -941,8 +958,8 @@ class MainAplication(QtWidgets.QMainWindow):
             self.draw_net(0,0)
             self.image_number += 1
             self.net = self.logical_petri_net(M)
-            self.tree.write(self.file_name.split('.')[
-                        0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+            dir_path = os.path.dirname(self.file_path)
+            self.tree.write(os.path.join(dir_path, self.file_name.split('.')[0] + "_final_marking.xml"), encoding="UTF-8", xml_declaration=True)
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
             dialog.setWindowTitle("Message Dialog")
@@ -962,8 +979,8 @@ class MainAplication(QtWidgets.QMainWindow):
             self.draw_net(0,0)
             self.image_number += 1
             self.net = self.fuzzy_petri_net(M)
-            self.tree.write(self.file_name.split('.')[
-                        0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+            dir_path = os.path.dirname(self.file_path)
+            self.tree.write(os.path.join(dir_path, self.file_name.split('.')[0] + "_final_marking.xml"), encoding="UTF-8", xml_declaration=True)
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
             dialog.setWindowTitle("Message Dialog")
@@ -982,10 +999,9 @@ class MainAplication(QtWidgets.QMainWindow):
         if M is not None:
             self.draw_net(1,0)
             self.image_number += 1
-            print(self.net.weights)
             self.net = self.fuzzy_petri_net_with_weights(M)
-            self.tree.write(self.file_name.split('.')[
-                        0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+            dir_path = os.path.dirname(self.file_path)
+            self.tree.write(os.path.join(dir_path, self.file_name.split('.')[0] + "_final_marking.xml"), encoding="UTF-8", xml_declaration=True)
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
             dialog.setWindowTitle("Message Dialog")
@@ -1004,8 +1020,8 @@ class MainAplication(QtWidgets.QMainWindow):
             self.draw_net(1,1)
             self.image_number += 1
             self.net = self.fuzzy_petri_net_with_weights_thresholds(M)
-            self.tree.write(self.file_name.split('.')[
-                        0] + "_final_marking.xml", encoding="UTF-8", xml_declaration=True)
+            dir_path = os.path.dirname(self.file_path)
+            self.tree.write(os.path.join(dir_path, self.file_name.split('.')[0] + "_final_marking.xml"), encoding="UTF-8", xml_declaration=True)
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
             dialog.setWindowTitle("Message Dialog")

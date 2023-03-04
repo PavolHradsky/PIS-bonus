@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 from typing import List
-
+import os
 from Arc import Arc
 from Item import Item
 from Place import Place
@@ -31,12 +31,12 @@ def read_xml(file_name, fuzzy_flag, weights_flag, treshold_flag):
     :param file_name: name of file
     :return: lists of objects
     """
-    """
+    
     script_path = os.path.dirname(os.path.realpath(__file__))
 
     path_to_file = os.path.join(script_path, 'petri nets', file_name)
-    """
-    tree = ET.parse(file_name)
+    
+    tree = ET.parse(path_to_file)
     root = tree.getroot()
     roles: List[Role] = []
     transitions: List[Transition] = []
