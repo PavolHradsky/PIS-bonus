@@ -45,7 +45,6 @@ def read_xml(file_name, fuzzy_flag, weights_flag, treshold_flag):
 
     for transition in root.findall("transition"):
         if weights_flag and not treshold_flag:
-            print(transition.find("weight").text)
             transitions.append(Transition(transition.find("id").text, transition.find("label").text, transition.find("weight").text, None))
         if weights_flag and treshold_flag:
             transitions.append(Transition(transition.find("id").text, transition.find("label").text, transition.find("weight").text, transition.find("treshold").text))
