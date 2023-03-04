@@ -29,7 +29,7 @@ class PetriNet:
         self.W: List[Arc] = arcs
         self.M0: List[int] = [i.tokens for i in places]
         self.tresholds = []
-        self.multiplicities = []
+        self.weights = []
         self.inputMatrix = None
         self.outputMatrix = None
         self.incidenceMatrix = None
@@ -45,6 +45,9 @@ class PetriNet:
     
     def getMultiplicities(self):
         return self.F
+    
+    def getWeights(self):
+        return self.weights
     
     def getRoles(self):
         return self.R

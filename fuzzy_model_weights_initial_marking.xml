@@ -12,43 +12,43 @@
 		<x>380</x>
 		<y>140</y>
 		<label>prvy prechod</label>
-	<treshold>0</treshold></transition>
+	<treshold>0.0</treshold><weight>0.3</weight><weight>0.3</weight></transition>
 	<transition>
 		<id>t2</id>
 		<x>300</x>
 		<y>260</y>
 		<label>druhy prechod</label>
-	<treshold>0</treshold></transition>
+	<treshold>0.8</treshold><weight>0.5</weight><weight>0.5</weight></transition>
 	<transition>
 		<id>t3</id>
 		<x>380</x>
 		<y>300</y>
 		<label>treti prechod</label>
-	<treshold>0</treshold></transition>
+	<treshold>0.2</treshold><weight>1.0</weight><weight>1.0</weight></transition>
 	<transition>
 		<id>t4</id>
 		<x>540</x>
 		<y>140</y>
 		<label>stvrty prechod</label>
-	<treshold>0</treshold></transition>
+	<treshold>0.0</treshold><weight>0.6</weight><weight>0.6</weight></transition>
 	<transition>
 		<id>t5</id>
 		<x>580</x>
 		<y>300</y>
 		<label>piaty prechod</label>
-	<treshold>0</treshold></transition>
+	<treshold>0.0</treshold><weight>0.9</weight><weight>0.9</weight></transition>
 	<transition>
 		<id>t6</id>
 		<x>660</x>
 		<y>140</y>
 		<label>siesty prechod</label>
-	<treshold>0</treshold></transition>
+	<treshold>0.0</treshold><weight>0.6</weight><weight>0.6</weight></transition>
 	<place>
 		<id>p1</id>
 		<x>260</x>
 		<y>140</y>
 		<label>prve miesto</label>
-		<tokens>1.0</tokens>
+		<tokens>0.4</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -56,7 +56,7 @@
 		<x>260</x>
 		<y>300</y>
 		<label>druhe miesto</label>
-		<tokens>0.0</tokens>
+		<tokens>0.7</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -119,7 +119,7 @@
 		<type>regular</type>
 		<sourceId>t1</sourceId>
 		<destinationId>p5</destinationId>
-		<multiplicity>0.3</multiplicity>
+		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a3</id>
@@ -133,7 +133,7 @@
 		<type>regular</type>
 		<sourceId>t2</sourceId>
 		<destinationId>p3</destinationId>
-		<multiplicity>0.5</multiplicity>
+		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a5</id>
@@ -168,7 +168,7 @@
 		<type>regular</type>
 		<sourceId>t5</sourceId>
 		<destinationId>p7</destinationId>
-		<multiplicity>0.9</multiplicity>
+		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a10</id>
@@ -182,7 +182,7 @@
 		<type>regular</type>
 		<sourceId>t4</sourceId>
 		<destinationId>p6</destinationId>
-		<multiplicity>0.6</multiplicity>
+		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a12</id>
@@ -196,6 +196,6 @@
 		<type>regular</type>
 		<sourceId>t6</sourceId>
 		<destinationId>p8</destinationId>
-		<multiplicity>0.6</multiplicity>
+		<multiplicity>1</multiplicity>
 	</arc>
 </document>

@@ -25,7 +25,7 @@ def get_item_by_name(transitions: List[Transition], places: List[Place], name: s
             return item
 
 
-def read_xml(file_name: str, fuzzy_flag) -> (List[Place], List[Transition], List[Arc]):
+def read_xml(file_name, fuzzy_flag, weights_flag, treshold_flag):
     """
     This function parse xml file to lists of objects: places, transitions and arcs
     :param file_name: name of file
@@ -44,7 +44,13 @@ def read_xml(file_name: str, fuzzy_flag) -> (List[Place], List[Transition], List
     arcs: List[Arc] = []
 
     for transition in root.findall("transition"):
-        transitions.append(Transition(transition.find("id").text, transition.find("label").text))
+        if weights_flag and not treshold_flag:
+            print(transition.find("weight").text)
+            transitions.append(Transition(transition.find("id").text, transition.find("label").text, transition.find("weight").text, None))
+        if weights_flag and treshold_flag:
+            transitions.append(Transition(transition.find("id").text, transition.find("label").text, transition.find("weight").text, transition.find("treshold").text))
+        if not weights_flag and not treshold_flag:
+            transitions.append(Transition(transition.find("id").text, transition.find("label").text, None, None))
 
     for place in root.findall("place"):
         if place.find("label") is None:
