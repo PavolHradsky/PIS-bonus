@@ -1,6 +1,3 @@
-import time
-from tkinter import ttk
-from typing import List
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
@@ -70,7 +67,7 @@ class MainAplication(QtWidgets.QMainWindow):
         self.main_layout = self.loader.load(self.ui)
         self.ui.close()
         self.setCentralWidget(self.main_layout)
-        self.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\icon.jpg'))
+        self.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
         self.setGeometry(200, 200, 800, 600)
         self.setWindowTitle("Petri nets")
        
@@ -99,7 +96,7 @@ class MainAplication(QtWidgets.QMainWindow):
         self.ui = QFile(".\\gui\\anotherwindow.ui")
         self.ui.open(QFile.ReadOnly)
         self.anotherWindow = self.loader.load(self.ui)
-        self.anotherWindow.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\icon.jpg'))
+        self.anotherWindow.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
         self.anotherWindow.setGeometry(200, 200, 800, 600)
         self.anotherWindow.setWindowTitle("Initial marking")
         self.ui.close()
@@ -188,6 +185,7 @@ class MainAplication(QtWidgets.QMainWindow):
             self.tree = None
             dialog = QMessageBox(text="Nevybrali ste žiadny súbor")
             dialog.setWindowTitle("Message Dialog")
+            dialog.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
             ret = dialog.exec()   # Stores the return value for the button pressed
     
     def run_final(self):
@@ -290,7 +288,6 @@ class MainAplication(QtWidgets.QMainWindow):
             self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1,0,0)
             self.run_fuzzy()
         elif self.weights_flag and not self.tresholds_flag and self.fuzzy_flag and not self.logical_flag:
-            print("tu")
             self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1,1,0) 
             self.run_fuzzy_with_weights()
         elif self.weights_flag and self.tresholds_flag and self.fuzzy_flag and not self.logical_flag:
@@ -772,8 +769,6 @@ class MainAplication(QtWidgets.QMainWindow):
             Uo = [round(abs(1 - i), 2) for i in Vo]
             almost_result = []
             sub_result = []
-            print(outputMatrix)
-            print(Uo)
             for i in outputMatrix:
                 for index, k in enumerate(i):
                     sub_result.append(min(k, Uo[index]))
@@ -948,6 +943,7 @@ class MainAplication(QtWidgets.QMainWindow):
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
             dialog.setWindowTitle("Message Dialog")
+            dialog.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
             ret = dialog.exec()   # Stores the return value for the button pressed
             
 
@@ -968,6 +964,7 @@ class MainAplication(QtWidgets.QMainWindow):
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
             dialog.setWindowTitle("Message Dialog")
+            dialog.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
             ret = dialog.exec()   # Stores the return value for the button pressed
 
 
@@ -989,6 +986,7 @@ class MainAplication(QtWidgets.QMainWindow):
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
             dialog.setWindowTitle("Message Dialog")
+            dialog.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
             ret = dialog.exec()   # Stores the return value for the button pressed
 
     def run_fuzzy_with_weights_and_thresholds(self):
@@ -1008,6 +1006,7 @@ class MainAplication(QtWidgets.QMainWindow):
         else:
             dialog = QMessageBox(text="Siet je neohranicena")
             dialog.setWindowTitle("Message Dialog")
+            dialog.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
             ret = dialog.exec()   # Stores the return value for the button pressed
 
 if __name__ == '__main__':
