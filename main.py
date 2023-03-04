@@ -126,6 +126,7 @@ class MainAplication(QtWidgets.QMainWindow):
             self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
         event.accept()
     
+    # TODO loading from directory petri net
     def open_dialog(self):
         fname = QFileDialog.getOpenFileName(
             self, 'Open file', 'c:\\', "XML files (*.xml)")
@@ -294,6 +295,7 @@ class MainAplication(QtWidgets.QMainWindow):
             self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1,1,1)
             self.run_fuzzy_with_weights_and_thresholds()
     
+    # TODO do this in qdesigner ???
     def set_marking_initial(self):
    
         for place in self.net.getPlaces():
@@ -453,7 +455,7 @@ class MainAplication(QtWidgets.QMainWindow):
         self.main_layout.nextButton.setEnabled(True)
         self.main_layout.clearAll.setEnabled(False)
 
-
+    # TODO add labels values to transitions for tresholds and weights due to "weights" and "tresholds" flags
     def draw_net(self, weights,thresholds):
         G = nx.DiGraph()
         edges = {}
