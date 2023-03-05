@@ -20,17 +20,19 @@ import glob
 from PySide6.QtGui import QPixmap, QImage, QResizeEvent
 import matplotlib 
 matplotlib.use('tkagg')
+from database import connect
 
-def loading_data(name_file, fuzzy_flag,weights_flag,threshold_flag):
-    places, transitions, arcs, role = read_xml(name_file, fuzzy_flag,weights_flag,threshold_flag)
+def loading_data(name_file, fuzzy_flag,weights_flag,threshold_flag, flag):
+    places, transitions, arcs, role = read_xml(name_file, fuzzy_flag,weights_flag,threshold_flag, flag)
     net: PetriNet = PetriNet(places, transitions, arcs, role)
-    if weights_flag:
-        net.weights = [float(t.getWeight()) for t in transitions]
-    if threshold_flag:
-        net.tresholds = [float(t.getTreshold()) for t in transitions]
-    if weights_flag and threshold_flag:
-        net.weights = [float(t.getWeight()) for t in transitions]
-        net.tresholds = [float(t.getTreshold()) for t in transitions]
+    if flag:
+        if weights_flag:
+            net.weights = [float(t.getWeight()) for t in transitions]
+        if threshold_flag:
+            net.tresholds = [float(t.getTreshold()) for t in transitions]
+        if weights_flag and threshold_flag:
+            net.weights = [float(t.getWeight()) for t in transitions]
+            net.tresholds = [float(t.getTreshold()) for t in transitions]
     return net
 
 def reachability(net):
@@ -93,7 +95,7 @@ class MainAplication(QtWidgets.QMainWindow):
         self.TR = []
         self.k = 0
         self.tree = None
-        self.ui = QFile(".\\gui\\anotherwindow.ui")
+        self.ui = QFile(".\\gui\\anotherWindowFinal.ui")
         self.ui.open(QFile.ReadOnly)
         self.anotherWindow = self.loader.load(self.ui)
         self.anotherWindow.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
@@ -150,7 +152,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.fuzzy_flag = 1
             else:
                 self.fuzzy_flag = 0
-            self.net = loading_data(self.file_name, self.fuzzy_flag, self.weights_flag, self.tresholds_flag)
+            self.net = loading_data(self.file_name, self.fuzzy_flag, self.weights_flag, self.tresholds_flag,0)
             if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = 1
                 self.fuzzy_flag = 0
@@ -283,21 +285,21 @@ class MainAplication(QtWidgets.QMainWindow):
         print("Počiatočné označkovanie: ", self.net.M0)
 
         if self.logical_flag and not self.fuzzy_flag and not self.weights_flag and not self.tresholds_flag:
-            self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 0,0,0)
+            self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 0,0,0,1)
             self.run_logical()
         elif self.fuzzy_flag and not self.weights_flag and not self.tresholds_flag and not self.logical_flag:
-            self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1,0,0)
+            self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1,0,0,1)
             self.run_fuzzy()
         elif self.weights_flag and not self.tresholds_flag and self.fuzzy_flag and not self.logical_flag:
-            self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1,1,0) 
+            self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1,1,0,1) 
             self.run_fuzzy_with_weights()
         elif self.weights_flag and self.tresholds_flag and self.fuzzy_flag and not self.logical_flag:
-            self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1,1,1)
+            self.net = loading_data(self.file_name.split('.')[0] + "_initial_marking.xml", 1,1,1,1)
             self.run_fuzzy_with_weights_and_thresholds()
     
+
     # TODO do this in qdesigner ???
-    def set_marking_initial(self):
-   
+    def set_marking_initial1(self):
         for place in self.net.getPlaces():
             self.dict_places[place.label] = place.tokens
         for transition in self.net.getTransitions():
@@ -375,8 +377,85 @@ class MainAplication(QtWidgets.QMainWindow):
             okButton3.clicked.connect(lambda: [self.set_tresholds(self.dict_tresholds), self.delete_text(self.dict_tresholds)])
             transitionsLayout.addWidget(okButton3)
             self.anotherWindow.main.addLayout(transitionsLayout)
+
+
+    def set_marking_initial(self):
+        for place in self.net.getPlaces():
+            self.dict_places[place.label] = place.tokens
+        for transition in self.net.getTransitions():
+            self.dict_transitions[transition.getId()] = transition.label
+
+
+        for i, key in enumerate(self.dict_places):
+            placeLabel = QtWidgets.QLabel(key)
+            placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+            entry = QtWidgets.QLineEdit()
+            self.dict_marks[key] = entry
+            placeLayout = QtWidgets.QHBoxLayout()
+            placeLayout.addWidget(placeLabel)
+            placeLayout.addWidget(entry)
+            self.anotherWindow.placesLayout.addLayout(placeLayout)
+        self.anotherWindow.OK1.clicked.connect(lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
         
-       
+        
+        """
+        placesLayout = QtWidgets.QVBoxLayout()
+        placesLabel = QtWidgets.QLabel("Miesta")
+        placesLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
+        placesLayout.addWidget(placesLabel) 
+
+        for i, key in enumerate(self.dict_places):
+            placeLabel = QtWidgets.QLabel(key)
+            placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+            entry = QtWidgets.QLineEdit()
+            self.dict_marks[key] = entry
+            placeLayout = QtWidgets.QHBoxLayout()
+            placeLayout.addWidget(placeLabel)
+            placeLayout.addWidget(entry)
+            placesLayout.addLayout(placeLayout)
+        okButton = QtWidgets.QPushButton("OK")
+        okButton.clicked.connect(lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
+        placesLayout.addWidget(okButton)
+        self.anotherWindow.main.addLayout(placesLayout)
+    
+        transitionsLayout0 = QtWidgets.QVBoxLayout()
+        transitionsLabel0 = QtWidgets.QLabel("Prechody")
+        transitionsLabel0.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
+        transitionsLayout0.addWidget(transitionsLabel0)
+        for i, key in enumerate(self.dict_transitions):
+            transitionLabel0 = QtWidgets.QLabel(self.dict_transitions[key])
+            transitionLabel0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+            transitionLayout0 = QtWidgets.QHBoxLayout()
+            transitionLayout0.addWidget(transitionLabel0)
+            transitionsLayout0.addLayout(transitionLayout0)
+          
+        self.anotherWindow.main.addLayout(transitionsLayout0)
+        """ 
+        if self.weights_flag or self.tresholds_flag:
+            for i, key in enumerate(self.dict_transitions):
+                weightLabel = QtWidgets.QLabel(self.dict_transitions[key])
+                weightLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+                entry2 = QtWidgets.QLineEdit()
+                self.dict_weights[key] = entry2
+                weightLayout = QtWidgets.QHBoxLayout()
+                weightLayout.addWidget(weightLabel)
+                weightLayout.addWidget(entry2)
+                self.anotherWindow.weightsLayout.addLayout(weightLayout)
+            self.anotherWindow.OK2.clicked.connect(lambda: [self.set_weights(self.dict_weights), self.delete_text(self.dict_weights)])
+           
+        if self.tresholds_flag:
+        
+            for i, key in enumerate(self.dict_transitions):
+                transitionLabel = QtWidgets.QLabel(self.dict_transitions[key])
+                transitionLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+                if self.tresholds_flag:
+                    entry3 = QtWidgets.QLineEdit()
+                    self.dict_tresholds[key] = entry3
+                    transitionLayout = QtWidgets.QHBoxLayout()
+                    transitionLayout.addWidget(transitionLabel)
+                    transitionLayout.addWidget(entry3)
+                    self.anotherWindow.transitionsLayout.addLayout(transitionLayout)
+            self.anotherWindow.OK3.clicked.connect(lambda: [self.set_tresholds(self.dict_tresholds), self.delete_text(self.dict_tresholds)])
     
     def delete_text(self,entries):
         for _, value in entries.items():
@@ -1029,6 +1108,7 @@ class MainAplication(QtWidgets.QMainWindow):
             ret = dialog.exec()   # Stores the return value for the button pressed
 
 if __name__ == '__main__':
+    #connect()
     app = QtWidgets.QApplication(sys.argv)
     window = MainAplication()  
     window.show()

@@ -56,7 +56,7 @@
 		<x>260</x>
 		<y>300</y>
 		<label>druhe miesto</label>
-		<tokens>1</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
