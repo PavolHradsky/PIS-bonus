@@ -116,7 +116,6 @@ class MainAplication(QtWidgets.QMainWindow):
             self.main_layout.prevButton.setEnabled(False)
 
     # resize event
-    
     def resizeEvent(self, event):
         # setImage
         if len(self.image_dict)>0:
@@ -260,7 +259,6 @@ class MainAplication(QtWidgets.QMainWindow):
 
 
             if self.weights_flag:
-               
                 if len(self.net.weights) == 0:
                     self.net.weights = [0 for _ in range(len(self.dict_weights))]
                     for i, rank in enumerate(self.root.iter('transition')):
@@ -296,87 +294,6 @@ class MainAplication(QtWidgets.QMainWindow):
             self.run_fuzzy_with_weights_and_thresholds()
     
 
-    # TODO do this in qdesigner ???
-    def set_marking_initial1(self):
-        for place in self.net.getPlaces():
-            self.dict_places[place.label] = place.tokens
-        for transition in self.net.getTransitions():
-            self.dict_transitions[transition.getId()] = transition.label
-
-    
-        placesLayout = QtWidgets.QVBoxLayout()
-        placesLabel = QtWidgets.QLabel("Miesta")
-        placesLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
-        placesLayout.addWidget(placesLabel) 
-
-        for i, key in enumerate(self.dict_places):
-            placeLabel = QtWidgets.QLabel(key)
-            placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-            entry = QtWidgets.QLineEdit()
-            self.dict_marks[key] = entry
-            placeLayout = QtWidgets.QHBoxLayout()
-            placeLayout.addWidget(placeLabel)
-            placeLayout.addWidget(entry)
-            placesLayout.addLayout(placeLayout)
-        okButton = QtWidgets.QPushButton("OK")
-        okButton.clicked.connect(lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
-        placesLayout.addWidget(okButton)
-        self.anotherWindow.main.addLayout(placesLayout)
-
-        transitionsLayout0 = QtWidgets.QVBoxLayout()
-        transitionsLabel0 = QtWidgets.QLabel("Prechody")
-        transitionsLabel0.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
-        transitionsLayout0.addWidget(transitionsLabel0)
-        for i, key in enumerate(self.dict_transitions):
-            transitionLabel0 = QtWidgets.QLabel(self.dict_transitions[key])
-            transitionLabel0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-            transitionLayout0 = QtWidgets.QHBoxLayout()
-            transitionLayout0.addWidget(transitionLabel0)
-            transitionsLayout0.addLayout(transitionLayout0)
-          
-        self.anotherWindow.main.addLayout(transitionsLayout0)
-        
-        if self.weights_flag or self.tresholds_flag:
-            weightsLayout = QtWidgets.QVBoxLayout()
-            weightsLabel = QtWidgets.QLabel("Váhy prechodov")
-            weightsLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
-            weightsLayout.addWidget(weightsLabel)
-            for i, key in enumerate(self.dict_transitions):
-                weightLabel = QtWidgets.QLabel(self.dict_transitions[key])
-                weightLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-                entry2 = QtWidgets.QLineEdit()
-                self.dict_weights[key] = entry2
-                weightLayout = QtWidgets.QHBoxLayout()
-                weightLayout.addWidget(weightLabel)
-                weightLayout.addWidget(entry2)
-                weightsLayout.addLayout(weightLayout)
-            okButton2 = QtWidgets.QPushButton("OK")
-            okButton2.clicked.connect(lambda: [self.set_weights(self.dict_weights), self.delete_text(self.dict_weights)])
-            weightsLayout.addWidget(okButton2)
-            self.anotherWindow.main.addLayout(weightsLayout)
-
-        if self.tresholds_flag:
-            transitionsLayout = QtWidgets.QVBoxLayout()
-            transitionsLabel = QtWidgets.QLabel("Prahy prechodov")
-            transitionsLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
-            transitionsLayout.addWidget(transitionsLabel)
-            
-            for i, key in enumerate(self.dict_transitions):
-                transitionLabel = QtWidgets.QLabel(self.dict_transitions[key])
-                transitionLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-                if self.tresholds_flag:
-                    entry3 = QtWidgets.QLineEdit()
-                    self.dict_tresholds[key] = entry3
-                    transitionLayout = QtWidgets.QHBoxLayout()
-                    transitionLayout.addWidget(transitionLabel)
-                    transitionLayout.addWidget(entry3)
-                    transitionsLayout.addLayout(transitionLayout)
-            okButton3 = QtWidgets.QPushButton("OK")
-            okButton3.clicked.connect(lambda: [self.set_tresholds(self.dict_tresholds), self.delete_text(self.dict_tresholds)])
-            transitionsLayout.addWidget(okButton3)
-            self.anotherWindow.main.addLayout(transitionsLayout)
-
-
     def set_marking_initial(self):
         for place in self.net.getPlaces():
             self.dict_places[place.label] = place.tokens
@@ -384,50 +301,60 @@ class MainAplication(QtWidgets.QMainWindow):
             self.dict_transitions[transition.getId()] = transition.label
         placesLayout = QtWidgets.QVBoxLayout()
         self.anotherWindow.placesWidget.setLayout(placesLayout)
-        # Iterate over the dictionary and add each QLabel and QLineEdit to a QHBoxLayout
         for i, key in enumerate(self.dict_places):
             placeLabel = QtWidgets.QLabel(key)
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
             entry = QtWidgets.QLineEdit()
+            entry.setMaximumWidth(50)
             self.dict_marks[key] = entry
-            placeLayout = QtWidgets.QHBoxLayout()
+            placeLayout = QtWidgets.QVBoxLayout()
             placeLayout.addWidget(placeLabel)
             placeLayout.addWidget(entry)
+            placeLayout.addStretch()
             placesLayout.addLayout(placeLayout)
 
-        # Set the QWidget as the widget for the QScrollArea
+
         self.anotherWindow.placesScrollArea.setWidget(self.anotherWindow.placesWidget)
         self.anotherWindow.OK1.clicked.connect(lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
-        
         if self.fuzzy_flag and not self.weights_flag and not self.tresholds_flag:
+            self.anotherWindow.OK2.hide()
+            self.anotherWindow.OK3.setDisabled(True)
             weightsLayout = QtWidgets.QVBoxLayout()
             self.anotherWindow.weightsWidget.setLayout(weightsLayout)
             self.anotherWindow.weight.setText("Prechody")
             for i, key in enumerate(self.dict_transitions):
                 transitionLabel0 = QtWidgets.QLabel(self.dict_transitions[key])
                 transitionLabel0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-                weightLayout = QtWidgets.QHBoxLayout()
+                weightLayout = QtWidgets.QVBoxLayout()
                 weightLayout.addWidget(transitionLabel0)
                 weightsLayout.addLayout(weightLayout)
             self.anotherWindow.weightsScrollArea.setWidget(self.anotherWindow.weightsWidget)
-            self.anotherWindow.OK2.hide()
-        
-        if self.weights_flag or self.tresholds_flag:
+            
+        if self.weights_flag:
+            self.anotherWindow.OK3.setDisabled(True)
+            self.anotherWindow.OK2.show()
+            self.anotherWindow.weight.setText("Váhy prechodov")
             weightsLayout = QtWidgets.QVBoxLayout()
+            self.anotherWindow.weightsWidget = QtWidgets.QWidget()
             self.anotherWindow.weightsWidget.setLayout(weightsLayout)
             for i, key in enumerate(self.dict_transitions):
                 weightLabel = QtWidgets.QLabel(self.dict_transitions[key])
                 weightLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
                 entry2 = QtWidgets.QLineEdit()
+                entry2.setMaximumWidth(50)
                 self.dict_weights[key] = entry2
-                weightLayout = QtWidgets.QHBoxLayout()
+                weightLayout = QtWidgets.QVBoxLayout()
                 weightLayout.addWidget(weightLabel)
                 weightLayout.addWidget(entry2)
+                weightLayout.addStretch()
                 weightsLayout.addLayout(weightLayout)
             self.anotherWindow.weightsScrollArea.setWidget(self.anotherWindow.weightsWidget)
             self.anotherWindow.OK2.clicked.connect(lambda: [self.set_weights(self.dict_weights), self.delete_text(self.dict_weights)])
         
         if self.tresholds_flag:
+            self.anotherWindow.OK2.show()
+            self.anotherWindow.OK2.setDisabled(False)
+            self.anotherWindow.OK3.setDisabled(False)
             tresholdsLayout = QtWidgets.QVBoxLayout()
             self.anotherWindow.tresholdsWidget = QtWidgets.QWidget()
             self.anotherWindow.tresholdsWidget.setLayout(tresholdsLayout)
@@ -435,10 +362,12 @@ class MainAplication(QtWidgets.QMainWindow):
                 transitionLabel = QtWidgets.QLabel(self.dict_transitions[key])
                 transitionLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
                 entry3 = QtWidgets.QLineEdit()
+                entry3.setMaximumWidth(50)
                 self.dict_tresholds[key] = entry3
-                transitionLayout = QtWidgets.QHBoxLayout()
+                transitionLayout = QtWidgets.QVBoxLayout()
                 transitionLayout.addWidget(transitionLabel)
                 transitionLayout.addWidget(entry3)
+                transitionLayout.addStretch()
                 tresholdsLayout.addLayout(transitionLayout)
             self.anotherWindow.tresholdsScrollArea.setWidget(self.anotherWindow.tresholdsWidget)
             self.anotherWindow.OK3.clicked.connect(lambda: [self.set_tresholds(self.dict_tresholds), self.delete_text(self.dict_tresholds)])
@@ -448,15 +377,49 @@ class MainAplication(QtWidgets.QMainWindow):
             value.setText("")
 
     def set_marking(self, entries):
-        self.net.M0 = [float(value.text()) if value.text() != '' else 0.0 for _,value in entries.items()]
+        M0 = []
+        for _, value in entries.items():
+            if value.text() == '':
+                M0.append(0.0)
+            else:
+                try:
+                    num = float(value.text().replace(',', '.'))
+                    M0.append(num)
+                except ValueError:
+                    QtWidgets.QMessageBox.warning(self, "Invalid Input", "Please enter a valid number.")
+                    return
+        
+        self.net.M0 = M0
 
     def set_tresholds(self,entries):
-        if entries.items():
-            self.net.tresholds = [float(value.text()) if value.text() != '' else 0.0 for _,value in entries.items()]
-            self.TR = self.net.tresholds
+        tresholds = []
+        for _, value in entries.items():
+            if value.text() == '':
+                tresholds.append(0.0)
+            else:
+                try:
+                    num = float(value.text().replace(',', '.'))
+                    tresholds.append(num)
+                except ValueError:
+                    QtWidgets.QMessageBox.warning(self, "Invalid Input", "Please enter a valid number.")
+                    return
+            
+        self.net.tresholds = tresholds
+        self.TR = tresholds
 
     def set_weights(self, entries):
-        self.net.weights = [float(value.text()) if value.text() != '' else 0.0 for _,value in entries.items()]
+        weights = []
+        for _, value in entries.items():
+            if value.text() == '':
+                weights.append(0.0)
+            else:
+                try:
+                    num = float(value.text().replace(',', '.'))
+                    weights.append(num)
+                except ValueError:
+                    QtWidgets.QMessageBox.warning(self, "Invalid Input", "Please enter a valid number.")
+                    return       
+        self.net.weights = weights
 
 
     def prev(self):
