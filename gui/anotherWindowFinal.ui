@@ -277,7 +277,7 @@
           <number>0</number>
          </property>
          <item row="0" column="0">
-          <layout class="QVBoxLayout" name="transitionsLayout_2">
+          <layout class="QVBoxLayout" name="tresholdsLayout">
            <property name="spacing">
             <number>10</number>
            </property>
@@ -320,7 +320,7 @@
              <property name="widgetResizable">
               <bool>true</bool>
              </property>
-             <widget class="QWidget" name="scrollAreaWidgetContents">
+             <widget class="QWidget" name="tresholdsWidget">
               <property name="geometry">
                <rect>
                 <x>0</x>

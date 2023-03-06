@@ -382,7 +382,6 @@ class MainAplication(QtWidgets.QMainWindow):
             self.dict_places[place.label] = place.tokens
         for transition in self.net.getTransitions():
             self.dict_transitions[transition.getId()] = transition.label
-        print(self.fuzzy_flag, self.weights_flag, self.tresholds_flag, self.logical_flag)
         placesLayout = QtWidgets.QVBoxLayout()
         self.anotherWindow.placesWidget.setLayout(placesLayout)
         # Iterate over the dictionary and add each QLabel and QLineEdit to a QHBoxLayout
@@ -400,7 +399,6 @@ class MainAplication(QtWidgets.QMainWindow):
         self.anotherWindow.placesScrollArea.setWidget(self.anotherWindow.placesWidget)
         self.anotherWindow.OK1.clicked.connect(lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
         
-     
         if self.fuzzy_flag and not self.weights_flag and not self.tresholds_flag:
             weightsLayout = QtWidgets.QVBoxLayout()
             self.anotherWindow.weightsWidget.setLayout(weightsLayout)
@@ -410,12 +408,11 @@ class MainAplication(QtWidgets.QMainWindow):
                 transitionLabel0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
                 weightLayout = QtWidgets.QHBoxLayout()
                 weightLayout.addWidget(transitionLabel0)
-                self.anotherWindow.weightsLayout.addLayout(weightLayout)
+                weightsLayout.addLayout(weightLayout)
             self.anotherWindow.weightsScrollArea.setWidget(self.anotherWindow.weightsWidget)
             self.anotherWindow.OK2.hide()
         
         if self.weights_flag or self.tresholds_flag:
-            print("weights_flag")
             weightsLayout = QtWidgets.QVBoxLayout()
             self.anotherWindow.weightsWidget.setLayout(weightsLayout)
             for i, key in enumerate(self.dict_transitions):
@@ -426,11 +423,13 @@ class MainAplication(QtWidgets.QMainWindow):
                 weightLayout = QtWidgets.QHBoxLayout()
                 weightLayout.addWidget(weightLabel)
                 weightLayout.addWidget(entry2)
+                weightsLayout.addLayout(weightLayout)
             self.anotherWindow.weightsScrollArea.setWidget(self.anotherWindow.weightsWidget)
             self.anotherWindow.OK2.clicked.connect(lambda: [self.set_weights(self.dict_weights), self.delete_text(self.dict_weights)])
         
         if self.tresholds_flag:
             tresholdsLayout = QtWidgets.QVBoxLayout()
+            self.anotherWindow.tresholdsWidget = QtWidgets.QWidget()
             self.anotherWindow.tresholdsWidget.setLayout(tresholdsLayout)
             for i, key in enumerate(self.dict_transitions):
                 transitionLabel = QtWidgets.QLabel(self.dict_transitions[key])
@@ -440,6 +439,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 transitionLayout = QtWidgets.QHBoxLayout()
                 transitionLayout.addWidget(transitionLabel)
                 transitionLayout.addWidget(entry3)
+                tresholdsLayout.addLayout(transitionLayout)
             self.anotherWindow.tresholdsScrollArea.setWidget(self.anotherWindow.tresholdsWidget)
             self.anotherWindow.OK3.clicked.connect(lambda: [self.set_tresholds(self.dict_tresholds), self.delete_text(self.dict_tresholds)])
     
