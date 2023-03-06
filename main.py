@@ -72,8 +72,6 @@ class MainAplication(QtWidgets.QMainWindow):
         self.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
         self.setGeometry(200, 200, 800, 600)
         self.setWindowTitle("Petri nets")
-       
-        #self.window.show()
         self.image_number = 1
 
         # bind events to buttons
@@ -384,26 +382,10 @@ class MainAplication(QtWidgets.QMainWindow):
             self.dict_places[place.label] = place.tokens
         for transition in self.net.getTransitions():
             self.dict_transitions[transition.getId()] = transition.label
-
-
-        for i, key in enumerate(self.dict_places):
-            placeLabel = QtWidgets.QLabel(key)
-            placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-            entry = QtWidgets.QLineEdit()
-            self.dict_marks[key] = entry
-            placeLayout = QtWidgets.QHBoxLayout()
-            placeLayout.addWidget(placeLabel)
-            placeLayout.addWidget(entry)
-            self.anotherWindow.placesLayout.addLayout(placeLayout)
-        self.anotherWindow.OK1.clicked.connect(lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
-        
-        
-        """
+        print(self.fuzzy_flag, self.weights_flag, self.tresholds_flag, self.logical_flag)
         placesLayout = QtWidgets.QVBoxLayout()
-        placesLabel = QtWidgets.QLabel("Miesta")
-        placesLabel.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
-        placesLayout.addWidget(placesLabel) 
-
+        self.anotherWindow.placesWidget.setLayout(placesLayout)
+        # Iterate over the dictionary and add each QLabel and QLineEdit to a QHBoxLayout
         for i, key in enumerate(self.dict_places):
             placeLabel = QtWidgets.QLabel(key)
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
@@ -413,25 +395,29 @@ class MainAplication(QtWidgets.QMainWindow):
             placeLayout.addWidget(placeLabel)
             placeLayout.addWidget(entry)
             placesLayout.addLayout(placeLayout)
-        okButton = QtWidgets.QPushButton("OK")
-        okButton.clicked.connect(lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
-        placesLayout.addWidget(okButton)
-        self.anotherWindow.main.addLayout(placesLayout)
-    
-        transitionsLayout0 = QtWidgets.QVBoxLayout()
-        transitionsLabel0 = QtWidgets.QLabel("Prechody")
-        transitionsLabel0.setFont(QtGui.QFont("Arial", 11, QtGui.QFont.Bold))
-        transitionsLayout0.addWidget(transitionsLabel0)
-        for i, key in enumerate(self.dict_transitions):
-            transitionLabel0 = QtWidgets.QLabel(self.dict_transitions[key])
-            transitionLabel0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-            transitionLayout0 = QtWidgets.QHBoxLayout()
-            transitionLayout0.addWidget(transitionLabel0)
-            transitionsLayout0.addLayout(transitionLayout0)
-          
-        self.anotherWindow.main.addLayout(transitionsLayout0)
-        """ 
+
+        # Set the QWidget as the widget for the QScrollArea
+        self.anotherWindow.placesScrollArea.setWidget(self.anotherWindow.placesWidget)
+        self.anotherWindow.OK1.clicked.connect(lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
+        
+     
+        if self.fuzzy_flag and not self.weights_flag and not self.tresholds_flag:
+            weightsLayout = QtWidgets.QVBoxLayout()
+            self.anotherWindow.weightsWidget.setLayout(weightsLayout)
+            self.anotherWindow.weight.setText("Prechody")
+            for i, key in enumerate(self.dict_transitions):
+                transitionLabel0 = QtWidgets.QLabel(self.dict_transitions[key])
+                transitionLabel0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+                weightLayout = QtWidgets.QHBoxLayout()
+                weightLayout.addWidget(transitionLabel0)
+                self.anotherWindow.weightsLayout.addLayout(weightLayout)
+            self.anotherWindow.weightsScrollArea.setWidget(self.anotherWindow.weightsWidget)
+            self.anotherWindow.OK2.hide()
+        
         if self.weights_flag or self.tresholds_flag:
+            print("weights_flag")
+            weightsLayout = QtWidgets.QVBoxLayout()
+            self.anotherWindow.weightsWidget.setLayout(weightsLayout)
             for i, key in enumerate(self.dict_transitions):
                 weightLabel = QtWidgets.QLabel(self.dict_transitions[key])
                 weightLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
@@ -440,21 +426,21 @@ class MainAplication(QtWidgets.QMainWindow):
                 weightLayout = QtWidgets.QHBoxLayout()
                 weightLayout.addWidget(weightLabel)
                 weightLayout.addWidget(entry2)
-                self.anotherWindow.weightsLayout.addLayout(weightLayout)
+            self.anotherWindow.weightsScrollArea.setWidget(self.anotherWindow.weightsWidget)
             self.anotherWindow.OK2.clicked.connect(lambda: [self.set_weights(self.dict_weights), self.delete_text(self.dict_weights)])
-           
-        if self.tresholds_flag:
         
+        if self.tresholds_flag:
+            tresholdsLayout = QtWidgets.QVBoxLayout()
+            self.anotherWindow.tresholdsWidget.setLayout(tresholdsLayout)
             for i, key in enumerate(self.dict_transitions):
                 transitionLabel = QtWidgets.QLabel(self.dict_transitions[key])
                 transitionLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-                if self.tresholds_flag:
-                    entry3 = QtWidgets.QLineEdit()
-                    self.dict_tresholds[key] = entry3
-                    transitionLayout = QtWidgets.QHBoxLayout()
-                    transitionLayout.addWidget(transitionLabel)
-                    transitionLayout.addWidget(entry3)
-                    self.anotherWindow.transitionsLayout.addLayout(transitionLayout)
+                entry3 = QtWidgets.QLineEdit()
+                self.dict_tresholds[key] = entry3
+                transitionLayout = QtWidgets.QHBoxLayout()
+                transitionLayout.addWidget(transitionLabel)
+                transitionLayout.addWidget(entry3)
+            self.anotherWindow.tresholdsScrollArea.setWidget(self.anotherWindow.tresholdsWidget)
             self.anotherWindow.OK3.clicked.connect(lambda: [self.set_tresholds(self.dict_tresholds), self.delete_text(self.dict_tresholds)])
     
     def delete_text(self,entries):
