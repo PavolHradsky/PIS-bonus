@@ -71,7 +71,7 @@ class MainAplication(QtWidgets.QMainWindow):
         self.setCentralWidget(self.main_layout)
         self.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
         self.setGeometry(200, 200, 800, 600)
-        self.setWindowTitle("Petri nets")
+        self.setWindowTitle("Chronické zlyhávanie srdca")
         self.image_number = 1
 
         # bind events to buttons
@@ -98,7 +98,7 @@ class MainAplication(QtWidgets.QMainWindow):
         self.anotherWindow = self.loader.load(self.ui)
         self.anotherWindow.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
         self.anotherWindow.setGeometry(200, 200, 800, 600)
-        self.anotherWindow.setWindowTitle("Initial marking")
+        self.anotherWindow.setWindowTitle("Nastavenie váh a prahov pravidiel")
         self.ui.close()
         self.net = None
         self.root = None
@@ -317,7 +317,7 @@ class MainAplication(QtWidgets.QMainWindow):
         self.anotherWindow.placesScrollArea.setWidget(self.anotherWindow.placesWidget)
         self.anotherWindow.OK1.clicked.connect(lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
         if self.fuzzy_flag and not self.weights_flag and not self.tresholds_flag:
-            self.anotherWindow.OK2.hide()
+            
             self.anotherWindow.OK3.setDisabled(True)
             weightsLayout = QtWidgets.QVBoxLayout()
             self.anotherWindow.weightsWidget.setLayout(weightsLayout)
@@ -329,7 +329,8 @@ class MainAplication(QtWidgets.QMainWindow):
                 weightLayout.addWidget(transitionLabel0)
                 weightsLayout.addLayout(weightLayout)
             self.anotherWindow.weightsScrollArea.setWidget(self.anotherWindow.weightsWidget)
-            
+            self.anotherWindow.OK2.setVisible(False)
+
         if self.weights_flag:
             self.anotherWindow.OK3.setDisabled(True)
             self.anotherWindow.OK2.show()
@@ -380,7 +381,10 @@ class MainAplication(QtWidgets.QMainWindow):
         M0 = []
         for _, value in entries.items():
             if value.text() == '':
-                M0.append(0.0)
+                if self.logical_flag:
+                    M0.append(0)
+                else:
+                    M0.append(0.0)
             else:
                 try:
                     num = float(value.text().replace(',', '.'))
@@ -509,9 +513,14 @@ class MainAplication(QtWidgets.QMainWindow):
         
         fig = plt.figure()
         nx.draw_networkx_nodes(G, pos, places)
-        nx.draw_networkx_labels(
-            G, pos, labels={n: n.tokens for n in places_list}, font_size=6
-        )
+        if self.logical_flag:
+            nx.draw_networkx_labels(
+                G, pos, labels={n: int(n.tokens) for n in places_list}, font_size=6
+            )
+        else:
+            nx.draw_networkx_labels(
+                G, pos, labels={n: n.tokens for n in places_list}, font_size=6
+            )
         
         nx.draw_networkx_nodes(G, pos, transitions, node_shape='s', node_color='#ff0000')
         if weights and not thresholds:
@@ -975,6 +984,7 @@ class MainAplication(QtWidgets.QMainWindow):
     
 
     def run_logical(self):
+        self.net.M0 = [int(i) for i in self.net.M0]
         self.image_number = 1
         self.image_dict = {}
         self.step_dict = {}
@@ -1056,9 +1066,32 @@ class MainAplication(QtWidgets.QMainWindow):
             dialog.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
             ret = dialog.exec()   # Stores the return value for the button pressed
 
+"""
+class DialogWindow(QtWidgets.QDialog):
+    
+    def __init__(self):
+        super().__init__()
+        self.loader = QUiLoader()
+        self.ui = QFile(".\\gui\\patientWindow.ui")
+        self.ui.open(QFile.ReadOnly)
+        self.main_layout = self.loader.load(self.ui)
+        self.ui.close()
+        self.setWindowIcon(QtGui.QIcon('C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
+        self.setFixedSize(300, 100)
+        self.setWindowTitle("Výber pacienta")
+        self.enroll.clicked.connect(self.open_main_application)
+        self.show()
+
+    def open_main_application(self):
+            self.close()
+            self.main_application = MainAplication()
+            self.main_application.show()
+
+"""
 if __name__ == '__main__':
     #connect()
     app = QtWidgets.QApplication(sys.argv)
+    #dialog = DialogWindow()
     window = MainAplication()  
     window.show()
     sys.exit(app.exec())
