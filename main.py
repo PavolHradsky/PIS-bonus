@@ -1,3 +1,4 @@
+import graphviz as gv
 import bcrypt
 from database import connect
 import networkx as nx
@@ -488,6 +489,25 @@ class MainAplication(QtWidgets.QMainWindow):
 
     def draw_net(self, weights=False, thresholds=False):
         G = nx.DiGraph()
+        graph_data = {
+            'places': [],
+            'transitions': [],
+            'tresholds': self.net.getThresholds(),
+            'weights': self.net.getWeights(),
+            'edges': {},
+        }
+        for arc in self.net.getArcs():
+            if isinstance(arc.src, Place):
+                graph_data['places'].append(arc.getSourceId())
+            else:
+                graph_data['transitions'].append(arc.getSourceId())
+            if isinstance(arc.dest, Place):
+                graph_data['places'].append(arc.getDestinationId())
+            else:
+                graph_data['transitions'].append(arc.getDestinationId())
+            graph_data['edges'][(
+                arc.getSourceId(), arc.getDestinationId())] = arc.getMultiplicity()
+
         edges = {}
         places = self.net.getPlaces()
         transitions = self.net.getTransitions()
@@ -1102,30 +1122,26 @@ class DialogWindow(QtWidgets.QDialog):
         self.main_layout.interrupt.clicked.connect(self.main_layout.close)
         self.patient_records = None
         self.patient_problems = None
+        self.hashed = None
         self.main_layout.password.setEchoMode(QtWidgets.QLineEdit.Password)
 
     def open_main_application(self):
         password = self.main_layout.password.text().encode('utf-8')
-        print(password)
-        print(self.main_layout.password.text())
-        hashed = bcrypt.hashpw(password, bcrypt.gensalt())
-        print(hashed)
-        expected_pass = "admin"
-        expected_pass = expected_pass.encode('utf-8')
-        print(expected_pass)
-        print(bcrypt.hashpw(expected_pass, bcrypt.gensalt()))
-
-        if bcrypt.checkpw(expected_pass, hashed) is False:
+        hashed_with_salt = self.hashed[0][1]
+        hashed_str, salt_str = hashed_with_salt.split("+++")
+        salt = salt_str.encode('utf-8')
+        hashed = bcrypt.hashpw(password, salt)
+        if hashed_str.encode('utf-8') == hashed:
+            self.main_layout.close()
+            self.main_application = MainAplication()
+            self.main_application.database_output_table1 = self.patient_records
+            self.main_application.database_output_table2 = self.patient_problems
+            self.main_application.show()
+        else:
             self.main_layout.check.setText("Zadali ste nesprávne heslo")
             self.main_layout.check.setStyleSheet("color: red")
+            self.main_layout.password.clear()
             return
-        self.main_layout.close()
-        self.main_application = MainAplication()
-        print(self.patient_records)
-        print(self.patient_problems)
-        self.main_application.database_output_table1 = self.patient_records
-        self.main_application.database_output_table2 = self.patient_problems
-        self.main_application.show()
 
     def combo_changed(self, index):
         if index >= 0:
@@ -1159,5 +1175,6 @@ if __name__ == '__main__':
     dialog = DialogWindow()
     dialog.database_output_table1 = result
     dialog.database_output_table2 = result1
+    dialog.hashed = result2
     dialog.parsing_database()
     sys.exit(app.exec())
