@@ -118,6 +118,8 @@ class MainAplication(QtWidgets.QMainWindow):
         self.dict_transitions = {}
         self.database_output_table1 = ()
         self.database_output_table2 = ()
+        self.image_index = 0
+        self.dict_final = {}
 
         if self.image_number == 1:
             self.main_layout.prevButton.setEnabled(False)
@@ -496,6 +498,10 @@ class MainAplication(QtWidgets.QMainWindow):
             'weights': self.net.getWeights(),
             'edges': {},
         }
+        tresholds_list = self.net.getThresholds()
+        weights_list = self.net.getWeights()
+        transitions = self.net.getTransitions()
+
         for arc in self.net.getArcs():
             if isinstance(arc.src, Place):
                 graph_data['places'].append(arc.getSourceId())
@@ -507,6 +513,185 @@ class MainAplication(QtWidgets.QMainWindow):
                 graph_data['transitions'].append(arc.getDestinationId())
             graph_data['edges'][(
                 arc.getSourceId(), arc.getDestinationId())] = arc.getMultiplicity()
+
+        for i in graph_data['edges']:
+
+            if isinstance(i[0], Transition):
+
+                if i[0].label not in self.dict_final:
+                    if not weights and not thresholds:
+
+                        self.dict_final[i[0].label] = {
+                            "typ": "t",
+                            "suradnice": [],
+                            "hodnoty": [{
+                                "label": i[0].label,
+                                "image": self.image_index
+                            }],
+                            "sipky": {
+                                "kam": i[1].label,
+                                "hodnota": graph_data['edges'][i]
+                            }
+                        }
+                    if weights and not thresholds:
+                        self.dict_final[i[0].label] = {
+                            "typ": "p",
+                            "suradnice": [],
+                            "hodnoty": [{
+                                "label": i[0].label,
+                                "image": self.image_index,
+                                "vaha": i[0].getWeight()
+                            }],
+                            "sipky": {
+                                "kam": i[1].label,
+                                "hodnota": graph_data['edges'][i]
+
+                            }
+                        }
+                    if thresholds:
+                        self.dict_final[i[0].label] = {
+                            "typ": "p",
+                            "suradnice": [],
+                            "hodnoty": [{
+                                "label": i[0].label,
+                                "image": self.image_index,
+                                "vaha": i[0].getWeight(),
+                                "prah": i[0].getThreshold()
+                            }],
+                            "sipky": {
+                                "kam": i[1].label,
+                                "hodnota": graph_data['edges'][i]
+                            }
+                        }
+                else:
+                    if not weights and not thresholds:
+                        self.dict_final[i[0].label]["hodnoty"].append({
+                            "label": i[0].label,
+                            "image": self.image_index
+
+                        })
+
+                    if weights and not thresholds:
+
+                        self.dict_final[i[0].label]["hodnoty"].append({
+                            "label": i[0].label,
+                            "image": self.image_index,
+                            "vaha": i[0].getWeight()
+                        })
+
+                    if thresholds:
+                        self.dict_final[i[0].label]["hodnoty"].append({
+                            "label": i[0].label,
+                            "image": self.image_index,
+                            "vaha": i[0].getWeight(),
+                            "prah": i[0].getThreshold()
+                        })
+
+            if isinstance(i[0], Place):
+
+                if i[0].label not in self.dict_final:
+
+                    self.dict_final[i[0].label] = {
+                        "typ": "p",
+                        "suradnice": [],
+                        "hodnoty": [{
+                            "label": i[0].label,
+                            "image": self.image_index,
+                            "tokeny": i[0].tokens
+                        }],
+                        "sipky": {
+                            "kam": i[1].label,
+                            "hodnota": graph_data['edges'][i]
+                        }
+                    }
+                else:
+                    self.dict_final[i[0].label]["hodnoty"].append({
+                        "label": i[0].label,
+                        "image": self.image_index,
+                        "tokeny": i[0].tokens
+                    })
+        for i in graph_data['places']:
+            if not self.dict_final.get(i.label):
+                self.dict_final[i.label] = {
+                    "typ": "p",
+                    "suradnice": [],
+                    "hodnoty": [{
+                        "label": i.label,
+                        "image": self.image_index,
+                        "tokeny": i.tokens
+                    }]
+                }
+            else:
+                self.dict_final[i.label]["hodnoty"].append({
+                    "label": i.label,
+                    "image": self.image_index,
+                    "tokeny": i.tokens
+                })
+        for i in graph_data['transitions']:
+            if not self.dict_final.get(i.label):
+                if not weights and not thresholds:
+
+                    self.dict_final[i.label] = {
+                        "typ": "t",
+                        "suradnice": [],
+                        "hodnoty": [{
+                            "label": i.label,
+                            "image": self.image_index
+                        }]
+
+                    }
+                if weights and not thresholds:
+                    self.dict_final[i.label] = {
+                        "typ": "p",
+                        "suradnice": [],
+                        "hodnoty": [{
+                            "label": i.label,
+                            "image": self.image_index,
+                            "vaha": i.getWeight()
+                        }]
+                    }
+                if thresholds:
+                    self.dict_final[i.label] = {
+                        "typ": "p",
+                        "suradnice": [],
+                        "hodnoty": [{
+                            "label": i.label,
+                            "image": self.image_index,
+                            "vaha": i.getWeight(),
+                            "prah": i.getThreshold()
+                        }]
+                    }
+            else:
+                if not weights and not thresholds:
+                    self.dict_final[i.label]["hodnoty"].append({
+                        "label": i.label,
+                        "image": self.image_index
+
+                    })
+
+                if weights and not thresholds:
+
+                    self.dict_final[i.label]["hodnoty"].append({
+                        "label": i.label,
+                        "image": self.image_index,
+                        "vaha": i.getWeight()
+                    })
+
+                if thresholds:
+                    self.dict_final[i.label]["hodnoty"].append({
+                        "label": i.label,
+                        "image": self.image_index,
+                        "vaha": i.getWeight(),
+                        "prah": i.getThreshold()
+                    })
+        self.image_index += 1
+        print(self.image_index)
+        for i in self.dict_final:
+            print(self.dict_final[i])
+            print()
+            print()
+        print()
+        print(self.dict_final)
 
         edges = {}
         places = self.net.getPlaces()
