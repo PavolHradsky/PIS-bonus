@@ -23,6 +23,7 @@ import glob
 from PySide6.QtGui import QPixmap, QImage, QResizeEvent
 import matplotlib
 matplotlib.use('tkagg')
+from math import sin, cos, pi
 
 
 def loading_data(name_file, fuzzy_flag, weights_flag, threshold_flag, flag):
@@ -531,8 +532,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "image": self.image_index
                             }],
                             "sipky": {
-                                "kam": i[1].label,
-                                "hodnota": graph_data['edges'][i]
+                                i[1].label: graph_data['edges'][i]
                             }
                         }
                     if weights and not thresholds:
@@ -545,9 +545,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "vaha": i[0].getWeight()
                             }],
                             "sipky": {
-                                "kam": i[1].label,
-                                "hodnota": graph_data['edges'][i]
-
+                                i[1].label: graph_data['edges'][i]
                             }
                         }
                     if thresholds:
@@ -561,33 +559,40 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "prah": i[0].getTreshold()
                             }],
                             "sipky": {
-                                "kam": i[1].label,
-                                "hodnota": graph_data['edges'][i]
+                                i[1].label: graph_data['edges'][i]
                             }
                         }
                 else:
                     if not weights and not thresholds:
-                        self.dict_final[i[0].label]["hodnoty"].append({
-                            "label": i[0].label,
-                            "image": self.image_index
+                        if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i[0].label]["hodnoty"]):
+                            self.dict_final[i[0].label]["hodnoty"].append({
+                                "label": i[0].label,
+                                "image": self.image_index
 
-                        })
+                            })
+                        if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
+                            self.dict_final[i[0].label]["sipky"][i[1].label] = graph_data['edges'][i]
 
                     if weights and not thresholds:
-
-                        self.dict_final[i[0].label]["hodnoty"].append({
-                            "label": i[0].label,
-                            "image": self.image_index,
-                            "vaha": i[0].getWeight()
-                        })
+                        if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i[0].label]["hodnoty"]):
+                            self.dict_final[i[0].label]["hodnoty"].append({
+                                "label": i[0].label,
+                                "image": self.image_index,
+                                "vaha": i[0].getWeight()
+                            })
+                        if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
+                            self.dict_final[i[0].label]["sipky"][i[1].label] = graph_data['edges'][i]
 
                     if thresholds:
-                        self.dict_final[i[0].label]["hodnoty"].append({
-                            "label": i[0].label,
-                            "image": self.image_index,
-                            "vaha": i[0].getWeight(),
-                            "prah": i[0].getTreshold()
-                        })
+                        if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i[0].label]["hodnoty"]):
+                            self.dict_final[i[0].label]["hodnoty"].append({
+                                "label": i[0].label,
+                                "image": self.image_index,
+                                "vaha": i[0].getWeight(),
+                                "prah": i[0].getTreshold()
+                            })
+                        if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
+                            self.dict_final[i[0].label]["sipky"][i[1].label] = graph_data['edges'][i]
 
             if isinstance(i[0], Place):
 
@@ -601,42 +606,33 @@ class MainAplication(QtWidgets.QMainWindow):
                             "image": self.image_index,
                             "tokeny": i[0].tokens
                         }],
-                        "sipky": [{
-                            "kam": i[1].label,
-                            "hodnota": graph_data['edges'][i]
-                        }]
+                        "sipky": {
+                            i[1].label: graph_data['edges'][i]
+                        }
                     }
                 else:
-                    if self.image_index not in self.dict_final.get(i[0].label):
+                    if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i[0].label]["hodnoty"]):                   
                         self.dict_final[i[0].label]["hodnoty"].append({
                             "label": i[0].label,
                             "image": self.image_index,
                             "tokeny": i[0].tokens
                         })
-                    if i[1] not in self.dict_final.get(i[0].label):
-                        self.dict_final[i[0].label]["sipky"].append({
-                            "kam": i[1].label,
-                            "hodnota": graph_data['edges'][i]
-                        })
+                        print("xxxx")
+                    if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
+                        self.dict_final[i[0].label]["sipky"][i[1].label] = graph_data['edges'][i]
+                    
 
         for i in graph_data['places']:
-
             if not self.dict_final.get(i.label):
                 self.dict_final[i.label] = {
                     "typ": "p",
                     "suradnice": [],
-                    "hodnoty": []
+                    "hodnoty": [{
+                        "label": i.label,
+                        "image": self.image_index,
+                        "tokeny": i.tokens
+                    }]
                 }
-
-                self.places_end.append(i)
-
-        for i in self.places_end:
-
-            self.dict_final[i.label]["hodnoty"].append({
-                "label": i.label,
-                "image": self.image_index,
-                "tokeny": i.tokens
-            })
 
         for i in graph_data['transitions']:
 
@@ -646,7 +642,11 @@ class MainAplication(QtWidgets.QMainWindow):
                     self.dict_final[i.label] = {
                         "typ": "t",
                         "suradnice": [],
-                        "hodnoty": []
+                        "hodnoty": [{
+                    "label": i.label,
+                    "image": self.image_index
+
+                }]
 
                     }
 
@@ -654,47 +654,40 @@ class MainAplication(QtWidgets.QMainWindow):
                     self.dict_final[i.label] = {
                         "typ": "t",
                         "suradnice": [],
-                        "hodnoty": []
+                        "hodnoty": [{
+                    "label": i.label,
+                    "image": self.image_index,
+                    "vaha": i.getWeight()
+                }]
                     }
                 if thresholds:
                     self.dict_final[i.label] = {
                         "typ": "t",
                         "suradnice": [],
-                        "hodnoty": []
-                    }
-                self.transitions_end.append(i)
-
-        for i in self.transitions_end:
-            if not weights and not thresholds:
-                self.dict_final[i.label]["hodnoty"].append({
-                    "label": i.label,
-                    "image": self.image_index
-
-                })
-
-            if weights and not thresholds:
-
-                self.dict_final[i.label]["hodnoty"].append({
-                    "label": i.label,
-                    "image": self.image_index,
-                    "vaha": i.getWeight()
-                })
-
-            if thresholds:
-                self.dict_final[i.label]["hodnoty"].append({
+                        "hodnoty": [{
                     "label": i.label,
                     "image": self.image_index,
                     "vaha": i.getWeight(),
                     "prah": i.getTreshold()
-                })
+                }]
+                    }
+
+        if self.image_index == 1:
+            dict_keys = list(self.dict_final)
+            x = 300
+            y = 300
+            diam = 200
+            amount = len(self.dict_final)
+            angle = 360/amount
+            for i in range(1, amount+1):
+                x1 = diam * cos(angle*i * pi/180)
+                y1 = diam * sin(angle*i * pi/180)
+                self.dict_final[dict_keys[i-1]]["suradnice"] = [round(x + x1), round(y + y1)]
+                print([round(x + x1), round(y + y1)])
+
         self.image_index += 1
-        print(self.image_index)
         for i in self.dict_final:
-            print(self.dict_final[i])
-            print()
-            print()
-        print()
-        print(self.dict_final)
+            print(self.dict_final[i], "\n\n")
 
         edges = {}
         places = self.net.getPlaces()
@@ -1358,11 +1351,13 @@ class DialogWindow(QtWidgets.QDialog):
 
 
 if __name__ == '__main__':
-    result, result1, result2 = connect()
+    #result, result1, result2 = connect()
     app = QtWidgets.QApplication(sys.argv)
-    dialog = DialogWindow()
-    dialog.database_output_table1 = result
-    dialog.database_output_table2 = result1
-    dialog.hashed = result2
-    dialog.parsing_database()
+    window = MainAplication()
+    window.show()
+    # dialog = DialogWindow()
+    # dialog.database_output_table1 = result
+    # dialog.database_output_table2 = result1
+    # dialog.hashed = result2
+    # dialog.parsing_database()
     sys.exit(app.exec())
