@@ -1,5 +1,6 @@
 import graphviz as gv
 import bcrypt
+import cv2
 from database import connect
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -716,7 +717,7 @@ class MainAplication(QtWidgets.QMainWindow):
 
         if self.image_index == 1:
             dict_keys = list(self.dict_final)
-            x = 300
+            x = 350
             y = 300
             diam = 200
             amount = len(self.dict_final)
@@ -803,6 +804,19 @@ class MainAplication(QtWidgets.QMainWindow):
         fig.savefig(path)
         self.image_dict[self.image_number] = path
         print("path: ", path)
+        self.generate_image()
+
+    def generate_image(self):
+        img = np.zeros((600, 700, 3), np.uint8)
+        img.fill(255)
+        
+        for i in self.dict_final:
+            if self.dict_final[i]["typ"] == 'p':
+                cv2.circle(img, (self.dict_final[i]["suradnice"][0], self.dict_final[i]["suradnice"][1]), 15, (0, 0, 0), 2)
+            else:
+                cv2.rectangle(img, (self.dict_final[i]["suradnice"][0]-15, self.dict_final[i]["suradnice"][1]-15), (self.dict_final[i]["suradnice"][0]+15, self.dict_final[i]["suradnice"][1]+15), (0, 0, 0), 2)
+        cv2.imshow("image", img)
+
 
     def logical_petri_net(self, M):
         array_steps = []
