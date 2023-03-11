@@ -617,25 +617,41 @@ class MainAplication(QtWidgets.QMainWindow):
                             "image": self.image_index,
                             "tokeny": i[0].tokens
                         })
-                        print("xxxx")
                     if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
                         self.dict_final[i[0].label]["sipky"][i[1].label] = graph_data['edges'][i]
                     
+        if self.image_index == 1:
+            self.missing_places = []
+            self.missing_transitions = []    
+            for i in graph_data['places']:
+                if not self.dict_final.get(i.label):
+                    self.missing_places.append(i)
+            
+            for i in graph_data['transitions']:
+                if not self.dict_final.get(i.label):
+                    self.missing_transitions.append(i)
 
-        for i in graph_data['places']:
+        for i in self.missing_places:
             if not self.dict_final.get(i.label):
                 self.dict_final[i.label] = {
-                    "typ": "p",
-                    "suradnice": [],
-                    "hodnoty": [{
+                        "typ": "p",
+                        "suradnice": [],
+                        "hodnoty": [{
+                            "label": i.label,
+                            "image": self.image_index,
+                            "tokeny": i.tokens
+                        }],
+                        "sipky": {}
+                    }
+            else:
+                if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i.label]["hodnoty"]):                   
+                    self.dict_final[i.label]["hodnoty"].append({
                         "label": i.label,
                         "image": self.image_index,
                         "tokeny": i.tokens
-                    }]
-                }
+                    })
 
-        for i in graph_data['transitions']:
-
+        for i in self.missing_transitions:
             if not self.dict_final.get(i.label):
                 if not weights and not thresholds:
 
@@ -671,6 +687,32 @@ class MainAplication(QtWidgets.QMainWindow):
                     "prah": i.getTreshold()
                 }]
                     }
+            else:
+                    if not weights and not thresholds:
+                        if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i.label]["hodnoty"]):
+                            self.dict_final[i.label]["hodnoty"].append({
+                                "label": i.label,
+                                "image": self.image_index
+
+                            })
+
+                    if weights and not thresholds:
+                        if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i.label]["hodnoty"]):
+                            self.dict_final[i.label]["hodnoty"].append({
+                                "label": i.label,
+                                "image": self.image_index,
+                                "vaha": i.getWeight()
+                            })
+
+                    if thresholds:
+                        if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i.label]["hodnoty"]):
+                            self.dict_final[i.label]["hodnoty"].append({
+                                "label": i.label,
+                                "image": self.image_index,
+                                "vaha": i.getWeight(),
+                                "prah": i.getTreshold()
+                            })
+            
 
         if self.image_index == 1:
             dict_keys = list(self.dict_final)
