@@ -24,7 +24,7 @@ import glob
 from PySide6.QtGui import QPixmap, QImage, QResizeEvent
 import matplotlib
 matplotlib.use('tkagg')
-from math import sin, cos, pi
+from math import sin, cos, pi, atan2, sqrt
 
 
 def loading_data(name_file, fuzzy_flag, weights_flag, threshold_flag, flag):
@@ -717,18 +717,16 @@ class MainAplication(QtWidgets.QMainWindow):
 
         if self.image_index == 1:
             dict_keys = list(self.dict_final)
-            x = 350
-            y = 300
-            diam = 200
+            x = 600
+            y = 400
+            rad = 300
             amount = len(self.dict_final)
             angle = 360/amount
             for i in range(1, amount+1):
-                x1 = diam * cos(angle*i * pi/180)
-                y1 = diam * sin(angle*i * pi/180)
+                x1 = rad * cos(angle*i * pi/180)
+                y1 = rad * sin(angle*i * pi/180)
                 self.dict_final[dict_keys[i-1]]["suradnice"] = [round(x + x1), round(y + y1)]
-                print([round(x + x1), round(y + y1)])
 
-        self.image_index += 1
         for i in self.dict_final:
             print(self.dict_final[i], "\n\n")
 
@@ -805,17 +803,76 @@ class MainAplication(QtWidgets.QMainWindow):
         self.image_dict[self.image_number] = path
         print("path: ", path)
         self.generate_image()
+        self.image_index += 1
 
     def generate_image(self):
-        img = np.zeros((600, 700, 3), np.uint8)
+        img = np.zeros((800, 1200, 3), np.uint8)
         img.fill(255)
         
         for i in self.dict_final:
+            x1 = self.dict_final[i]["suradnice"][0]
+            y1 = self.dict_final[i]["suradnice"][1]
             if self.dict_final[i]["typ"] == 'p':
-                cv2.circle(img, (self.dict_final[i]["suradnice"][0], self.dict_final[i]["suradnice"][1]), 15, (0, 0, 0), 2)
+                text = str(self.dict_final[i]['hodnoty'][self.image_index-1]['tokeny'])
+                text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+                text_origin = (int(x1 - text_size[0] / 2), int(y1 + text_size[1] / 2))
+                cv2.putText(img, text, text_origin, cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
+                cv2.circle(img, (x1, y1), 30, (0, 0, 0), 2)
+                if self.dict_final[i]['sipky']:
+                    for j in self.dict_final[i]['sipky']:
+                        x2 = self.dict_final[j]["suradnice"][0]
+                        y2 = self.dict_final[j]["suradnice"][1]
+                        radius1 = 32
+                        radius2 = 34
+                        fixed_arrow_length = 3
+                        arrow_tip_size = 3
+                        angle = atan2(y2 - y1, x2 - x1)
+                        point1_x = x1 + radius1 * cos(angle)
+                        point1_y = y1 + radius1 * sin(angle)
+                        point2_x = x2 - radius2 * cos(angle)
+                        point2_y = y2 - radius2 * sin(angle)
+                        distance = sqrt((x2 - x1)**2 + (y2 - y1)**2)
+                        mid_point = (int((point1_x + point2_x) / 2), int((point1_y + point2_y) / 2))
+                        normalized_line_length = distance / fixed_arrow_length
+                        normalized_arrow_tip_size = arrow_tip_size / normalized_line_length
+                        cv2.arrowedLine(img, (int(point1_x), int(point1_y)), 
+                                        (int(point2_x), int(point2_y)), 
+                                        (0, 0, 0), 2, tipLength=normalized_arrow_tip_size)
+                        text = str(self.dict_final[i]['sipky'][j])
+                        text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+                        text_pos = (mid_point[0] - text_size[0] // 2, mid_point[1] + text_size[1] // 2 - 3)
+                        cv2.rectangle(img, (text_pos[0]-2, text_pos[1]+2), (text_pos[0] + text_size[0], text_pos[1] - text_size[1]), (255,255,255), -1)
+                        cv2.putText(img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
             else:
-                cv2.rectangle(img, (self.dict_final[i]["suradnice"][0]-15, self.dict_final[i]["suradnice"][1]-15), (self.dict_final[i]["suradnice"][0]+15, self.dict_final[i]["suradnice"][1]+15), (0, 0, 0), 2)
-        cv2.imshow("image", img)
+                cv2.rectangle(img, (x1 - 30, y1 - 30), (x1 + 30, y1 + 30), (0, 0, 0), 2)
+                if self.dict_final[i]['sipky']:
+                    for j in self.dict_final[i]['sipky']:
+                        x2 = self.dict_final[j]["suradnice"][0]
+                        y2 = self.dict_final[j]["suradnice"][1]
+                        radius1 = 34
+                        radius2 = 32
+                        fixed_arrow_length = 3
+                        arrow_tip_size = 3
+                        angle = atan2(y2 - y1, x2 - x1)
+                        point1_x = x1 + radius1 * cos(angle)
+                        point1_y = y1 + radius1 * sin(angle)
+                        point2_x = x2 - radius2 * cos(angle)
+                        point2_y = y2 - radius2 * sin(angle)
+                        distance = sqrt((x2 - x1)**2 + (y2 - y1)**2)
+                        mid_point = (int((point1_x + point2_x) / 2), int((point1_y + point2_y) / 2))
+                        normalized_line_length = distance / fixed_arrow_length
+                        normalized_arrow_tip_size = arrow_tip_size / normalized_line_length
+                        cv2.arrowedLine(img, (int(point1_x), int(point1_y)),
+                                        (int(point2_x), int(point2_y)),
+                                        (0, 0, 0), 2, tipLength=normalized_arrow_tip_size)
+                        text = str(self.dict_final[i]['sipky'][j])
+                        text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+                        text_pos = (mid_point[0] - text_size[0] // 2, mid_point[1] + text_size[1] // 2 - 3)
+                        cv2.rectangle(img, (text_pos[0]-2, text_pos[1]+2), (text_pos[0] + text_size[0], text_pos[1] - text_size[1]), (255,255,255), -1)
+                        cv2.putText(img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
+                        
+        cv2.imwrite(f"./images/image_{self.image_index}.png", img)
+
 
 
     def logical_petri_net(self, M):
