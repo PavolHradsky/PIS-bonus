@@ -1,3 +1,4 @@
+from math import sin, cos, pi, atan2, sqrt
 import graphviz as gv
 import bcrypt
 import cv2
@@ -24,7 +25,6 @@ import glob
 from PySide6.QtGui import QPixmap, QImage, QResizeEvent
 import matplotlib
 matplotlib.use('tkagg')
-from math import sin, cos, pi, atan2, sqrt
 
 
 def loading_data(name_file, fuzzy_flag, weights_flag, threshold_flag, flag):
@@ -124,6 +124,7 @@ class MainAplication(QtWidgets.QMainWindow):
         self.dict_final = {}
         self.places_end = []
         self.transitions_end = []
+        self.transitions_to_change = []
 
         if self.image_number == 1:
             self.main_layout.prevButton.setEnabled(False)
@@ -530,7 +531,8 @@ class MainAplication(QtWidgets.QMainWindow):
                             "suradnice": [],
                             "hodnoty": [{
                                 "label": i[0].label,
-                                "image": self.image_index
+                                "image": self.image_index,
+                                "farba": True if i[0].label in self.transitions_to_change else False
                             }],
                             "sipky": {
                                 i[1].label: graph_data['edges'][i]
@@ -543,7 +545,8 @@ class MainAplication(QtWidgets.QMainWindow):
                             "hodnoty": [{
                                 "label": i[0].label,
                                 "image": self.image_index,
-                                "vaha": i[0].getWeight()
+                                "vaha": i[0].getWeight(),
+                                "farba": True if i[0].label in self.transitions_to_change else False
                             }],
                             "sipky": {
                                 i[1].label: graph_data['edges'][i]
@@ -557,7 +560,8 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "label": i[0].label,
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
-                                "prah": i[0].getTreshold()
+                                "prah": i[0].getTreshold(),
+                                "farba": True if i[0].label in self.transitions_to_change else False
                             }],
                             "sipky": {
                                 i[1].label: graph_data['edges'][i]
@@ -568,21 +572,25 @@ class MainAplication(QtWidgets.QMainWindow):
                         if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i[0].label]["hodnoty"]):
                             self.dict_final[i[0].label]["hodnoty"].append({
                                 "label": i[0].label,
-                                "image": self.image_index
+                                "image": self.image_index,
+                                "farba": True if i[0].label in self.transitions_to_change else False
 
                             })
                         if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
-                            self.dict_final[i[0].label]["sipky"][i[1].label] = graph_data['edges'][i]
+                            self.dict_final[i[0].label]["sipky"][i[1]
+                                                                 .label] = graph_data['edges'][i]
 
                     if weights and not thresholds:
                         if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i[0].label]["hodnoty"]):
                             self.dict_final[i[0].label]["hodnoty"].append({
                                 "label": i[0].label,
                                 "image": self.image_index,
-                                "vaha": i[0].getWeight()
+                                "vaha": i[0].getWeight(),
+                                "farba": True if i[0].label in self.transitions_to_change else False
                             })
                         if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
-                            self.dict_final[i[0].label]["sipky"][i[1].label] = graph_data['edges'][i]
+                            self.dict_final[i[0].label]["sipky"][i[1]
+                                                                 .label] = graph_data['edges'][i]
 
                     if thresholds:
                         if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i[0].label]["hodnoty"]):
@@ -590,10 +598,12 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "label": i[0].label,
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
-                                "prah": i[0].getTreshold()
+                                "prah": i[0].getTreshold(),
+                                "farba": True if i[0].label in self.transitions_to_change else False
                             })
                         if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
-                            self.dict_final[i[0].label]["sipky"][i[1].label] = graph_data['edges'][i]
+                            self.dict_final[i[0].label]["sipky"][i[1]
+                                                                 .label] = graph_data['edges'][i]
 
             if isinstance(i[0], Place):
 
@@ -612,22 +622,23 @@ class MainAplication(QtWidgets.QMainWindow):
                         }
                     }
                 else:
-                    if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i[0].label]["hodnoty"]):                   
+                    if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i[0].label]["hodnoty"]):
                         self.dict_final[i[0].label]["hodnoty"].append({
                             "label": i[0].label,
                             "image": self.image_index,
                             "tokeny": i[0].tokens
                         })
                     if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
-                        self.dict_final[i[0].label]["sipky"][i[1].label] = graph_data['edges'][i]
-                    
+                        self.dict_final[i[0].label]["sipky"][i[1]
+                                                             .label] = graph_data['edges'][i]
+
         if self.image_index == 1:
             self.missing_places = []
-            self.missing_transitions = []    
+            self.missing_transitions = []
             for i in graph_data['places']:
                 if not self.dict_final.get(i.label):
                     self.missing_places.append(i)
-            
+
             for i in graph_data['transitions']:
                 if not self.dict_final.get(i.label):
                     self.missing_transitions.append(i)
@@ -635,17 +646,17 @@ class MainAplication(QtWidgets.QMainWindow):
         for i in self.missing_places:
             if not self.dict_final.get(i.label):
                 self.dict_final[i.label] = {
-                        "typ": "p",
-                        "suradnice": [],
-                        "hodnoty": [{
-                            "label": i.label,
-                            "image": self.image_index,
-                            "tokeny": i.tokens
-                        }],
-                        "sipky": {}
-                    }
+                    "typ": "p",
+                    "suradnice": [],
+                    "hodnoty": [{
+                        "label": i.label,
+                        "image": self.image_index,
+                        "tokeny": i.tokens
+                    }],
+                    "sipky": {}
+                }
             else:
-                if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i.label]["hodnoty"]):                   
+                if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i.label]["hodnoty"]):
                     self.dict_final[i.label]["hodnoty"].append({
                         "label": i.label,
                         "image": self.image_index,
@@ -660,10 +671,10 @@ class MainAplication(QtWidgets.QMainWindow):
                         "typ": "t",
                         "suradnice": [],
                         "hodnoty": [{
-                    "label": i.label,
-                    "image": self.image_index
-
-                }]
+                            "label": i.label,
+                            "image": self.image_index,
+                            "farba": True if i[0].label in self.transitions_to_change else False
+                        }]
 
                     }
 
@@ -672,48 +683,51 @@ class MainAplication(QtWidgets.QMainWindow):
                         "typ": "t",
                         "suradnice": [],
                         "hodnoty": [{
-                    "label": i.label,
-                    "image": self.image_index,
-                    "vaha": i.getWeight()
-                }]
+                            "label": i.label,
+                            "image": self.image_index,
+                            "vaha": i.getWeight(),
+                            "farba": True if i[0].label in self.transitions_to_change else False
+                        }]
                     }
                 if thresholds:
                     self.dict_final[i.label] = {
                         "typ": "t",
                         "suradnice": [],
                         "hodnoty": [{
-                    "label": i.label,
-                    "image": self.image_index,
-                    "vaha": i.getWeight(),
-                    "prah": i.getTreshold()
-                }]
+                            "label": i.label,
+                            "image": self.image_index,
+                            "vaha": i.getWeight(),
+                            "prah": i.getTreshold(),
+                            "farba": True if i[0].label in self.transitions_to_change else False
+                        }]
                     }
             else:
-                    if not weights and not thresholds:
-                        if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i.label]["hodnoty"]):
-                            self.dict_final[i.label]["hodnoty"].append({
-                                "label": i.label,
-                                "image": self.image_index
+                if not weights and not thresholds:
+                    if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i.label]["hodnoty"]):
+                        self.dict_final[i.label]["hodnoty"].append({
+                            "label": i.label,
+                            "image": self.image_index,
+                            "farba": True if i[0].label in self.transitions_to_change else False
+                        })
 
-                            })
+                if weights and not thresholds:
+                    if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i.label]["hodnoty"]):
+                        self.dict_final[i.label]["hodnoty"].append({
+                            "label": i.label,
+                            "image": self.image_index,
+                            "vaha": i.getWeight(),
+                            "farba": True if i[0].label in self.transitions_to_change else False
+                        })
 
-                    if weights and not thresholds:
-                        if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i.label]["hodnoty"]):
-                            self.dict_final[i.label]["hodnoty"].append({
-                                "label": i.label,
-                                "image": self.image_index,
-                                "vaha": i.getWeight()
-                            })
-
-                    if thresholds:
-                        if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i.label]["hodnoty"]):
-                            self.dict_final[i.label]["hodnoty"].append({
-                                "label": i.label,
-                                "image": self.image_index,
-                                "vaha": i.getWeight(),
-                                "prah": i.getTreshold()
-                            })
-            
+                if thresholds:
+                    if not True in map(lambda value: True if value['image'] == self.image_index else False, self.dict_final[i.label]["hodnoty"]):
+                        self.dict_final[i.label]["hodnoty"].append({
+                            "label": i.label,
+                            "image": self.image_index,
+                            "vaha": i.getWeight(),
+                            "prah": i.getTreshold(),
+                            "farba": True if i[0].label in self.transitions_to_change else False
+                        })
 
         if self.image_index == 1:
             dict_keys = list(self.dict_final)
@@ -725,7 +739,8 @@ class MainAplication(QtWidgets.QMainWindow):
             for i in range(1, amount+1):
                 x1 = rad * cos(angle*i * pi/180)
                 y1 = rad * sin(angle*i * pi/180)
-                self.dict_final[dict_keys[i-1]]["suradnice"] = [round(x + x1), round(y + y1)]
+                self.dict_final[dict_keys[i-1]
+                                ]["suradnice"] = [round(x + x1), round(y + y1)]
 
         for i in self.dict_final:
             print(self.dict_final[i], "\n\n")
@@ -808,15 +823,19 @@ class MainAplication(QtWidgets.QMainWindow):
     def generate_image(self):
         img = np.zeros((800, 1200, 3), np.uint8)
         img.fill(255)
-        
+
         for i in self.dict_final:
             x1 = self.dict_final[i]["suradnice"][0]
             y1 = self.dict_final[i]["suradnice"][1]
             if self.dict_final[i]["typ"] == 'p':
-                text = str(self.dict_final[i]['hodnoty'][self.image_index-1]['tokeny'])
-                text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
-                text_origin = (int(x1 - text_size[0] / 2), int(y1 + text_size[1] / 2))
-                cv2.putText(img, text, text_origin, cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
+                text = str(self.dict_final[i]['hodnoty']
+                           [self.image_index-1]['tokeny'])
+                text_size, _ = cv2.getTextSize(
+                    text, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+                text_origin = (
+                    int(x1 - text_size[0] / 2), int(y1 + text_size[1] / 2))
+                cv2.putText(img, text, text_origin,
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
                 cv2.circle(img, (x1, y1), 30, (0, 0, 0), 2)
                 if self.dict_final[i]['sipky']:
                     for j in self.dict_final[i]['sipky']:
@@ -832,19 +851,25 @@ class MainAplication(QtWidgets.QMainWindow):
                         point2_x = x2 - radius2 * cos(angle)
                         point2_y = y2 - radius2 * sin(angle)
                         distance = sqrt((x2 - x1)**2 + (y2 - y1)**2)
-                        mid_point = (int((point1_x + point2_x) / 2), int((point1_y + point2_y) / 2))
+                        mid_point = (int((point1_x + point2_x) / 2),
+                                     int((point1_y + point2_y) / 2))
                         normalized_line_length = distance / fixed_arrow_length
                         normalized_arrow_tip_size = arrow_tip_size / normalized_line_length
-                        cv2.arrowedLine(img, (int(point1_x), int(point1_y)), 
-                                        (int(point2_x), int(point2_y)), 
+                        cv2.arrowedLine(img, (int(point1_x), int(point1_y)),
+                                        (int(point2_x), int(point2_y)),
                                         (0, 0, 0), 2, tipLength=normalized_arrow_tip_size)
                         text = str(self.dict_final[i]['sipky'][j])
-                        text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
-                        text_pos = (mid_point[0] - text_size[0] // 2, mid_point[1] + text_size[1] // 2 - 3)
-                        cv2.rectangle(img, (text_pos[0]-2, text_pos[1]+2), (text_pos[0] + text_size[0], text_pos[1] - text_size[1]), (255,255,255), -1)
-                        cv2.putText(img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
+                        text_size, _ = cv2.getTextSize(
+                            text, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+                        text_pos = (
+                            mid_point[0] - text_size[0] // 2, mid_point[1] + text_size[1] // 2 - 3)
+                        cv2.rectangle(img, (text_pos[0]-2, text_pos[1]+2), (text_pos[0] +
+                                      text_size[0], text_pos[1] - text_size[1]), (255, 255, 255), -1)
+                        cv2.putText(
+                            img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
             else:
-                cv2.rectangle(img, (x1 - 30, y1 - 30), (x1 + 30, y1 + 30), (0, 0, 0), 2)
+                cv2.rectangle(img, (x1 - 30, y1 - 30),
+                              (x1 + 30, y1 + 30), (0, 0, 0), 2)
                 if self.dict_final[i]['sipky']:
                     for j in self.dict_final[i]['sipky']:
                         x2 = self.dict_final[j]["suradnice"][0]
@@ -859,21 +884,24 @@ class MainAplication(QtWidgets.QMainWindow):
                         point2_x = x2 - radius2 * cos(angle)
                         point2_y = y2 - radius2 * sin(angle)
                         distance = sqrt((x2 - x1)**2 + (y2 - y1)**2)
-                        mid_point = (int((point1_x + point2_x) / 2), int((point1_y + point2_y) / 2))
+                        mid_point = (int((point1_x + point2_x) / 2),
+                                     int((point1_y + point2_y) / 2))
                         normalized_line_length = distance / fixed_arrow_length
                         normalized_arrow_tip_size = arrow_tip_size / normalized_line_length
                         cv2.arrowedLine(img, (int(point1_x), int(point1_y)),
                                         (int(point2_x), int(point2_y)),
                                         (0, 0, 0), 2, tipLength=normalized_arrow_tip_size)
                         text = str(self.dict_final[i]['sipky'][j])
-                        text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
-                        text_pos = (mid_point[0] - text_size[0] // 2, mid_point[1] + text_size[1] // 2 - 3)
-                        cv2.rectangle(img, (text_pos[0]-2, text_pos[1]+2), (text_pos[0] + text_size[0], text_pos[1] - text_size[1]), (255,255,255), -1)
-                        cv2.putText(img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
-                        
+                        text_size, _ = cv2.getTextSize(
+                            text, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+                        text_pos = (
+                            mid_point[0] - text_size[0] // 2, mid_point[1] + text_size[1] // 2 - 3)
+                        cv2.rectangle(img, (text_pos[0]-2, text_pos[1]+2), (text_pos[0] +
+                                      text_size[0], text_pos[1] - text_size[1]), (255, 255, 255), -1)
+                        cv2.putText(
+                            img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
+
         cv2.imwrite(f"./images/image_{self.image_index}.png", img)
-
-
 
     def logical_petri_net(self, M):
         array_steps = []
@@ -946,6 +974,7 @@ class MainAplication(QtWidgets.QMainWindow):
                     changed_places.append(False)
             previous_place = None
             count_place = 0
+            self.transitions_to_change = []
             for place in self.net.getPlaces():
                 place.tokens = Wk[self.net.getPlaces().index(place)]
                 count_place += 1
@@ -954,9 +983,12 @@ class MainAplication(QtWidgets.QMainWindow):
                         previous_place = self.net.getPlaceById(
                             arc.getSourceId()).label
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
+                        self.transitions_to_change.append(arc.src.label)
+                    if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
                         print(result_string)
+            print("transitions_to_change: ", self.transitions_to_change)
             if Wk != Wo:
                 self.step_dict[self.image_number-1] = array_steps
                 array_steps = []
@@ -1056,6 +1088,7 @@ class MainAplication(QtWidgets.QMainWindow):
                     changed_places.append(False)
             previous_place = None
             count_place = 0
+            self.transitions_to_change = []
             for place in self.net.getPlaces():
                 place.tokens = Wk[self.net.getPlaces().index(place)]
                 count_place += 1
@@ -1063,10 +1096,13 @@ class MainAplication(QtWidgets.QMainWindow):
                     if arc.getSourceId().__class__ == Place:
                         previous_place = self.net.getPlaceById(
                             arc.getSourceId()).label
+                    if changed_places[count_place - 1] and arc.dest.name == place.name:
+                        self.transitions_to_change.append(arc.src.label)
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
                         print(result_string)
+            print("transitions_to_change: ", self.transitions_to_change)
             if Wk != Wo:
                 self.step_dict[self.image_number-1] = array_steps
                 array_steps = []
@@ -1165,6 +1201,7 @@ class MainAplication(QtWidgets.QMainWindow):
                     changed_places.append(False)
             previous_place = None
             count_place = 0
+            self.transitions_to_change = []
             for place in self.net.getPlaces():
                 place.tokens = Wk[self.net.getPlaces().index(place)]
                 count_place += 1
@@ -1172,10 +1209,13 @@ class MainAplication(QtWidgets.QMainWindow):
                     if arc.getSourceId().__class__ == Place:
                         previous_place = self.net.getPlaceById(
                             arc.getSourceId()).label
+                    if changed_places[count_place - 1] and arc.dest.name == place.name:
+                        self.transitions_to_change.append(arc.src.label)
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
                         print(result_string)
+            print("transitions_to_change: ", self.transitions_to_change)
             if Wk != Wo:
                 self.step_dict[self.image_number-1] = array_steps
                 array_steps = []
@@ -1280,6 +1320,7 @@ class MainAplication(QtWidgets.QMainWindow):
                     changed_places.append(False)
             previous_place = None
             count_place = 0
+            self.transitions_to_change = []
             for place in self.net.getPlaces():
                 place.tokens = Wk[self.net.getPlaces().index(place)]
                 count_place += 1
@@ -1287,10 +1328,13 @@ class MainAplication(QtWidgets.QMainWindow):
                     if arc.getSourceId().__class__ == Place:
                         previous_place = self.net.getPlaceById(
                             arc.getSourceId()).label
+                    if changed_places[count_place - 1] and arc.dest.name == place.name:
+                        self.transitions_to_change.append(arc.src.label)
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
                         print(result_string)
+            print("transitions_to_change: ", self.transitions_to_change)
             if Wk != Wo:
                 self.step_dict[self.image_number-1] = array_steps
                 array_steps = []
