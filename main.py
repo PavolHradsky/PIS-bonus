@@ -118,8 +118,10 @@ class MainAplication(QtWidgets.QMainWindow):
         self.dict_transitions = {}
         self.database_output_table1 = ()
         self.database_output_table2 = ()
-        self.image_index = 0
+        self.image_index = 1
         self.dict_final = {}
+        self.places_end = []
+        self.transitions_end = []
 
         if self.image_number == 1:
             self.main_layout.prevButton.setEnabled(False)
@@ -252,7 +254,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             new_tag = ET.SubElement(rank, 'weight')
                             new_tag.text = str(self.net.weights[i])
 
-            if self.weights_flag:
+            if self.weights_flag and not self.tresholds_flag:
                 if len(self.net.weights) == 0:
                     self.net.weights = [
                         0 for _ in range(len(self.dict_weights))]
@@ -515,7 +517,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 arc.getSourceId(), arc.getDestinationId())] = arc.getMultiplicity()
 
         for i in graph_data['edges']:
-
+            print(i[0])
             if isinstance(i[0], Transition):
 
                 if i[0].label not in self.dict_final:
@@ -535,7 +537,7 @@ class MainAplication(QtWidgets.QMainWindow):
                         }
                     if weights and not thresholds:
                         self.dict_final[i[0].label] = {
-                            "typ": "p",
+                            "typ": "t",
                             "suradnice": [],
                             "hodnoty": [{
                                 "label": i[0].label,
@@ -550,13 +552,13 @@ class MainAplication(QtWidgets.QMainWindow):
                         }
                     if thresholds:
                         self.dict_final[i[0].label] = {
-                            "typ": "p",
+                            "typ": "t",
                             "suradnice": [],
                             "hodnoty": [{
                                 "label": i[0].label,
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
-                                "prah": i[0].getThreshold()
+                                "prah": i[0].getTreshold()
                             }],
                             "sipky": {
                                 "kam": i[1].label,
@@ -584,7 +586,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "label": i[0].label,
                             "image": self.image_index,
                             "vaha": i[0].getWeight(),
-                            "prah": i[0].getThreshold()
+                            "prah": i[0].getTreshold()
                         })
 
             if isinstance(i[0], Place):
@@ -599,91 +601,92 @@ class MainAplication(QtWidgets.QMainWindow):
                             "image": self.image_index,
                             "tokeny": i[0].tokens
                         }],
-                        "sipky": {
+                        "sipky": [{
                             "kam": i[1].label,
                             "hodnota": graph_data['edges'][i]
-                        }
+                        }]
                     }
                 else:
-                    self.dict_final[i[0].label]["hodnoty"].append({
-                        "label": i[0].label,
-                        "image": self.image_index,
-                        "tokeny": i[0].tokens
-                    })
+                    if self.image_index not in self.dict_final.get(i[0].label):
+                        self.dict_final[i[0].label]["hodnoty"].append({
+                            "label": i[0].label,
+                            "image": self.image_index,
+                            "tokeny": i[0].tokens
+                        })
+                    if i[1] not in self.dict_final.get(i[0].label):
+                        self.dict_final[i[0].label]["sipky"].append({
+                            "kam": i[1].label,
+                            "hodnota": graph_data['edges'][i]
+                        })
+
         for i in graph_data['places']:
+
             if not self.dict_final.get(i.label):
                 self.dict_final[i.label] = {
                     "typ": "p",
                     "suradnice": [],
-                    "hodnoty": [{
-                        "label": i.label,
-                        "image": self.image_index,
-                        "tokeny": i.tokens
-                    }]
+                    "hodnoty": []
                 }
-            else:
-                self.dict_final[i.label]["hodnoty"].append({
-                    "label": i.label,
-                    "image": self.image_index,
-                    "tokeny": i.tokens
-                })
+
+                self.places_end.append(i)
+
+        for i in self.places_end:
+
+            self.dict_final[i.label]["hodnoty"].append({
+                "label": i.label,
+                "image": self.image_index,
+                "tokeny": i.tokens
+            })
+
         for i in graph_data['transitions']:
+
             if not self.dict_final.get(i.label):
                 if not weights and not thresholds:
 
                     self.dict_final[i.label] = {
                         "typ": "t",
                         "suradnice": [],
-                        "hodnoty": [{
-                            "label": i.label,
-                            "image": self.image_index
-                        }]
+                        "hodnoty": []
 
                     }
+
                 if weights and not thresholds:
                     self.dict_final[i.label] = {
-                        "typ": "p",
+                        "typ": "t",
                         "suradnice": [],
-                        "hodnoty": [{
-                            "label": i.label,
-                            "image": self.image_index,
-                            "vaha": i.getWeight()
-                        }]
+                        "hodnoty": []
                     }
                 if thresholds:
                     self.dict_final[i.label] = {
-                        "typ": "p",
+                        "typ": "t",
                         "suradnice": [],
-                        "hodnoty": [{
-                            "label": i.label,
-                            "image": self.image_index,
-                            "vaha": i.getWeight(),
-                            "prah": i.getThreshold()
-                        }]
+                        "hodnoty": []
                     }
-            else:
-                if not weights and not thresholds:
-                    self.dict_final[i.label]["hodnoty"].append({
-                        "label": i.label,
-                        "image": self.image_index
+                self.transitions_end.append(i)
 
-                    })
+        for i in self.transitions_end:
+            if not weights and not thresholds:
+                self.dict_final[i.label]["hodnoty"].append({
+                    "label": i.label,
+                    "image": self.image_index
 
-                if weights and not thresholds:
+                })
 
-                    self.dict_final[i.label]["hodnoty"].append({
-                        "label": i.label,
-                        "image": self.image_index,
-                        "vaha": i.getWeight()
-                    })
+            if weights and not thresholds:
 
-                if thresholds:
-                    self.dict_final[i.label]["hodnoty"].append({
-                        "label": i.label,
-                        "image": self.image_index,
-                        "vaha": i.getWeight(),
-                        "prah": i.getThreshold()
-                    })
+                self.dict_final[i.label]["hodnoty"].append({
+                    "label": i.label,
+                    "image": self.image_index,
+                    "vaha": i.getWeight()
+                })
+
+            if thresholds:
+                self.dict_final[i.label]["hodnoty"].append({
+                    "label": i.label,
+                    "image": self.image_index,
+                    "vaha": i.getWeight(),
+                    "prah": i.getTreshold()
+                })
         self.image_index += 1
         print(self.image_index)
         for i in self.dict_final:
