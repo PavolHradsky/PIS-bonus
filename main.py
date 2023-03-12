@@ -106,7 +106,6 @@ class MainAplication(QtWidgets.QMainWindow):
             'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
         self.anotherWindow.setGeometry(200, 200, 800, 600)
         self.anotherWindow.setWindowTitle("Nastavenie váh a prahov pravidiel")
-        self.anotherWindow.fuzzyficate_run.clicked.connect(self.fuzzyficate)
         self.ui.close()
         self.net = None
         self.root = None
@@ -126,6 +125,9 @@ class MainAplication(QtWidgets.QMainWindow):
         self.places_end = []
         self.transitions_end = []
         self.transitions_to_change = []
+        self.counter_first_draw = 0
+        self.fuzzyfication = 0
+        self.fuzzyficated_M0 = []
 
         if self.image_number == 1:
             self.main_layout.prevButton.setEnabled(False)
@@ -168,12 +170,14 @@ class MainAplication(QtWidgets.QMainWindow):
             if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = 1
                 self.fuzzy_flag = 0
+                self.fuzzyficate()
                 self.anotherWindow.show()
                 self.set_marking_initial()
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť":
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
+                self.fuzzyficate()
                 self.anotherWindow.show()
                 self.set_marking_initial()
                 self.anotherWindow.enter.clicked.connect(self.run_final)
@@ -182,6 +186,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.tresholds_flag = 0
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
+                self.fuzzyficate()
                 self.anotherWindow.show()
                 self.set_marking_initial()
                 self.anotherWindow.enter.clicked.connect(self.run_final)
@@ -190,6 +195,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.weights_flag = 1
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
+                self.fuzzyficate()
                 self.anotherWindow.show()
                 self.set_marking_initial()
                 self.anotherWindow.enter.clicked.connect(self.run_final)
@@ -303,19 +309,22 @@ class MainAplication(QtWidgets.QMainWindow):
         for i, key in enumerate(self.dict_places):
             placeLabel = QtWidgets.QLabel(key)
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-            entry = QtWidgets.QLineEdit()
-            entry.setMaximumWidth(50)
-            self.dict_marks[key] = entry
+            placeLabelM0 = QtWidgets.QLabel(str(self.fuzzyficated_M0[i]))
+            placeLabelM0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+            #entry = QtWidgets.QLineEdit()
+            # entry.setMaximumWidth(50)
+            #self.dict_marks[key] = entry
             placeLayout = QtWidgets.QVBoxLayout()
             placeLayout.addWidget(placeLabel)
-            placeLayout.addWidget(entry)
+            placeLayout.addWidget(placeLabelM0)
             placeLayout.addStretch()
             placesLayout.addLayout(placeLayout)
 
         self.anotherWindow.placesScrollArea.setWidget(
             self.anotherWindow.placesWidget)
-        self.anotherWindow.OK1.clicked.connect(
-            lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
+        # self.anotherWindow.OK1.clicked.connect(
+        #    lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
+
         if self.fuzzy_flag and not self.weights_flag and not self.tresholds_flag:
             self.anotherWindow.OK3.setDisabled(True)
             weightsLayout = QtWidgets.QVBoxLayout()
@@ -905,6 +914,84 @@ class MainAplication(QtWidgets.QMainWindow):
         cv2.imwrite(f"./images/image_{self.image_index}.png", img)
 
     def logical_petri_net(self, M):
+        if self.counter_first_draw == 0:
+            array_steps = []
+            Wo = M[0].state
+            # print("Počiatočné ohodnotenie: ", Wo)
+            nRows = len(self.net.getPlaces())
+            nColumns = len(self.net.getTransitions())
+            inputMatrix = np.array([[0 for _ in range(nColumns)]
+                                    for _ in range(nRows)])
+            outputMatrix = np.array([[0 for _ in range(nColumns)]
+                                    for _ in range(nRows)])
+            # fill each matrix with the proper data
+            for arc in self.net.getArcs():
+                sourceId = arc.getSourceId()
+                destinationId = arc.getDestinationId()
+                source = None
+                destination = None
+                if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
+                    source = self.net.getPlaceById(sourceId)
+                    destination = self.net.getTransitionById(destinationId)
+                elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
+                    source = self.net.getTransitionById(sourceId)
+                    destination = self.net.getPlaceById(destinationId)
+                if type(source) == Place:
+                    sourceIdInNetList = self.net.getPlaces().index(source)
+                    destinationIdInNetList = self.net.getTransitions().index(destination)
+                    inputMatrix[sourceIdInNetList,
+                                destinationIdInNetList] = arc.getMultiplicity()
+                if type(source) == Transition:
+                    sourceIdInNetList = self.net.getTransitions().index(source)
+                    destinationIdInNetList = self.net.getPlaces().index(destination)
+                    outputMatrix[destinationIdInNetList,
+                                 sourceIdInNetList] = arc.getMultiplicity()
+            Wk = []
+            i = 0
+            while not np.array_equal(Wo, Wk):
+                if i == 0:
+                    Wo = Wo
+                else:
+                    Wo = Wk
+                i += 1
+                neg_Wo = [abs(1 - i) for i in Wo]
+                transponse_array = np.transpose(inputMatrix)
+                Vo = []
+                sub_result = []
+                for i in transponse_array:
+                    for index, k in enumerate(i):
+                        sub_result.append(min(k, neg_Wo[index]))
+                    Vo.append(float(max(sub_result)))
+                    sub_result = []
+
+                for i in range(len(Vo)):
+                    if Vo[i] > 1:
+                        Vo[i] = 1.0
+                Uo = [abs(1 - i) for i in Vo]
+                Wk = [int((outputMatrix @ Uo)[i] or Wo[i])
+                      for i in range(len(Wo))]
+
+                changed_places = []
+                for num in range(len(Wo)):
+                    if Wk[num] != Wo[num]:
+                        changed_places.append(True)
+                    else:
+                        changed_places.append(False)
+                previous_place = None
+
+                if self.counter_first_draw == 0:
+                    count_place = 0
+                    self.transitions_to_change = []
+                    for place in self.net.getPlaces():
+                        count_place += 1
+                        for arc in self.net.getArcs():
+                            if arc.dest.name == place.name and changed_places[count_place - 1]:
+                                self.transitions_to_change.append(
+                                    arc.src.label)
+                    self.draw_net(0, 0)
+                    self.image_number += 1
+                break
+        self.counter_first_draw += 1
         array_steps = []
         Wo = M[0].state
         # print("Počiatočné ohodnotenie: ", Wo)
@@ -997,17 +1084,20 @@ class MainAplication(QtWidgets.QMainWindow):
                                                       for i, elem in enumerate(Wk)])+" )"
                 self.actual_marking_dict[self.image_number -
                                          1] = actual_step_marking
-                self.draw_net(0, 0)
+                if self.counter_first_draw != 0:
+                    self.draw_net(0, 0)
                 self.image_number += 1
                 print("Wk: ", Wk)
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
-        self.image_number = 1
-        prem = QImage(self.image_dict[self.image_number])
-        pixmap = QPixmap.fromImage(prem)
-        self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
-        ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-        self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+
+        if self.counter_first_draw != 0:
+            self.image_number = 1
+            prem = QImage(self.image_dict[self.image_number])
+            pixmap = QPixmap.fromImage(prem)
+            self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
+            ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+            self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
 
     def fuzzy_petri_net(self, M):
         array_steps = []
@@ -1368,9 +1458,10 @@ class MainAplication(QtWidgets.QMainWindow):
             os.remove(f)
         M = reachability(self.net)
         if M is not None:
-            self.draw_net(0, 0)
-            self.image_number += 1
+            #self.draw_net(0, 0)
+
             self.logical_petri_net(M)
+            print("asdas", self.net.Wk_final)
             dir_path = os.path.dirname(self.file_path)
             l = 0
             for rank in self.root.iter('place'):
@@ -1472,6 +1563,8 @@ class MainAplication(QtWidgets.QMainWindow):
             dialog.exec()   # Stores the return value for the button pressed
 
     def fuzzyficate(self):
+        self.fuzzyfication = 1
+        self.fuzzyficated_M0 = [1, 0, 1, 0, 0, 0, 0, 0]
         print("Fuzzyfication")
 
 
