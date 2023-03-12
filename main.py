@@ -128,7 +128,9 @@ class MainAplication(QtWidgets.QMainWindow):
         self.counter_first_draw = 0
         self.fuzzyfication = 0
         self.fuzzyficated_M0 = []
-
+        self.list_edit_widgets = []
+        self.fuzzyficated_M0 = [1, 0, 1, 0, 0, 0, 0, 0]
+        self.anotherWindow.fuzzyficate_run.clicked.connect(self.fuzzyficate)
         if self.image_number == 1:
             self.main_layout.prevButton.setEnabled(False)
 
@@ -170,14 +172,12 @@ class MainAplication(QtWidgets.QMainWindow):
             if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = 1
                 self.fuzzy_flag = 0
-                self.fuzzyficate()
                 self.anotherWindow.show()
                 self.set_marking_initial()
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť":
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
-                self.fuzzyficate()
                 self.anotherWindow.show()
                 self.set_marking_initial()
                 self.anotherWindow.enter.clicked.connect(self.run_final)
@@ -186,7 +186,6 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.tresholds_flag = 0
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
-                self.fuzzyficate()
                 self.anotherWindow.show()
                 self.set_marking_initial()
                 self.anotherWindow.enter.clicked.connect(self.run_final)
@@ -195,7 +194,6 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.weights_flag = 1
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
-                self.fuzzyficate()
                 self.anotherWindow.show()
                 self.set_marking_initial()
                 self.anotherWindow.enter.clicked.connect(self.run_final)
@@ -205,7 +203,7 @@ class MainAplication(QtWidgets.QMainWindow):
             dialog.setWindowTitle("Message Dialog")
             dialog.setWindowIcon(QtGui.QIcon(
                 'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
-            ret = dialog.exec()   # Stores the return value for the button pressed
+            dialog.exec()   # Stores the return value for the button pressed
 
     def run_final(self):
         l = 0
@@ -299,6 +297,31 @@ class MainAplication(QtWidgets.QMainWindow):
                 '.')[0] + "_initial_marking.xml", 1, 1, 1, 1)
             self.run_fuzzy_with_weights_and_thresholds()
 
+    def fuzzyficate(self):
+        # self.database_output_table1
+        # self.database_output_table2
+        self.net.M0 = self.fuzzyficated_M0
+        placesLayout = self.anotherWindow.placesWidget.layout()
+        counter = 0
+        for i, key in enumerate(self.dict_places):
+            placeLabel = QtWidgets.QLabel(key)
+            placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+            placeLabelM0 = QtWidgets.QLabel(str(self.fuzzyficated_M0[i]))
+            placeLabelM0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+            for j in range(2):
+                edit = self.list_edit_widgets[i+j+counter]
+                placeLayout = QtWidgets.QVBoxLayout()
+                # remove edit widget from layout
+                placeLayout.removeWidget(edit)
+                edit.setParent(None)
+                placeLayout.addWidget(placeLabel)
+                placeLayout.addWidget(placeLabelM0)
+                placeLayout.addStretch()
+                placesLayout.addLayout(placeLayout)
+            counter += 1
+        self.anotherWindow.OK1.setEnabled(False)
+        self.anotherWindow.fuzzyficate_run.setEnabled(False)
+
     def set_marking_initial(self):
         for place in self.net.getPlaces():
             self.dict_places[place.label] = place.tokens
@@ -309,21 +332,21 @@ class MainAplication(QtWidgets.QMainWindow):
         for i, key in enumerate(self.dict_places):
             placeLabel = QtWidgets.QLabel(key)
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-            placeLabelM0 = QtWidgets.QLabel(str(self.fuzzyficated_M0[i]))
-            placeLabelM0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-            #entry = QtWidgets.QLineEdit()
-            # entry.setMaximumWidth(50)
-            #self.dict_marks[key] = entry
+            entry = QtWidgets.QLineEdit()
+            entry.setMaximumWidth(50)
+            self.list_edit_widgets.append(entry)
+            self.list_edit_widgets.append(placeLabel)
+            self.dict_marks[key] = entry
             placeLayout = QtWidgets.QVBoxLayout()
             placeLayout.addWidget(placeLabel)
-            placeLayout.addWidget(placeLabelM0)
+            placeLayout.addWidget(entry)
             placeLayout.addStretch()
             placesLayout.addLayout(placeLayout)
 
         self.anotherWindow.placesScrollArea.setWidget(
             self.anotherWindow.placesWidget)
-        # self.anotherWindow.OK1.clicked.connect(
-        #    lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
+        self.anotherWindow.OK1.clicked.connect(
+            lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
 
         if self.fuzzy_flag and not self.weights_flag and not self.tresholds_flag:
             self.anotherWindow.OK3.setDisabled(True)
@@ -339,7 +362,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 weightsLayout.addLayout(weightLayout)
             self.anotherWindow.weightsScrollArea.setWidget(
                 self.anotherWindow.weightsWidget)
-            self.anotherWindow.OK2.setVisible(False)
+            self.anotherWindow.OK2.setDisabled(False)
 
         if self.weights_flag:
             self.anotherWindow.OK3.setDisabled(True)
@@ -392,54 +415,36 @@ class MainAplication(QtWidgets.QMainWindow):
         for _, value in entries.items():
             value.setText("")
 
-    def set_marking(self, entries):
-        M0 = []
+    def set_values(self, array, entries, flag):
         for _, value in entries.items():
             if value.text() == '':
-                if self.logical_flag:
-                    M0.append(0)
+                if flag:
+                    array.append(0)
                 else:
-                    M0.append(0.0)
+                    array.append(0.0)
             else:
                 try:
                     num = float(value.text().replace(',', '.'))
-                    M0.append(num)
+                    array.append(num)
                 except ValueError:
                     QtWidgets.QMessageBox.warning(
                         self, "Invalid Input", "Please enter a valid number.")
                     return
-        self.net.M0 = M0
+        return array
+
+    def set_marking(self, entries):
+        M0 = []
+        self.net.M0 = self.set_values(M0, entries, self.logical_flag)
 
     def set_tresholds(self, entries):
         tresholds = []
-        for _, value in entries.items():
-            if value.text() == '':
-                tresholds.append(0.0)
-            else:
-                try:
-                    num = float(value.text().replace(',', '.'))
-                    tresholds.append(num)
-                except ValueError:
-                    QtWidgets.QMessageBox.warning(
-                        self, "Invalid Input", "Please enter a valid number.")
-                    return
-        self.net.tresholds = tresholds
-        self.TR = tresholds
+        self.net.tresholds = self.set_values(
+            tresholds, entries, self.logical_flag)
+        self.TR = self.net.tresholds
 
     def set_weights(self, entries):
         weights = []
-        for _, value in entries.items():
-            if value.text() == '':
-                weights.append(0.0)
-            else:
-                try:
-                    num = float(value.text().replace(',', '.'))
-                    weights.append(num)
-                except ValueError:
-                    QtWidgets.QMessageBox.warning(
-                        self, "Invalid Input", "Please enter a valid number.")
-                    return
-        self.net.weights = weights
+        self.net.weights = self.set_values(weights, entries, self.logical_flag)
 
     def prev(self):
         if self.image_number > 1:
@@ -505,7 +510,6 @@ class MainAplication(QtWidgets.QMainWindow):
         self.main_layout.clearAll.setEnabled(False)
 
     def draw_net(self, weights=False, thresholds=False):
-        G = nx.DiGraph()
         graph_data = {
             'places': [],
             'transitions': [],
@@ -513,10 +517,6 @@ class MainAplication(QtWidgets.QMainWindow):
             'weights': self.net.getWeights(),
             'edges': {},
         }
-        tresholds_list = self.net.getThresholds()
-        weights_list = self.net.getWeights()
-        transitions = self.net.getTransitions()
-
         for arc in self.net.getArcs():
             if isinstance(arc.src, Place):
                 graph_data['places'].append(arc.getSourceId())
@@ -755,76 +755,7 @@ class MainAplication(QtWidgets.QMainWindow):
         for i in self.dict_final:
             print(self.dict_final[i], "\n\n")
 
-        edges = {}
-        places = self.net.getPlaces()
-        transitions = self.net.getTransitions()
-        places_list = []
-        tresholds_list = self.net.getThresholds()
-        weights_list = self.net.getWeights()
-        transitions_list = []
-        for arc in self.net.getArcs():
-            G.add_edge(arc.getSourceId(), arc.getDestinationId())
-            if arc.src.__class__ == Place:
-                places_list.append(arc.getSourceId())
-            else:
-                transitions_list.append(arc.getSourceId())
-            if arc.dest.__class__ == Place:
-                places_list.append(arc.getDestinationId())
-            else:
-                transitions_list.append(arc.getDestinationId())
-            edges[(arc.getSourceId(), arc.getDestinationId())
-                  ] = arc.getMultiplicity()
-        pos = nx.circular_layout(G)
-
-        fig = plt.figure()
-        nx.draw_networkx_nodes(G, pos, places)
-        if self.logical_flag:
-            nx.draw_networkx_labels(
-                G, pos, labels={n: int(n.tokens) for n in places_list}, font_size=6
-            )
-        else:
-            nx.draw_networkx_labels(
-                G, pos, labels={n: n.tokens for n in places_list}, font_size=6
-            )
-
-        nx.draw_networkx_nodes(G, pos, transitions,
-                               node_shape='s', node_color='#ff0000')
-        if weights and not thresholds:
-            nx.draw_networkx_labels(
-                G, pos,
-                labels={
-                    n: f"{n.label}\nweight: {weights_list[transitions.index(n)]}"
-                    for n in transitions
-                },
-                font_size=6,
-            )
-        elif weights and thresholds:
-            for l in pos:
-                pos[l][1] += 0.08
-            nx.draw_networkx_labels(
-                G, pos,
-                labels={
-                    n: f"{n.label}\nweight: {weights_list[transitions.index(n)]}\nthreshold: {tresholds_list[transitions.index(n)]}"
-                    for n in transitions
-                },
-                font_size=6,
-            )
-        else:
-            nx.draw_networkx_labels(
-                G, pos, labels={n: n.label for n in transitions}, font_size=6
-            )
-
-        for l in pos:
-            pos[l][1] += 0.08
-        nx.draw_networkx_labels(
-            G, pos, labels={n: n.label for n in places}, font_size=6
-        )
-
-        nx.draw_networkx_edges(G, pos)
-        nx.draw_networkx_edge_labels(G, pos, edge_labels=edges)
-        plt.axis('off')
         path = './images/' + str(self.image_number) + '.png'
-        fig.savefig(path)
         self.image_dict[self.image_number] = path
         print("path: ", path)
         self.generate_image()
@@ -911,7 +842,7 @@ class MainAplication(QtWidgets.QMainWindow):
                         cv2.putText(
                             img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
 
-        cv2.imwrite(f"./images/image_{self.image_index}.png", img)
+        cv2.imwrite(f"./images/{self.image_index}.png", img)
 
     def logical_petri_net(self, M):
         if self.counter_first_draw == 0:
@@ -1459,7 +1390,6 @@ class MainAplication(QtWidgets.QMainWindow):
         M = reachability(self.net)
         if M is not None:
             #self.draw_net(0, 0)
-
             self.logical_petri_net(M)
             print("asdas", self.net.Wk_final)
             dir_path = os.path.dirname(self.file_path)
@@ -1561,11 +1491,6 @@ class MainAplication(QtWidgets.QMainWindow):
             dialog.setWindowIcon(QtGui.QIcon(
                 'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
             dialog.exec()   # Stores the return value for the button pressed
-
-    def fuzzyficate(self):
-        self.fuzzyfication = 1
-        self.fuzzyficated_M0 = [1, 0, 1, 0, 0, 0, 0, 0]
-        print("Fuzzyfication")
 
 
 class DialogWindow(QtWidgets.QDialog):
