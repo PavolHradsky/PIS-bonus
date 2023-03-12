@@ -25,9 +25,10 @@ class PetriNet:
         self.P: List[Place] = places
         self.T: List[Transition] = transitions
         self.R: List[Role] = roles
-        #self.F: dict[str,str] = dict(zip([j.id for j in arcs], [i.src.label + i.dest.label for i in arcs])) 
+        #self.F: dict[str,str] = dict(zip([j.id for j in arcs], [i.src.label + i.dest.label for i in arcs]))
         self.W: List[Arc] = arcs
         self.M0: List[int] = [i.tokens for i in places]
+        self.Wk_final = []
         self.tresholds = []
         self.weights = []
         self.inputMatrix = None
@@ -46,11 +47,15 @@ class PetriNet:
     def getMultiplicities(self):
         return self.F
     """
+
     def getWeights(self):
         return self.weights
-    
+
     def getRoles(self):
         return self.R
+
+    def final_Wk(self):
+        return self.Wk_final
 
     def getThresholds(self):
         return self.tresholds

@@ -106,6 +106,7 @@ class MainAplication(QtWidgets.QMainWindow):
             'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
         self.anotherWindow.setGeometry(200, 200, 800, 600)
         self.anotherWindow.setWindowTitle("Nastavenie váh a prahov pravidiel")
+        self.anotherWindow.fuzzyficate_run.clicked.connect(self.fuzzyficate)
         self.ui.close()
         self.net = None
         self.root = None
@@ -999,6 +1000,8 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.draw_net(0, 0)
                 self.image_number += 1
                 print("Wk: ", Wk)
+                self.net.Wk_final = Wk
+            self.net.Wk_final = Wo
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
@@ -1113,6 +1116,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.draw_net(0, 0)
                 self.image_number += 1
                 print("Wk: ", Wk)
+            self.net.Wk_final = Wk
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
@@ -1226,6 +1230,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.draw_net(1, 0)
                 self.image_number += 1
                 print("Wk: ", Wk)
+            self.net.Wk_final = Wk
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
@@ -1345,6 +1350,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.draw_net(1, 1)
                 self.image_number += 1
                 print("Wk: ", Wk)
+            self.net.Wk_final = Wk
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
@@ -1364,8 +1370,14 @@ class MainAplication(QtWidgets.QMainWindow):
         if M is not None:
             self.draw_net(0, 0)
             self.image_number += 1
-            self.net = self.logical_petri_net(M)
+            self.logical_petri_net(M)
             dir_path = os.path.dirname(self.file_path)
+            l = 0
+            for rank in self.root.iter('place'):
+                for value in rank:
+                    if value.tag == 'tokens':
+                        value.text = str(int(self.net.Wk_final[l]))
+                        l += 1
             self.tree.write(os.path.join(dir_path, self.file_name.split(
                 '.')[0] + "_final_marking.xml"), encoding="UTF-8", xml_declaration=True)
         else:
@@ -1373,7 +1385,7 @@ class MainAplication(QtWidgets.QMainWindow):
             dialog.setWindowTitle("Message Dialog")
             dialog.setWindowIcon(QtGui.QIcon(
                 'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
-            ret = dialog.exec()   # Stores the return value for the button pressed
+            dialog.exec()   # Stores the return value for the button pressed
 
     def run_fuzzy(self):
         self.image_number = 1
@@ -1386,8 +1398,14 @@ class MainAplication(QtWidgets.QMainWindow):
         if M is not None:
             self.draw_net(0, 0)
             self.image_number += 1
-            self.net = self.fuzzy_petri_net(M)
+            self.fuzzy_petri_net(M)
             dir_path = os.path.dirname(self.file_path)
+            l = 0
+            for rank in self.root.iter('place'):
+                for value in rank:
+                    if value.tag == 'tokens':
+                        value.text = str(float(self.net.Wk_final[l]))
+                        l += 1
             self.tree.write(os.path.join(dir_path, self.file_name.split(
                 '.')[0] + "_final_marking.xml"), encoding="UTF-8", xml_declaration=True)
         else:
@@ -1395,7 +1413,7 @@ class MainAplication(QtWidgets.QMainWindow):
             dialog.setWindowTitle("Message Dialog")
             dialog.setWindowIcon(QtGui.QIcon(
                 'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
-            ret = dialog.exec()   # Stores the return value for the button pressed
+            dialog.exec()   # Stores the return value for the button pressed
 
     def run_fuzzy_with_weights(self):
         self.image_number = 1
@@ -1408,8 +1426,14 @@ class MainAplication(QtWidgets.QMainWindow):
         if M is not None:
             self.draw_net(1, 0)
             self.image_number += 1
-            self.net = self.fuzzy_petri_net_with_weights(M)
+            self.fuzzy_petri_net_with_weights(M)
             dir_path = os.path.dirname(self.file_path)
+            l = 0
+            for rank in self.root.iter('place'):
+                for value in rank:
+                    if value.tag == 'tokens':
+                        value.text = str(float(self.net.Wk_final[l]))
+                        l += 1
             self.tree.write(os.path.join(dir_path, self.file_name.split(
                 '.')[0] + "_final_marking.xml"), encoding="UTF-8", xml_declaration=True)
         else:
@@ -1417,7 +1441,7 @@ class MainAplication(QtWidgets.QMainWindow):
             dialog.setWindowTitle("Message Dialog")
             dialog.setWindowIcon(QtGui.QIcon(
                 'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
-            ret = dialog.exec()   # Stores the return value for the button pressed
+            dialog.exec()   # Stores the return value for the button pressed
 
     def run_fuzzy_with_weights_and_thresholds(self):
         self.image_number = 1
@@ -1430,8 +1454,14 @@ class MainAplication(QtWidgets.QMainWindow):
         if M is not None:
             self.draw_net(1, 1)
             self.image_number += 1
-            self.net = self.fuzzy_petri_net_with_weights_thresholds(M)
+            self.fuzzy_petri_net_with_weights_thresholds(M)
             dir_path = os.path.dirname(self.file_path)
+            l = 0
+            for rank in self.root.iter('place'):
+                for value in rank:
+                    if value.tag == 'tokens':
+                        value.text = str(float(self.net.Wk_final[l]))
+                        l += 1
             self.tree.write(os.path.join(dir_path, self.file_name.split(
                 '.')[0] + "_final_marking.xml"), encoding="UTF-8", xml_declaration=True)
         else:
@@ -1439,7 +1469,10 @@ class MainAplication(QtWidgets.QMainWindow):
             dialog.setWindowTitle("Message Dialog")
             dialog.setWindowIcon(QtGui.QIcon(
                 'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
-            ret = dialog.exec()   # Stores the return value for the button pressed
+            dialog.exec()   # Stores the return value for the button pressed
+
+    def fuzzyficate(self):
+        print("Fuzzyfication")
 
 
 class DialogWindow(QtWidgets.QDialog):
