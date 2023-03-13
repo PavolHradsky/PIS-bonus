@@ -345,7 +345,7 @@
        </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,0">
+       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,0,0">
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -358,6 +358,16 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="table">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>100</height>
+           </size>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">

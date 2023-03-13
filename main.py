@@ -120,6 +120,7 @@ class MainAplication(QtWidgets.QMainWindow):
         self.dict_transitions = {}
         self.database_output_table1 = ()
         self.database_output_table2 = ()
+
         self.image_index = 1
         self.dict_final = {}
         self.places_end = []
@@ -160,6 +161,12 @@ class MainAplication(QtWidgets.QMainWindow):
         print(self.main_layout.comboBox.currentText())
 
     def run(self):
+        print(self.database_output_table2)
+        self.anotherWindow.table.setColumnCount(7)
+        self.anotherWindow.table.setHorizontalHeaderLabels(
+            ["Meno", "Priezvisko", "Vek", "Pohlavie", "Výška", "Váha", "Choroba"])
+        self.anotherWindow.table.setRowCount(1)
+
         if self.file_path:
             self.tree = ET.parse(self.file_path)
             self.root = self.tree.getroot()
@@ -1511,6 +1518,24 @@ class DialogWindow(QtWidgets.QDialog):
             self.main_layout.close()
             self.main_application = MainAplication()
             self.main_application.database_output_table1 = self.patient_records
+            self.main_application.main_layout.table.setColumnCount(7)
+            self.main_application.main_layout.table.setHorizontalHeaderLabels(
+                ["Meno", "Priezvisko", "Vek", "Pohlavie", "Výška", "Váha", "Choroba"])
+            self.main_application.main_layout.table.setRowCount(1)
+            self.main_application.main_layout.table.setItem(0, 0, QtWidgets.QTableWidgetItem(
+                self.patient_records[1]))
+            self.main_application.main_layout.table.setItem(0, 1, QtWidgets.QTableWidgetItem(
+                self.patient_records[2]))
+            self.main_application.main_layout.table.setItem(0, 2, QtWidgets.QTableWidgetItem(
+                str(self.patient_records[3])))  # Need to convert integer to string
+            self.main_application.main_layout.table.setItem(0, 3, QtWidgets.QTableWidgetItem(
+                self.patient_records[4]))
+            self.main_application.main_layout.table.setItem(0, 4, QtWidgets.QTableWidgetItem(
+                str(self.patient_records[5])))  # Need to convert float to string
+            self.main_application.main_layout.table.setItem(0, 5, QtWidgets.QTableWidgetItem(
+                str(self.patient_records[6])))  # Need to convert float to string
+            self.main_application.main_layout.table.setItem(0, 6, QtWidgets.QTableWidgetItem(
+                self.patient_records[7]))
             self.main_application.database_output_table2 = self.patient_problems
             self.main_application.show()
         else:
@@ -1546,13 +1571,13 @@ class DialogWindow(QtWidgets.QDialog):
 
 
 if __name__ == '__main__':
-    #result, result1, result2 = connect()
+    result, result1, result2 = connect()
     app = QtWidgets.QApplication(sys.argv)
-    window = MainAplication()
-    window.show()
-    # dialog = DialogWindow()
-    # dialog.database_output_table1 = result
-    # dialog.database_output_table2 = result1
-    # dialog.hashed = result2
-    # dialog.parsing_database()
+    #window = MainAplication()
+   # window.show()
+    dialog = DialogWindow()
+    dialog.database_output_table1 = result
+    dialog.database_output_table2 = result1
+    dialog.hashed = result2
+    dialog.parsing_database()
     sys.exit(app.exec())

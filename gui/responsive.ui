@@ -17,7 +17,7 @@
    <string notr="true">background: #bdbdbd;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout" rowstretch="5,3">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="5,0">
     <item row="0" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="5,2,0">
       <property name="spacing">
@@ -337,6 +337,19 @@
             <property name="spacing">
              <number>10</number>
             </property>
+            <item>
+             <widget class="QTableWidget" name="table">
+              <property name="maximumSize">
+               <size>
+                <width>500</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+             </widget>
+            </item>
             <item>
              <widget class="QLabel" name="label">
               <property name="text">
