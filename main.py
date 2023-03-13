@@ -205,6 +205,13 @@ class MainAplication(QtWidgets.QMainWindow):
                 'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
             dialog.exec()   # Stores the return value for the button pressed
 
+    def write_to_file_transitions(self):
+        for i, rank in enumerate(self.root.iter('transition')):
+            new_tag = ET.SubElement(rank, 'treshold')
+            new_tag.text = str(self.net.tresholds[i])
+            new_tag = ET.SubElement(rank, 'weight')
+            new_tag.text = str(self.net.weights[i])
+
     def run_final(self):
         l = 0
         self.anotherWindow.close()
@@ -226,41 +233,25 @@ class MainAplication(QtWidgets.QMainWindow):
                         self.net.weights = [
                             0 for _ in range(len(self.dict_weights))]
                     # create new tag to xml to each transition
-                    for i, rank in enumerate(self.root.iter('transition')):
-                        new_tag = ET.SubElement(rank, 'treshold')
-                        new_tag.text = str(self.net.tresholds[i])
-                        new_tag = ET.SubElement(rank, 'weight')
-                        new_tag.text = str(self.net.weights[i])
+                    self.write_to_file_transitions()
                 else:
                     if len(self.net.tresholds) != 0 and len(self.net.weights) == 0:
                         # create new tag to xml to each transition
                         if len(self.net.weights) == 0:
                             self.net.weights = [
                                 0 for _ in range(len(self.dict_weights))]
-                        for i, rank in enumerate(self.root.iter('transition')):
-                            new_tag = ET.SubElement(rank, 'treshold')
-                            new_tag.text = str(self.net.tresholds[i])
-                            new_tag = ET.SubElement(rank, 'weight')
-                            new_tag.text = str(self.net.weights[i])
+                        self.write_to_file_transitions()
 
                     if len(self.net.tresholds) == 0 and len(self.net.weights) != 0:
                         if len(self.net.tresholds) == 0:
                             self.net.tresholds = [
                                 0 for _ in range(len(self.dict_transitions))]
                         # create new tag to xml to each transition
-                        for i, rank in enumerate(self.root.iter('transition')):
-                            new_tag = ET.SubElement(rank, 'trehsold')
-                            new_tag.text = str(self.net.tresholds[i])
-                            new_tag = ET.SubElement(rank, 'weight')
-                            new_tag.text = str(self.net.weights[i])
+                        self.write_to_file_transitions()
 
                     if len(self.net.tresholds) != 0 and len(self.net.weights) != 0:
                         # create new tag to xml to each transition
-                        for i, rank in enumerate(self.root.iter('transition')):
-                            new_tag = ET.SubElement(rank, 'treshold')
-                            new_tag.text = str(self.net.tresholds[i])
-                            new_tag = ET.SubElement(rank, 'weight')
-                            new_tag.text = str(self.net.weights[i])
+                        self.write_to_file_transitions()
 
             if self.weights_flag and not self.tresholds_flag:
                 if len(self.net.weights) == 0:
@@ -298,6 +289,7 @@ class MainAplication(QtWidgets.QMainWindow):
             self.run_fuzzy_with_weights_and_thresholds()
 
     def fuzzyficate(self):
+        # TODO to the future there will be a function that will fuzzyficate the input data from database and results will be stored in self.fuzzyficated_M0
         # self.database_output_table1
         # self.database_output_table2
         self.net.M0 = self.fuzzyficated_M0
@@ -509,7 +501,7 @@ class MainAplication(QtWidgets.QMainWindow):
         self.main_layout.nextButton.setEnabled(True)
         self.main_layout.clearAll.setEnabled(False)
 
-    def draw_net(self, weights=False, thresholds=False):
+    def draw_net(self, weights=False, thresholds=False, value=0):
         graph_data = {
             'places': [],
             'transitions': [],
@@ -542,7 +534,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "hodnoty": [{
                                 "label": i[0].label,
                                 "image": self.image_index,
-                                "farba": True if i[0].label in self.transitions_to_change else False
+                                "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
                             }],
                             "sipky": {
                                 i[1].label: graph_data['edges'][i]
@@ -556,7 +548,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "label": i[0].label,
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
-                                "farba": True if i[0].label in self.transitions_to_change else False
+                                "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
                             }],
                             "sipky": {
                                 i[1].label: graph_data['edges'][i]
@@ -571,7 +563,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
                                 "prah": i[0].getTreshold(),
-                                "farba": True if i[0].label in self.transitions_to_change else False
+                                "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
                             }],
                             "sipky": {
                                 i[1].label: graph_data['edges'][i]
@@ -583,7 +575,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             self.dict_final[i[0].label]["hodnoty"].append({
                                 "label": i[0].label,
                                 "image": self.image_index,
-                                "farba": True if i[0].label in self.transitions_to_change else False
+                                "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
 
                             })
                         if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
@@ -596,7 +588,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "label": i[0].label,
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
-                                "farba": True if i[0].label in self.transitions_to_change else False
+                                "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
                             })
                         if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
                             self.dict_final[i[0].label]["sipky"][i[1]
@@ -609,7 +601,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
                                 "prah": i[0].getTreshold(),
-                                "farba": True if i[0].label in self.transitions_to_change else False
+                                "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
                             })
                         if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
                             self.dict_final[i[0].label]["sipky"][i[1]
@@ -683,7 +675,7 @@ class MainAplication(QtWidgets.QMainWindow):
                         "hodnoty": [{
                             "label": i.label,
                             "image": self.image_index,
-                            "farba": True if i[0].label in self.transitions_to_change else False
+                            "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
                         }]
 
                     }
@@ -696,7 +688,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "label": i.label,
                             "image": self.image_index,
                             "vaha": i.getWeight(),
-                            "farba": True if i[0].label in self.transitions_to_change else False
+                            "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
                         }]
                     }
                 if thresholds:
@@ -708,7 +700,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "image": self.image_index,
                             "vaha": i.getWeight(),
                             "prah": i.getTreshold(),
-                            "farba": True if i[0].label in self.transitions_to_change else False
+                            "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
                         }]
                     }
             else:
@@ -717,7 +709,7 @@ class MainAplication(QtWidgets.QMainWindow):
                         self.dict_final[i.label]["hodnoty"].append({
                             "label": i.label,
                             "image": self.image_index,
-                            "farba": True if i[0].label in self.transitions_to_change else False
+                            "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
                         })
 
                 if weights and not thresholds:
@@ -726,7 +718,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "label": i.label,
                             "image": self.image_index,
                             "vaha": i.getWeight(),
-                            "farba": True if i[0].label in self.transitions_to_change else False
+                            "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
                         })
 
                 if thresholds:
@@ -736,7 +728,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "image": self.image_index,
                             "vaha": i.getWeight(),
                             "prah": i.getTreshold(),
-                            "farba": True if i[0].label in self.transitions_to_change else False
+                            "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
                         })
 
         if self.image_index == 1:
@@ -784,8 +776,8 @@ class MainAplication(QtWidgets.QMainWindow):
                         y2 = self.dict_final[j]["suradnice"][1]
                         radius1 = 32
                         radius2 = 34
-                        fixed_arrow_length = 3
-                        arrow_tip_size = 3
+                        fixed_arrow_length = 5
+                        arrow_tip_size = 5
                         angle = atan2(y2 - y1, x2 - x1)
                         point1_x = x1 + radius1 * cos(angle)
                         point1_y = y1 + radius1 * sin(angle)
@@ -817,8 +809,8 @@ class MainAplication(QtWidgets.QMainWindow):
                         y2 = self.dict_final[j]["suradnice"][1]
                         radius1 = 34
                         radius2 = 32
-                        fixed_arrow_length = 3
-                        arrow_tip_size = 3
+                        fixed_arrow_length = 5
+                        arrow_tip_size = 5
                         angle = atan2(y2 - y1, x2 - x1)
                         point1_x = x1 + radius1 * cos(angle)
                         point1_y = y1 + radius1 * sin(angle)
@@ -912,17 +904,18 @@ class MainAplication(QtWidgets.QMainWindow):
 
                 if self.counter_first_draw == 0:
                     count_place = 0
-                    self.transitions_to_change = []
+                    self.transitions_to_change = {}
                     for place in self.net.getPlaces():
                         count_place += 1
                         for arc in self.net.getArcs():
                             if arc.dest.name == place.name and changed_places[count_place - 1]:
-                                self.transitions_to_change.append(
-                                    arc.src.label)
-                    self.draw_net(0, 0)
+                                self.transitions_to_change[self.image_number] = arc.src.label
+                    self.draw_net(0, 0, 0)
+                    print("transitions_to_change: ",
+                          self.transitions_to_change)
                     self.image_number += 1
                 break
-        self.counter_first_draw += 1
+
         array_steps = []
         Wo = M[0].state
         # print("Počiatočné ohodnotenie: ", Wo)
@@ -993,7 +986,7 @@ class MainAplication(QtWidgets.QMainWindow):
                     changed_places.append(False)
             previous_place = None
             count_place = 0
-            self.transitions_to_change = []
+            self.transitions_to_change = {}
             for place in self.net.getPlaces():
                 place.tokens = Wk[self.net.getPlaces().index(place)]
                 count_place += 1
@@ -1002,7 +995,7 @@ class MainAplication(QtWidgets.QMainWindow):
                         previous_place = self.net.getPlaceById(
                             arc.getSourceId()).label
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
-                        self.transitions_to_change.append(arc.src.label)
+                        self.transitions_to_change[self.image_number] = arc.src.label
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
@@ -1015,8 +1008,10 @@ class MainAplication(QtWidgets.QMainWindow):
                                                       for i, elem in enumerate(Wk)])+" )"
                 self.actual_marking_dict[self.image_number -
                                          1] = actual_step_marking
+                self.counter_first_draw += 1
                 if self.counter_first_draw != 0:
-                    self.draw_net(0, 0)
+                    self.draw_net(0, 0, 0)
+
                 self.image_number += 1
                 print("Wk: ", Wk)
                 self.net.Wk_final = Wk
@@ -1112,7 +1107,7 @@ class MainAplication(QtWidgets.QMainWindow):
                     changed_places.append(False)
             previous_place = None
             count_place = 0
-            self.transitions_to_change = []
+            self.transitions_to_change = {}
             for place in self.net.getPlaces():
                 place.tokens = Wk[self.net.getPlaces().index(place)]
                 count_place += 1
@@ -1121,7 +1116,8 @@ class MainAplication(QtWidgets.QMainWindow):
                         previous_place = self.net.getPlaceById(
                             arc.getSourceId()).label
                     if changed_places[count_place - 1] and arc.dest.name == place.name:
-                        self.transitions_to_change.append(arc.src.label)
+                        self.transitions_to_change[self.image_number -
+                                                   1] = arc.src.label
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
@@ -1379,6 +1375,13 @@ class MainAplication(QtWidgets.QMainWindow):
         ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
         self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
 
+    def error_message_box(self):
+        dialog = QMessageBox(text="Siet je neohranicena")
+        dialog.setWindowTitle("Message Dialog")
+        dialog.setWindowIcon(QtGui.QIcon(
+            'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
+        dialog.exec()   # Stores the return value for the button pressed
+
     def run_logical(self):
         self.net.M0 = [int(i) for i in self.net.M0]
         self.image_number = 1
@@ -1402,11 +1405,7 @@ class MainAplication(QtWidgets.QMainWindow):
             self.tree.write(os.path.join(dir_path, self.file_name.split(
                 '.')[0] + "_final_marking.xml"), encoding="UTF-8", xml_declaration=True)
         else:
-            dialog = QMessageBox(text="Siet je neohranicena")
-            dialog.setWindowTitle("Message Dialog")
-            dialog.setWindowIcon(QtGui.QIcon(
-                'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
-            dialog.exec()   # Stores the return value for the button pressed
+            self.error_message_box()
 
     def run_fuzzy(self):
         self.image_number = 1
@@ -1430,11 +1429,7 @@ class MainAplication(QtWidgets.QMainWindow):
             self.tree.write(os.path.join(dir_path, self.file_name.split(
                 '.')[0] + "_final_marking.xml"), encoding="UTF-8", xml_declaration=True)
         else:
-            dialog = QMessageBox(text="Siet je neohranicena")
-            dialog.setWindowTitle("Message Dialog")
-            dialog.setWindowIcon(QtGui.QIcon(
-                'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
-            dialog.exec()   # Stores the return value for the button pressed
+            self.error_message_box()
 
     def run_fuzzy_with_weights(self):
         self.image_number = 1
@@ -1458,11 +1453,7 @@ class MainAplication(QtWidgets.QMainWindow):
             self.tree.write(os.path.join(dir_path, self.file_name.split(
                 '.')[0] + "_final_marking.xml"), encoding="UTF-8", xml_declaration=True)
         else:
-            dialog = QMessageBox(text="Siet je neohranicena")
-            dialog.setWindowTitle("Message Dialog")
-            dialog.setWindowIcon(QtGui.QIcon(
-                'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
-            dialog.exec()   # Stores the return value for the button pressed
+            self.error_message_box()
 
     def run_fuzzy_with_weights_and_thresholds(self):
         self.image_number = 1
@@ -1486,11 +1477,7 @@ class MainAplication(QtWidgets.QMainWindow):
             self.tree.write(os.path.join(dir_path, self.file_name.split(
                 '.')[0] + "_final_marking.xml"), encoding="UTF-8", xml_declaration=True)
         else:
-            dialog = QMessageBox(text="Siet je neohranicena")
-            dialog.setWindowTitle("Message Dialog")
-            dialog.setWindowIcon(QtGui.QIcon(
-                'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
-            dialog.exec()   # Stores the return value for the button pressed
+            self.error_message_box()
 
 
 class DialogWindow(QtWidgets.QDialog):
