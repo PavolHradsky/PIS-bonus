@@ -1,3 +1,4 @@
+import qdarktheme
 from math import sin, cos, pi, atan2, sqrt
 import graphviz as gv
 import bcrypt
@@ -161,12 +162,22 @@ class MainAplication(QtWidgets.QMainWindow):
         print(self.main_layout.comboBox.currentText())
 
     def run(self):
-        print(self.database_output_table2)
-        self.anotherWindow.table.setColumnCount(7)
+        """
+        self.anotherWindow.table.setColumnCount(5)
         self.anotherWindow.table.setHorizontalHeaderLabels(
-            ["Meno", "Priezvisko", "Vek", "Pohlavie", "Výška", "Váha", "Choroba"])
+            ["Pacient ID", "Pulz", "Okysličenie krvi", "Systolický KT", "Diastolický KT"])
         self.anotherWindow.table.setRowCount(1)
-
+        self.anotherWindow.table.setItem(0, 0, QtWidgets.QTableWidgetItem(
+            str(self.database_output_table2[1])))
+        self.anotherWindow.table.setItem(0, 1, QtWidgets.QTableWidgetItem(
+            str(self.database_output_table2[2])))
+        self.anotherWindow.table.setItem(0, 2, QtWidgets.QTableWidgetItem(
+            str(self.database_output_table2[3])))  # Need to convert integer to string
+        self.anotherWindow.table.setItem(0, 3, QtWidgets.QTableWidgetItem(
+            str(self.database_output_table2[4])))
+        self.anotherWindow.table.setItem(0, 4, QtWidgets.QTableWidgetItem(
+            str(self.database_output_table2[5])))  # Need to convert float to string
+        """
         if self.file_path:
             self.tree = ET.parse(self.file_path)
             self.root = self.tree.getroot()
@@ -361,7 +372,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 weightsLayout.addLayout(weightLayout)
             self.anotherWindow.weightsScrollArea.setWidget(
                 self.anotherWindow.weightsWidget)
-            self.anotherWindow.OK2.setDisabled(False)
+            self.anotherWindow.OK2.setDisabled(True)
 
         if self.weights_flag:
             self.anotherWindow.OK3.setDisabled(True)
@@ -508,7 +519,7 @@ class MainAplication(QtWidgets.QMainWindow):
         self.main_layout.nextButton.setEnabled(True)
         self.main_layout.clearAll.setEnabled(False)
 
-    def draw_net(self, weights=False, thresholds=False, value=0):
+    def draw_net(self, weights=False, thresholds=False):
         graph_data = {
             'places': [],
             'transitions': [],
@@ -541,7 +552,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "hodnoty": [{
                                 "label": i[0].label,
                                 "image": self.image_index,
-                                "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
+                                "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
                             }],
                             "sipky": {
                                 i[1].label: graph_data['edges'][i]
@@ -555,7 +566,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "label": i[0].label,
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
-                                "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
+                                "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
                             }],
                             "sipky": {
                                 i[1].label: graph_data['edges'][i]
@@ -570,7 +581,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
                                 "prah": i[0].getTreshold(),
-                                "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
+                                "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
                             }],
                             "sipky": {
                                 i[1].label: graph_data['edges'][i]
@@ -582,7 +593,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             self.dict_final[i[0].label]["hodnoty"].append({
                                 "label": i[0].label,
                                 "image": self.image_index,
-                                "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
+                                "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
 
                             })
                         if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
@@ -595,7 +606,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "label": i[0].label,
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
-                                "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
+                                "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
                             })
                         if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
                             self.dict_final[i[0].label]["sipky"][i[1]
@@ -608,7 +619,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
                                 "prah": i[0].getTreshold(),
-                                "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
+                                "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
                             })
                         if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
                             self.dict_final[i[0].label]["sipky"][i[1]
@@ -682,7 +693,7 @@ class MainAplication(QtWidgets.QMainWindow):
                         "hodnoty": [{
                             "label": i.label,
                             "image": self.image_index,
-                            "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
+                            "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
                         }]
 
                     }
@@ -695,7 +706,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "label": i.label,
                             "image": self.image_index,
                             "vaha": i.getWeight(),
-                            "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
+                            "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
                         }]
                     }
                 if thresholds:
@@ -707,7 +718,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "image": self.image_index,
                             "vaha": i.getWeight(),
                             "prah": i.getTreshold(),
-                            "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
+                            "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
                         }]
                     }
             else:
@@ -716,7 +727,7 @@ class MainAplication(QtWidgets.QMainWindow):
                         self.dict_final[i.label]["hodnoty"].append({
                             "label": i.label,
                             "image": self.image_index,
-                            "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
+                            "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
                         })
 
                 if weights and not thresholds:
@@ -725,7 +736,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "label": i.label,
                             "image": self.image_index,
                             "vaha": i.getWeight(),
-                            "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
+                            "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
                         })
 
                 if thresholds:
@@ -735,7 +746,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "image": self.image_index,
                             "vaha": i.getWeight(),
                             "prah": i.getTreshold(),
-                            "farba": True if i[0].label == self.transitions_to_change[self.image_index-value] else False
+                            "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
                         })
 
         if self.image_index == 1:
@@ -843,89 +854,83 @@ class MainAplication(QtWidgets.QMainWindow):
 
         cv2.imwrite(f"./images/{self.image_index}.png", img)
 
-    def logical_petri_net(self, M):
-        if self.counter_first_draw == 0:
-            array_steps = []
-            Wo = M[0].state
-            # print("Počiatočné ohodnotenie: ", Wo)
-            nRows = len(self.net.getPlaces())
-            nColumns = len(self.net.getTransitions())
-            inputMatrix = np.array([[0 for _ in range(nColumns)]
-                                    for _ in range(nRows)])
-            outputMatrix = np.array([[0 for _ in range(nColumns)]
-                                    for _ in range(nRows)])
-            # fill each matrix with the proper data
-            for arc in self.net.getArcs():
-                sourceId = arc.getSourceId()
-                destinationId = arc.getDestinationId()
-                source = None
-                destination = None
-                if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
-                    source = self.net.getPlaceById(sourceId)
-                    destination = self.net.getTransitionById(destinationId)
-                elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
-                    source = self.net.getTransitionById(sourceId)
-                    destination = self.net.getPlaceById(destinationId)
-                if type(source) == Place:
-                    sourceIdInNetList = self.net.getPlaces().index(source)
-                    destinationIdInNetList = self.net.getTransitions().index(destination)
-                    inputMatrix[sourceIdInNetList,
-                                destinationIdInNetList] = arc.getMultiplicity()
-                if type(source) == Transition:
-                    sourceIdInNetList = self.net.getTransitions().index(source)
-                    destinationIdInNetList = self.net.getPlaces().index(destination)
-                    outputMatrix[destinationIdInNetList,
-                                 sourceIdInNetList] = arc.getMultiplicity()
-            Wk = []
-            i = 0
-            while not np.array_equal(Wo, Wk):
-                if i == 0:
-                    Wo = Wo
-                else:
-                    Wo = Wk
-                i += 1
-                neg_Wo = [abs(1 - i) for i in Wo]
-                transponse_array = np.transpose(inputMatrix)
-                Vo = []
+    def fill_dict_pre_logical_net(self, M):
+        self.transitions_to_change = {}
+        Wo = M[0].state
+        nRows = len(self.net.getPlaces())
+        nColumns = len(self.net.getTransitions())
+        inputMatrix = np.array([[0 for _ in range(nColumns)]
+                                for _ in range(nRows)])
+        outputMatrix = np.array([[0 for _ in range(nColumns)]
+                                for _ in range(nRows)])
+
+        # fill each matrix with the proper data
+        for arc in self.net.getArcs():
+            sourceId = arc.getSourceId()
+            destinationId = arc.getDestinationId()
+            source = None
+            destination = None
+            if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
+                source = self.net.getPlaceById(sourceId)
+                destination = self.net.getTransitionById(destinationId)
+            elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
+                source = self.net.getTransitionById(sourceId)
+                destination = self.net.getPlaceById(destinationId)
+            if type(source) == Place:
+                sourceIdInNetList = self.net.getPlaces().index(source)
+                destinationIdInNetList = self.net.getTransitions().index(destination)
+                inputMatrix[sourceIdInNetList,
+                            destinationIdInNetList] = arc.getMultiplicity()
+            if type(source) == Transition:
+                sourceIdInNetList = self.net.getTransitions().index(source)
+                destinationIdInNetList = self.net.getPlaces().index(destination)
+                outputMatrix[destinationIdInNetList,
+                             sourceIdInNetList] = arc.getMultiplicity()
+        Wk = []
+        i = 0
+        while not np.array_equal(Wo, Wk):
+            if i == 0:
+                Wo = Wo
+            else:
+                Wo = Wk
+            i += 1
+            neg_Wo = [abs(1 - i) for i in Wo]
+            transponse_array = np.transpose(inputMatrix)
+            Vo = []
+            sub_result = []
+            for i in transponse_array:
+                for index, k in enumerate(i):
+                    sub_result.append(min(k, neg_Wo[index]))
+                Vo.append(float(max(sub_result)))
                 sub_result = []
-                for i in transponse_array:
-                    for index, k in enumerate(i):
-                        sub_result.append(min(k, neg_Wo[index]))
-                    Vo.append(float(max(sub_result)))
-                    sub_result = []
 
-                for i in range(len(Vo)):
-                    if Vo[i] > 1:
-                        Vo[i] = 1.0
-                Uo = [abs(1 - i) for i in Vo]
-                Wk = [int((outputMatrix @ Uo)[i] or Wo[i])
-                      for i in range(len(Wo))]
+            for i in range(len(Vo)):
+                if Vo[i] > 1:
+                    Vo[i] = 1.0
+            Uo = [abs(1 - i) for i in Vo]
+            Wk = [int((outputMatrix @ Uo)[i] or Wo[i]) for i in range(len(Wo))]
 
-                changed_places = []
-                for num in range(len(Wo)):
-                    if Wk[num] != Wo[num]:
-                        changed_places.append(True)
-                    else:
-                        changed_places.append(False)
-                previous_place = None
+            changed_places = []
+            for num in range(len(Wo)):
+                if Wk[num] != Wo[num]:
+                    changed_places.append(True)
+                else:
+                    changed_places.append(False)
 
-                if self.counter_first_draw == 0:
-                    count_place = 0
-                    self.transitions_to_change = {}
-                    for place in self.net.getPlaces():
-                        count_place += 1
-                        for arc in self.net.getArcs():
-                            if arc.dest.name == place.name and changed_places[count_place - 1]:
-                                self.transitions_to_change[self.image_number] = arc.src.label
-                    self.draw_net(0, 0, 0)
-                    print("transitions_to_change: ",
-                          self.transitions_to_change)
-                    self.image_number += 1
-                break
+            count_place = 0
+            for place in self.net.getPlaces():
+                count_place += 1
+                for arc in self.net.getArcs():
+                    if arc.dest.name == place.name and changed_places[count_place - 1]:
+                        self.transitions_to_change[self.image_number] = arc.src.label
+            if Wk != Wo:
+                self.image_number += 1
+        self.transitions_to_change[self.image_number] = "END"
+        print("transitions_to_change: ", self.transitions_to_change)
 
+    def logical_petri_net(self, M):
         array_steps = []
         Wo = M[0].state
-        # print("Počiatočné ohodnotenie: ", Wo)
         self.main_layout.marking.setText(
             "( "+', '.join([str(int(elem)) for i, elem in enumerate(Wo)])+" )")
         self.main_layout.marking.adjustSize()
@@ -993,7 +998,6 @@ class MainAplication(QtWidgets.QMainWindow):
                     changed_places.append(False)
             previous_place = None
             count_place = 0
-            self.transitions_to_change = {}
             for place in self.net.getPlaces():
                 place.tokens = Wk[self.net.getPlaces().index(place)]
                 count_place += 1
@@ -1002,12 +1006,10 @@ class MainAplication(QtWidgets.QMainWindow):
                         previous_place = self.net.getPlaceById(
                             arc.getSourceId()).label
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
-                        self.transitions_to_change[self.image_number] = arc.src.label
-                    if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
                         print(result_string)
-            print("transitions_to_change: ", self.transitions_to_change)
+
             if Wk != Wo:
                 self.step_dict[self.image_number-1] = array_steps
                 array_steps = []
@@ -1015,22 +1017,103 @@ class MainAplication(QtWidgets.QMainWindow):
                                                       for i, elem in enumerate(Wk)])+" )"
                 self.actual_marking_dict[self.image_number -
                                          1] = actual_step_marking
-                self.counter_first_draw += 1
-                if self.counter_first_draw != 0:
-                    self.draw_net(0, 0, 0)
-
+                self.draw_net(0, 0)
                 self.image_number += 1
                 print("Wk: ", Wk)
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
 
-        if self.counter_first_draw != 0:
-            self.image_number = 1
-            prem = QImage(self.image_dict[self.image_number])
-            pixmap = QPixmap.fromImage(prem)
-            self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
-            ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-            self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+        self.image_number = 1
+        prem = QImage(self.image_dict[self.image_number])
+        pixmap = QPixmap.fromImage(prem)
+        self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
+        ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+        self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+
+    def fill_dict_pre_fuzzy_net(self, M):
+        self.transitions_to_change = {}
+        Wo = M[0].state
+        nRows = len(self.net.getPlaces())
+        nColumns = len(self.net.getTransitions())
+        inputMatrix = np.array([[0 for _ in range(nColumns)]
+                                for _ in range(nRows)])
+        outputMatrix = np.array([[0 for _ in range(nColumns)]
+                                for _ in range(nRows)])
+        # fill each matrix with the proper data
+        for arc in self.net.getArcs():
+            sourceId = arc.getSourceId()
+            destinationId = arc.getDestinationId()
+            source = None
+            destination = None
+            if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
+                source = self.net.getPlaceById(sourceId)
+                destination = self.net.getTransitionById(destinationId)
+            elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
+                source = self.net.getTransitionById(sourceId)
+                destination = self.net.getPlaceById(destinationId)
+            if type(source) == Place:
+                sourceIdInNetList = self.net.getPlaces().index(source)
+                destinationIdInNetList = self.net.getTransitions().index(destination)
+                inputMatrix[sourceIdInNetList,
+                            destinationIdInNetList] = arc.getMultiplicity()
+            if type(source) == Transition:
+                sourceIdInNetList = self.net.getTransitions().index(source)
+                destinationIdInNetList = self.net.getPlaces().index(destination)
+                outputMatrix[destinationIdInNetList,
+                             sourceIdInNetList] = arc.getMultiplicity()
+        Wk = []
+        i = 0
+        while not np.array_equal(Wo, Wk):
+            if i == 0:
+                Wo = Wo
+            else:
+                Wo = Wk
+            i += 1
+            neg_Wo = [round(abs(1 - i), 2) for i in Wo]
+            transponse_array = np.transpose(inputMatrix)
+            Vo = []
+            sub_result = []
+            for i in transponse_array:
+                for index, k in enumerate(i):
+                    sub_result.append(min(k, neg_Wo[index]))
+                Vo.append(float(max(sub_result)))
+                sub_result = []
+
+            for i in range(len(Vo)):
+                if Vo[i] > 1:
+                    Vo[i] = 1.0
+            Uo = [round(abs(1 - i), 2) for i in Vo]
+
+            almost_result = []
+            sub_result = []
+            for i in outputMatrix:
+                for index, k in enumerate(i):
+                    sub_result.append(min(k, Uo[index]))
+                almost_result.append(float(max(sub_result)))
+                sub_result = []
+            Wk = []
+            for i in range(len(Wo)):
+                if Wo[i] > almost_result[i]:
+                    Wk.append(Wo[i])
+                else:
+                    Wk.append(almost_result[i])
+
+            changed_places = []
+            for num in range(len(Wo)):
+                if Wk[num] != Wo[num]:
+                    changed_places.append(True)
+                else:
+                    changed_places.append(False)
+            count_place = 0
+            for place in self.net.getPlaces():
+                count_place += 1
+                for arc in self.net.getArcs():
+                    if arc.dest.name == place.name and changed_places[count_place - 1]:
+                        self.transitions_to_change[self.image_number] = arc.src.label
+            if Wk != Wo:
+                self.image_number += 1
+        self.transitions_to_change[self.image_number] = "END"
+        print("transitions_to_change: ", self.transitions_to_change)
 
     def fuzzy_petri_net(self, M):
         array_steps = []
@@ -1114,7 +1197,7 @@ class MainAplication(QtWidgets.QMainWindow):
                     changed_places.append(False)
             previous_place = None
             count_place = 0
-            self.transitions_to_change = {}
+
             for place in self.net.getPlaces():
                 place.tokens = Wk[self.net.getPlaces().index(place)]
                 count_place += 1
@@ -1122,14 +1205,11 @@ class MainAplication(QtWidgets.QMainWindow):
                     if arc.getSourceId().__class__ == Place:
                         previous_place = self.net.getPlaceById(
                             arc.getSourceId()).label
-                    if changed_places[count_place - 1] and arc.dest.name == place.name:
-                        self.transitions_to_change[self.image_number -
-                                                   1] = arc.src.label
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
                         print(result_string)
-            print("transitions_to_change: ", self.transitions_to_change)
+
             if Wk != Wo:
                 self.step_dict[self.image_number-1] = array_steps
                 array_steps = []
@@ -1140,13 +1220,98 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.draw_net(0, 0)
                 self.image_number += 1
                 print("Wk: ", Wk)
-            self.net.Wk_final = Wk
+                self.net.Wk_final = Wk
+            self.net.Wk_final = Wo
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
         self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
         ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
         self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+
+    def fill_dict_pre_fuzzy_with_weights(self, M):
+        self.transitions_to_change = {}
+        Wo = M[0].state
+        nRows = len(self.net.getPlaces())
+        nColumns = len(self.net.getTransitions())
+        inputMatrix = np.array([[0.0 for _ in range(nColumns)]
+                                for _ in range(nRows)])
+        outputMatrix = np.array([[0.0 for _ in range(nColumns)]
+                                for _ in range(nRows)])
+
+        # fill each matrix with the proper data
+        for arc in self.net.getArcs():
+            sourceId = arc.getSourceId()
+            destinationId = arc.getDestinationId()
+            source = None
+            destination = None
+            if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
+                source = self.net.getPlaceById(sourceId)
+                destination = self.net.getTransitionById(destinationId)
+            elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
+                source = self.net.getTransitionById(sourceId)
+                destination = self.net.getPlaceById(destinationId)
+            if type(source) == Place:
+                sourceIdInNetList = self.net.getPlaces().index(source)
+                destinationIdInNetList = self.net.getTransitions().index(destination)
+                inputMatrix[sourceIdInNetList,
+                            destinationIdInNetList] = arc.getMultiplicity()
+            if type(source) == Transition:
+                sourceIdInNetList = self.net.getTransitions().index(source)
+                destinationIdInNetList = self.net.getPlaces().index(destination)
+                outputMatrix[destinationIdInNetList,
+                             sourceIdInNetList] = self.net.getWeights()[sourceIdInNetList]
+
+        Wk = []
+        i = 0
+        while not np.array_equal(Wo, Wk):
+            if i == 0:
+                Wo = Wo
+            else:
+                Wo = Wk
+            i += 1
+            neg_Wo = [round(abs(1 - i), 2) for i in Wo]
+            transponse_array = np.transpose(inputMatrix)
+            Vo = []
+            sub_result = []
+            for i in transponse_array:
+                for index, k in enumerate(i):
+                    sub_result.append(min(k, neg_Wo[index]))
+                Vo.append(max(sub_result))
+                sub_result = []
+            for i in range(len(Vo)):
+                if Vo[i] > 1:
+                    Vo[i] = 1.0
+            Uo = [round(abs(1 - i), 2) for i in Vo]
+            almost_result = []
+            sub_result = []
+            for i in outputMatrix:
+                for index, k in enumerate(i):
+                    sub_result.append(min(k, Uo[index]))
+                almost_result.append(float(max(sub_result)))
+                sub_result = []
+            Wk = []
+            for i in range(len(Wo)):
+                if Wo[i] > almost_result[i]:
+                    Wk.append(Wo[i])
+                else:
+                    Wk.append(almost_result[i])
+            changed_places = []
+            for num in range(len(Wo)):
+                if Wk[num] != Wo[num]:
+                    changed_places.append(True)
+                else:
+                    changed_places.append(False)
+            count_place = 0
+            for place in self.net.getPlaces():
+                count_place += 1
+                for arc in self.net.getArcs():
+                    if changed_places[count_place - 1] and arc.dest.name == place.name:
+                        self.transitions_to_change[self.image_number] = arc.src.label
+            if Wk != Wo:
+                self.image_number += 1
+        self.transitions_to_change[self.image_number] = "END"
+        print("transitions_to_change: ", self.transitions_to_change)
 
     def fuzzy_petri_net_with_weights(self, M):
         array_steps = []
@@ -1229,7 +1394,7 @@ class MainAplication(QtWidgets.QMainWindow):
                     changed_places.append(False)
             previous_place = None
             count_place = 0
-            self.transitions_to_change = []
+
             for place in self.net.getPlaces():
                 place.tokens = Wk[self.net.getPlaces().index(place)]
                 count_place += 1
@@ -1237,13 +1402,10 @@ class MainAplication(QtWidgets.QMainWindow):
                     if arc.getSourceId().__class__ == Place:
                         previous_place = self.net.getPlaceById(
                             arc.getSourceId()).label
-                    if changed_places[count_place - 1] and arc.dest.name == place.name:
-                        self.transitions_to_change.append(arc.src.label)
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
                         print(result_string)
-            print("transitions_to_change: ", self.transitions_to_change)
             if Wk != Wo:
                 self.step_dict[self.image_number-1] = array_steps
                 array_steps = []
@@ -1254,13 +1416,105 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.draw_net(1, 0)
                 self.image_number += 1
                 print("Wk: ", Wk)
-            self.net.Wk_final = Wk
+                self.net.Wk_final = Wk
+            self.net.Wk_final = Wo
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
         self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
         ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
         self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+
+    def fill_dict_pre_fuzzy_with_weights_and_thresholds(self, M):
+        self.transitions_to_change = {}
+        Wo = M[0].state
+        nRows = len(self.net.getPlaces())
+        nColumns = len(self.net.getTransitions())
+        inputMatrix = np.array([[0.0 for _ in range(nColumns)]
+                                for _ in range(nRows)])
+        outputMatrix = np.array([[0.0 for _ in range(nColumns)]
+                                for _ in range(nRows)])
+
+        # fill each matrix with the proper data
+        for arc in self.net.getArcs():
+            sourceId = arc.getSourceId()
+            destinationId = arc.getDestinationId()
+            source = None
+            destination = None
+            if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
+                source = self.net.getPlaceById(sourceId)
+                destination = self.net.getTransitionById(destinationId)
+            elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
+                source = self.net.getTransitionById(sourceId)
+                destination = self.net.getPlaceById(destinationId)
+            if type(source) == Place:
+                sourceIdInNetList = self.net.getPlaces().index(source)
+                destinationIdInNetList = self.net.getTransitions().index(destination)
+                inputMatrix[sourceIdInNetList,
+                            destinationIdInNetList] = arc.getMultiplicity()
+            if type(source) == Transition:
+                sourceIdInNetList = self.net.getTransitions().index(source)
+                destinationIdInNetList = self.net.getPlaces().index(destination)
+                outputMatrix[destinationIdInNetList,
+                             sourceIdInNetList] = arc.getMultiplicity()
+        Wk = []
+        i = 0
+        while not np.array_equal(Wo, Wk):
+            if i == 0:
+                Wo = Wo
+            else:
+                Wo = Wk
+            i += 1
+            neg_Wo = [round(abs(1 - i), 2) for i in Wo]
+            transponse_array = np.transpose(inputMatrix)
+            Vo = []
+            sub_result = []
+            for i in transponse_array:
+                for index, k in enumerate(i):
+                    sub_result.append(min(k, neg_Wo[index]))
+                Vo.append(max(sub_result))
+                sub_result = []
+            for i in range(len(Vo)):
+                if Vo[i] > 1:
+                    Vo[i] = 1.0
+            # reacts to TR
+            Uo = []
+            negVo = [round(abs(1 - i), 2) for i in Vo]
+            for i in range(len(negVo)):
+                if negVo[i] >= self.net.tresholds[i]:
+                    Uo.append(negVo[i])
+                else:
+                    Uo.append(0.0)
+            almost_result = []
+            sub_result = []
+            for i in outputMatrix:
+                for index, k in enumerate(i):
+                    sub_result.append(min(k, Uo[index]))
+                almost_result.append(float(max(sub_result)))
+                sub_result = []
+            Wk = []
+            for i in range(len(Wo)):
+                if Wo[i] > almost_result[i]:
+                    Wk.append(Wo[i])
+                else:
+                    Wk.append(almost_result[i])
+            changed_places = []
+            for num in range(len(Wo)):
+                if Wk[num] != Wo[num]:
+                    changed_places.append(True)
+                else:
+                    changed_places.append(False)
+            count_place = 0
+            for place in self.net.getPlaces():
+                place.tokens = Wk[self.net.getPlaces().index(place)]
+                count_place += 1
+                for arc in self.net.getArcs():
+                    if changed_places[count_place - 1] and arc.dest.name == place.name:
+                        self.transitions_to_change[self.image_number] = arc.src.label
+            if Wk != Wo:
+                self.image_number += 1
+        self.transitions_to_change[self.image_number] = "END"
+        print("transitions_to_change: ", self.transitions_to_change)
 
     def fuzzy_petri_net_with_weights_thresholds(self, M):
         array_steps = []
@@ -1349,7 +1603,6 @@ class MainAplication(QtWidgets.QMainWindow):
                     changed_places.append(False)
             previous_place = None
             count_place = 0
-            self.transitions_to_change = []
             for place in self.net.getPlaces():
                 place.tokens = Wk[self.net.getPlaces().index(place)]
                 count_place += 1
@@ -1357,8 +1610,6 @@ class MainAplication(QtWidgets.QMainWindow):
                     if arc.getSourceId().__class__ == Place:
                         previous_place = self.net.getPlaceById(
                             arc.getSourceId()).label
-                    if changed_places[count_place - 1] and arc.dest.name == place.name:
-                        self.transitions_to_change.append(arc.src.label)
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
@@ -1374,7 +1625,8 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.draw_net(1, 1)
                 self.image_number += 1
                 print("Wk: ", Wk)
-            self.net.Wk_final = Wk
+                self.net.Wk_final = Wk
+            self.net.Wk_final = Wo
         self.image_number = 1
         prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
@@ -1399,9 +1651,12 @@ class MainAplication(QtWidgets.QMainWindow):
             os.remove(f)
         M = reachability(self.net)
         if M is not None:
-            #self.draw_net(0, 0)
+            self.image_number = 1
+            self.fill_dict_pre_logical_net(M)
+            self.image_number = 1
+            self.draw_net(0, 0)
+            self.image_number += 1
             self.logical_petri_net(M)
-            print("asdas", self.net.Wk_final)
             dir_path = os.path.dirname(self.file_path)
             l = 0
             for rank in self.root.iter('place'):
@@ -1423,6 +1678,9 @@ class MainAplication(QtWidgets.QMainWindow):
             os.remove(f)
         M = reachability(self.net)
         if M is not None:
+            self.image_number = 1
+            self.fill_dict_pre_fuzzy_net(M)
+            self.image_number = 1
             self.draw_net(0, 0)
             self.image_number += 1
             self.fuzzy_petri_net(M)
@@ -1447,7 +1705,10 @@ class MainAplication(QtWidgets.QMainWindow):
             os.remove(f)
         M = reachability(self.net)
         if M is not None:
-            self.draw_net(1, 0)
+            self.image_number = 1
+            self.fill_dict_pre_fuzzy_with_weights(M)
+            self.image_number = 1
+            self.draw_net(0, 0)
             self.image_number += 1
             self.fuzzy_petri_net_with_weights(M)
             dir_path = os.path.dirname(self.file_path)
@@ -1471,7 +1732,10 @@ class MainAplication(QtWidgets.QMainWindow):
             os.remove(f)
         M = reachability(self.net)
         if M is not None:
-            self.draw_net(1, 1)
+            self.image_number = 1
+            self.fill_dict_pre_fuzzy_with_weights_and_thresholds(M)
+            self.image_number = 1
+            self.draw_net(0, 0)
             self.image_number += 1
             self.fuzzy_petri_net_with_weights_thresholds(M)
             dir_path = os.path.dirname(self.file_path)
@@ -1571,13 +1835,15 @@ class DialogWindow(QtWidgets.QDialog):
 
 
 if __name__ == '__main__':
-    result, result1, result2 = connect()
+    #result, result1, result2 = connect()
+    # qdarktheme.enable_hi_dpi()
     app = QtWidgets.QApplication(sys.argv)
-    #window = MainAplication()
-   # window.show()
-    dialog = DialogWindow()
-    dialog.database_output_table1 = result
-    dialog.database_output_table2 = result1
-    dialog.hashed = result2
-    dialog.parsing_database()
+    # qdarktheme.setup_theme()
+    window = MainAplication()
+    window.show()
+    #dialog = DialogWindow()
+    #dialog.database_output_table1 = result
+    #dialog.database_output_table2 = result1
+    #dialog.hashed = result2
+    # dialog.parsing_database()
     sys.exit(app.exec())
