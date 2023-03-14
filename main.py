@@ -835,7 +835,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
             else:
                 color = (
-                    0, 255, 0) if self.dict_final[i]["hodnoty"][self.image_index - 1]["farba"] else (0, 0, 0)
+                    0, 255, 0) if self.dict_final[i]["hodnoty"][self.image_index - 1]["farba"] else (0, 0, 255)
                 cv2.rectangle(img, (x1 - 30, y1 - 30),
                               (x1 + 30, y1 + 30), color, 2)
 
