@@ -1,4 +1,3 @@
-import qdarktheme
 from math import sin, cos, pi, atan2, sqrt
 import graphviz as gv
 import bcrypt
@@ -751,12 +750,9 @@ class MainAplication(QtWidgets.QMainWindow):
             for i in range(1, amount+1):
                 x1 = rad * cos(angle*i * pi/180)
                 y1 = rad * sin(angle*i * pi/180)
-                self.dict_final[dict_keys[i-1]
-                                ]["suradnice"] = [round(x + x1), round(y + y1)]
-
-        for i in self.dict_final:
-            print(self.dict_final[i], "\n\n")
-
+                self.dict_final[dict_keys[i-1]]["suradnice"] = {"main_coords": (round(x + x1), round(y + y1))}
+                # print label and coordinates
+                print("XXXXXXXXXXXXXXX", self.dict_final[dict_keys[i-1]]["hodnoty"][0]["label"], self.dict_final[dict_keys[i-1]]["suradnice"]["main_coords"])
         path = './images/' + str(self.image_number) + '.png'
         self.image_dict[self.image_number] = path
         print("path: ", path)
@@ -768,8 +764,18 @@ class MainAplication(QtWidgets.QMainWindow):
         img.fill(255)
 
         for i in self.dict_final:
-            x1 = self.dict_final[i]["suradnice"][0]
-            y1 = self.dict_final[i]["suradnice"][1]
+            x1 = self.dict_final[i]["suradnice"]["main_coords"][0]
+            y1 = self.dict_final[i]["suradnice"]["main_coords"][1]
+            if x1 > 600:
+                pos = "right"
+            # elif x1 <= 670 and x1 >= 530:
+            #     if y1 > 400:
+            #         pos = "bottom"
+            #     else:
+            #         pos = "top"
+            else:
+                pos = "left"
+
             if self.dict_final[i]["typ"] == 'p':
                 text = str(self.dict_final[i]['hodnoty']
                            [self.image_index-1]['tokeny'])
@@ -780,10 +786,22 @@ class MainAplication(QtWidgets.QMainWindow):
                 cv2.putText(img, text, text_origin,
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
                 cv2.circle(img, (x1, y1), 30, (0, 0, 0), 2)
+
+                text_size, _ = cv2.getTextSize(str(self.dict_final[i]['hodnoty'][0]['label']), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
+                if pos == "right":
+                    text_pos = (x1 + 40, y1)
+                elif pos == "left":
+                    text_pos = (x1 - 40 - text_size[0], y1)
+                elif pos == "bottom":
+                    text_pos = (x1 - text_size[0] // 2, y1 + 50 + text_size[1] // 2)
+                else:
+                    text_pos = (x1 - text_size[0] // 2, y1 - 50 - text_size[1] // 2)
+                cv2.putText(img, str(self.dict_final[i]['hodnoty'][0]['label']), text_pos,
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
                 if self.dict_final[i]['sipky']:
                     for j in self.dict_final[i]['sipky']:
-                        x2 = self.dict_final[j]["suradnice"][0]
-                        y2 = self.dict_final[j]["suradnice"][1]
+                        x2 = self.dict_final[j]["suradnice"]["main_coords"][0]
+                        y2 = self.dict_final[j]["suradnice"]["main_coords"][1]
                         radius1 = 32
                         radius2 = 34
                         fixed_arrow_length = 5
@@ -811,12 +829,24 @@ class MainAplication(QtWidgets.QMainWindow):
                         cv2.putText(
                             img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
             else:
-                cv2.rectangle(img, (x1 - 30, y1 - 30),
-                              (x1 + 30, y1 + 30), (0, 0, 0), 2)
+                color = (0, 255, 0) if self.dict_final[i]["hodnoty"][self.image_index - 1]["farba"] else (0, 0, 0)
+                cv2.rectangle(img, (x1 - 30, y1 - 30), (x1 + 30, y1 + 30), color, 2)
+                
+                text_size, _ = cv2.getTextSize(str(self.dict_final[i]['hodnoty'][0]['label']), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
+                if pos == "right":
+                    text_pos = (x1 + 40, y1)
+                elif pos == "left":
+                    text_pos = (x1 - 40 - text_size[0], y1)
+                elif pos == "bottom":
+                    text_pos = (x1 - text_size[0] // 2, y1 + 50 + text_size[1] // 2)
+                else:
+                    text_pos = (x1 - text_size[0] // 2, y1 - 50 - text_size[1] // 2)
+                cv2.putText(img, str(self.dict_final[i]['hodnoty'][0]['label']), text_pos,
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
                 if self.dict_final[i]['sipky']:
                     for j in self.dict_final[i]['sipky']:
-                        x2 = self.dict_final[j]["suradnice"][0]
-                        y2 = self.dict_final[j]["suradnice"][1]
+                        x2 = self.dict_final[j]["suradnice"]["main_coords"][0]
+                        y2 = self.dict_final[j]["suradnice"]["main_coords"][1]
                         radius1 = 34
                         radius2 = 32
                         fixed_arrow_length = 5
