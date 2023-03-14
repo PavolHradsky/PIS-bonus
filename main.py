@@ -156,7 +156,7 @@ class MainAplication(QtWidgets.QMainWindow):
         print(self.main_layout.comboBox.currentText())
 
     def run(self):
-        """
+        
         self.anotherWindow.table.setColumnCount(5)
         self.anotherWindow.table.setHorizontalHeaderLabels(
             ["Pacient ID", "Pulz", "Okysličenie krvi", "Systolický KT", "Diastolický KT"])
@@ -171,7 +171,7 @@ class MainAplication(QtWidgets.QMainWindow):
             str(self.database_output_table2[4])))
         self.anotherWindow.table.setItem(0, 4, QtWidgets.QTableWidgetItem(
             str(self.database_output_table2[5])))  # Need to convert float to string
-        """
+        
         if self.file_path:
             self.tree = ET.parse(self.file_path)
             self.root = self.tree.getroot()
@@ -545,7 +545,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "hodnoty": [{
                                 "label": i[0].label,
                                 "image": self.image_index,
-                                "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
+                                "farba": True if i[0].label in self.transitions_to_change[self.image_index] else False
                             }],
                             "sipky": {
                                 i[1].label: graph_data['edges'][i]
@@ -559,7 +559,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "label": i[0].label,
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
-                                "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
+                                "farba": True if i[0].label in self.transitions_to_change[self.image_index] else False
                             }],
                             "sipky": {
                                 i[1].label: graph_data['edges'][i]
@@ -574,7 +574,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
                                 "prah": i[0].getTreshold(),
-                                "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
+                                "farba": True if i[0].label in self.transitions_to_change[self.image_index] else False
                             }],
                             "sipky": {
                                 i[1].label: graph_data['edges'][i]
@@ -586,7 +586,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             self.dict_final[i[0].label]["hodnoty"].append({
                                 "label": i[0].label,
                                 "image": self.image_index,
-                                "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
+                                "farba": True if i[0].label in self.transitions_to_change[self.image_index] else False
 
                             })
                         if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
@@ -599,7 +599,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "label": i[0].label,
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
-                                "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
+                                "farba": True if i[0].label in self.transitions_to_change[self.image_index] else False
                             })
                         if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
                             self.dict_final[i[0].label]["sipky"][i[1]
@@ -612,7 +612,7 @@ class MainAplication(QtWidgets.QMainWindow):
                                 "image": self.image_index,
                                 "vaha": i[0].getWeight(),
                                 "prah": i[0].getTreshold(),
-                                "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
+                                "farba": True if i[0].label in self.transitions_to_change[self.image_index] else False
                             })
                         if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
                             self.dict_final[i[0].label]["sipky"][i[1]
@@ -684,7 +684,7 @@ class MainAplication(QtWidgets.QMainWindow):
                         "hodnoty": [{
                             "label": i.label,
                             "image": self.image_index,
-                            "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
+                            "farba": True if i[0].label in self.transitions_to_change[self.image_index] else False
                         }]
 
                     }
@@ -697,7 +697,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "label": i.label,
                             "image": self.image_index,
                             "vaha": i.getWeight(),
-                            "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
+                            "farba": True if i[0].label in self.transitions_to_change[self.image_index] else False
                         }]
                     }
                 if thresholds:
@@ -709,7 +709,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "image": self.image_index,
                             "vaha": i.getWeight(),
                             "prah": i.getTreshold(),
-                            "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
+                            "farba": True if i[0].label in self.transitions_to_change[self.image_index] else False
                         }]
                     }
             else:
@@ -718,7 +718,7 @@ class MainAplication(QtWidgets.QMainWindow):
                         self.dict_final[i.label]["hodnoty"].append({
                             "label": i.label,
                             "image": self.image_index,
-                            "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
+                            "farba": True if i[0].label in self.transitions_to_change[self.image_index] else False
                         })
 
                 if weights and not thresholds:
@@ -727,7 +727,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "label": i.label,
                             "image": self.image_index,
                             "vaha": i.getWeight(),
-                            "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
+                            "farba": True if i[0].label in self.transitions_to_change[self.image_index] else False
                         })
 
                 if thresholds:
@@ -737,7 +737,7 @@ class MainAplication(QtWidgets.QMainWindow):
                             "image": self.image_index,
                             "vaha": i.getWeight(),
                             "prah": i.getTreshold(),
-                            "farba": True if i[0].label == self.transitions_to_change[self.image_index] else False
+                            "farba": True if i[0].label in self.transitions_to_change[self.image_index] else False
                         })
 
         if self.image_index == 1:
@@ -750,9 +750,11 @@ class MainAplication(QtWidgets.QMainWindow):
             for i in range(1, amount+1):
                 x1 = rad * cos(angle*i * pi/180)
                 y1 = rad * sin(angle*i * pi/180)
-                self.dict_final[dict_keys[i-1]]["suradnice"] = {"main_coords": (round(x + x1), round(y + y1))}
+                self.dict_final[dict_keys[i-1]]["suradnice"] = {
+                    "main_coords": (round(x + x1), round(y + y1))}
                 # print label and coordinates
-                print("XXXXXXXXXXXXXXX", self.dict_final[dict_keys[i-1]]["hodnoty"][0]["label"], self.dict_final[dict_keys[i-1]]["suradnice"]["main_coords"])
+                print("XXXXXXXXXXXXXXX", self.dict_final[dict_keys[i-1]]["hodnoty"][0]
+                      ["label"], self.dict_final[dict_keys[i-1]]["suradnice"]["main_coords"])
         path = './images/' + str(self.image_number) + '.png'
         self.image_dict[self.image_number] = path
         print("path: ", path)
@@ -787,15 +789,18 @@ class MainAplication(QtWidgets.QMainWindow):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
                 cv2.circle(img, (x1, y1), 30, (0, 0, 0), 2)
 
-                text_size, _ = cv2.getTextSize(str(self.dict_final[i]['hodnoty'][0]['label']), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
+                text_size, _ = cv2.getTextSize(
+                    str(self.dict_final[i]['hodnoty'][0]['label']), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
                 if pos == "right":
                     text_pos = (x1 + 40, y1)
                 elif pos == "left":
                     text_pos = (x1 - 40 - text_size[0], y1)
                 elif pos == "bottom":
-                    text_pos = (x1 - text_size[0] // 2, y1 + 50 + text_size[1] // 2)
+                    text_pos = (x1 - text_size[0] //
+                                2, y1 + 50 + text_size[1] // 2)
                 else:
-                    text_pos = (x1 - text_size[0] // 2, y1 - 50 - text_size[1] // 2)
+                    text_pos = (x1 - text_size[0] //
+                                2, y1 - 50 - text_size[1] // 2)
                 cv2.putText(img, str(self.dict_final[i]['hodnoty'][0]['label']), text_pos,
                             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
                 if self.dict_final[i]['sipky']:
@@ -829,18 +834,23 @@ class MainAplication(QtWidgets.QMainWindow):
                         cv2.putText(
                             img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
             else:
-                color = (0, 255, 0) if self.dict_final[i]["hodnoty"][self.image_index - 1]["farba"] else (0, 0, 0)
-                cv2.rectangle(img, (x1 - 30, y1 - 30), (x1 + 30, y1 + 30), color, 2)
-                
-                text_size, _ = cv2.getTextSize(str(self.dict_final[i]['hodnoty'][0]['label']), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
+                color = (
+                    0, 255, 0) if self.dict_final[i]["hodnoty"][self.image_index - 1]["farba"] else (0, 0, 0)
+                cv2.rectangle(img, (x1 - 30, y1 - 30),
+                              (x1 + 30, y1 + 30), color, 2)
+
+                text_size, _ = cv2.getTextSize(
+                    str(self.dict_final[i]['hodnoty'][0]['label']), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
                 if pos == "right":
                     text_pos = (x1 + 40, y1)
                 elif pos == "left":
                     text_pos = (x1 - 40 - text_size[0], y1)
                 elif pos == "bottom":
-                    text_pos = (x1 - text_size[0] // 2, y1 + 50 + text_size[1] // 2)
+                    text_pos = (x1 - text_size[0] //
+                                2, y1 + 50 + text_size[1] // 2)
                 else:
-                    text_pos = (x1 - text_size[0] // 2, y1 - 50 - text_size[1] // 2)
+                    text_pos = (x1 - text_size[0] //
+                                2, y1 - 50 - text_size[1] // 2)
                 cv2.putText(img, str(self.dict_final[i]['hodnoty'][0]['label']), text_pos,
                             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
                 if self.dict_final[i]['sipky']:
@@ -956,7 +966,12 @@ class MainAplication(QtWidgets.QMainWindow):
                 count_place += 1
                 for arc in self.net.getArcs():
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
-                        self.transitions_to_change[self.image_number] = arc.src.label
+                        if self.image_number not in self.transitions_to_change:
+                            self.transitions_to_change[self.image_number] = [
+                                arc.src.label]
+                        else:
+                            self.transitions_to_change[self.image_number].append(
+                                arc.src.label)
             if Wk != Wo:
                 self.image_number += 1
         self.transitions_to_change[self.image_number] = "END"
@@ -1098,7 +1113,12 @@ class MainAplication(QtWidgets.QMainWindow):
                 count_place += 1
                 for arc in self.net.getArcs():
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
-                        self.transitions_to_change[self.image_number] = arc.src.label
+                        if self.image_number not in self.transitions_to_change:
+                            self.transitions_to_change[self.image_number] = [
+                                arc.src.label]
+                        else:
+                            self.transitions_to_change[self.image_number].append(
+                                arc.src.label)
             if Wk != Wo:
                 self.image_number += 1
         self.transitions_to_change[self.image_number] = "END"
@@ -1270,8 +1290,13 @@ class MainAplication(QtWidgets.QMainWindow):
             for place in self.net.getPlaces():
                 count_place += 1
                 for arc in self.net.getArcs():
-                    if changed_places[count_place - 1] and arc.dest.name == place.name:
-                        self.transitions_to_change[self.image_number] = arc.src.label
+                    if arc.dest.name == place.name and changed_places[count_place - 1]:
+                        if self.image_number not in self.transitions_to_change:
+                            self.transitions_to_change[self.image_number] = [
+                                arc.src.label]
+                        else:
+                            self.transitions_to_change[self.image_number].append(
+                                arc.src.label)
             if Wk != Wo:
                 self.image_number += 1
         self.transitions_to_change[self.image_number] = "END"
@@ -1447,8 +1472,13 @@ class MainAplication(QtWidgets.QMainWindow):
                 place.tokens = Wk[self.net.getPlaces().index(place)]
                 count_place += 1
                 for arc in self.net.getArcs():
-                    if changed_places[count_place - 1] and arc.dest.name == place.name:
-                        self.transitions_to_change[self.image_number] = arc.src.label
+                    if arc.dest.name == place.name and changed_places[count_place - 1]:
+                        if self.image_number not in self.transitions_to_change:
+                            self.transitions_to_change[self.image_number] = [
+                                arc.src.label]
+                        else:
+                            self.transitions_to_change[self.image_number].append(
+                                arc.src.label)
             if Wk != Wo:
                 self.image_number += 1
         self.transitions_to_change[self.image_number] = "END"
@@ -1747,15 +1777,15 @@ class DialogWindow(QtWidgets.QDialog):
 
 
 if __name__ == '__main__':
-    #result, result1, result2 = connect()
+    result, result1, result2 = connect()
     # qdarktheme.enable_hi_dpi()
     app = QtWidgets.QApplication(sys.argv)
     # qdarktheme.setup_theme()
-    window = MainAplication()
-    window.show()
-    #dialog = DialogWindow()
-    #dialog.database_output_table1 = result
-    #dialog.database_output_table2 = result1
-    #dialog.hashed = result2
-    # dialog.parsing_database()
+    #☺window = MainAplication()
+    #window.show()
+    dialog = DialogWindow()
+    dialog.database_output_table1 = result
+    dialog.database_output_table2 = result1
+    dialog.hashed = result2
+    dialog.parsing_database()
     sys.exit(app.exec())
