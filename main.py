@@ -1,30 +1,23 @@
 from math import sin, cos, pi, atan2, sqrt
-import graphviz as gv
 import bcrypt
 import cv2
 from database import connect
-import networkx as nx
-import matplotlib.pyplot as plt
 import numpy as np
 import xml.etree.ElementTree as ET
 import re
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import sys
 from PetriNet import PetriNet
 from Place import Place
 from Transition import Transition
 from functions import read_xml, list_is_greater
 from Rpn import Rpn
-import tkinter as tk
 from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QMessageBox
-from PySide6.QtCore import QFile, QIODevice
+from PySide6.QtCore import QFile
 import os
 import glob
-from PySide6.QtGui import QPixmap, QImage, QResizeEvent
-import matplotlib
-matplotlib.use('tkagg')
+from PySide6.QtGui import QPixmap, QImage
 
 
 def loading_data(name_file, fuzzy_flag, weights_flag, threshold_flag, flag):
@@ -62,7 +55,7 @@ def reachability(net):
     return M
 
 
-class MainAplication(QtWidgets.QMainWindow):
+class MainAplication(QMainWindow):
     loader = QUiLoader()
     file_path = None
     file_name = None
@@ -78,6 +71,8 @@ class MainAplication(QtWidgets.QMainWindow):
         self.setCentralWidget(self.main_layout)
         self.setWindowIcon(QtGui.QIcon(
             'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setStyleSheet("QMainWindow::titleBar { background-color: black; }")
         self.setGeometry(200, 200, 800, 600)
         self.setWindowTitle("Chronické zlyhávanie srdca")
         self.image_number = 1
@@ -93,6 +88,8 @@ class MainAplication(QtWidgets.QMainWindow):
         self.main_layout.nextButton.clicked.connect(self.next)
         self.main_layout.clearAll.clicked.connect(self.clear)
         self.main_layout.clearAll.setEnabled(False)
+        #self.main_layout.steps.setStyleSheet("background-color: black;")
+        self.main_layout.table.setStyleSheet("background-color: black;")
         self.image_dict = {}
         self.step_dict = {}
         self.actual_marking_dict = {}
@@ -248,7 +245,6 @@ class MainAplication(QtWidgets.QMainWindow):
                     self.write_to_file_transitions()
                 else:
                     if len(self.net.tresholds) != 0 and len(self.net.weights) == 0:
-                        # create new tag to xml to each transition
                         if len(self.net.weights) == 0:
                             self.net.weights = [
                                 0 for _ in range(len(self.dict_weights))]
@@ -258,11 +254,9 @@ class MainAplication(QtWidgets.QMainWindow):
                         if len(self.net.tresholds) == 0:
                             self.net.tresholds = [
                                 0 for _ in range(len(self.dict_transitions))]
-                        # create new tag to xml to each transition
                         self.write_to_file_transitions()
 
                     if len(self.net.tresholds) != 0 and len(self.net.weights) != 0:
-                        # create new tag to xml to each transition
                         self.write_to_file_transitions()
 
             if self.weights_flag and not self.tresholds_flag:
@@ -327,6 +321,11 @@ class MainAplication(QtWidgets.QMainWindow):
         self.anotherWindow.fuzzyficate_run.setEnabled(False)
 
     def set_marking_initial(self):
+        print(self.logical_flag, self.fuzzy_flag, self.weights_flag, self.tresholds_flag)
+        self.dict_marks = {}
+        self.dict_weights = {}
+        self.dict_tresholds = {}
+        self.list_edit_widgets = []
         for place in self.net.getPlaces():
             self.dict_places[place.label] = place.tokens
         for transition in self.net.getTransitions():
@@ -338,6 +337,7 @@ class MainAplication(QtWidgets.QMainWindow):
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
             entry = QtWidgets.QLineEdit()
             entry.setMaximumWidth(50)
+            entry.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$"))) if self.logical_flag else entry.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0(\.\d+)?|1)$")))
             self.list_edit_widgets.append(entry)
             self.list_edit_widgets.append(placeLabel)
             self.dict_marks[key] = entry
@@ -380,6 +380,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 weightLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
                 entry2 = QtWidgets.QLineEdit()
                 entry2.setMaximumWidth(50)
+                entry2.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0(\.\d+)?|1)$"))) if not self.logical_flag else entry2.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$")))
                 self.dict_weights[key] = entry2
                 weightLayout = QtWidgets.QVBoxLayout()
                 weightLayout.addWidget(weightLabel)
@@ -403,6 +404,7 @@ class MainAplication(QtWidgets.QMainWindow):
                     "Arial", 10, QtGui.QFont.Bold))
                 entry3 = QtWidgets.QLineEdit()
                 entry3.setMaximumWidth(50)
+                entry3.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0(\.\d+)?|1)$"))) if not self.logical_flag else entry3.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$")))
                 self.dict_tresholds[key] = entry3
                 transitionLayout = QtWidgets.QVBoxLayout()
                 transitionLayout.addWidget(transitionLabel)
@@ -463,6 +465,7 @@ class MainAplication(QtWidgets.QMainWindow):
             self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
             self.main_layout.actual_marking.setText(
                 self.actual_marking_dict[self.image_number-1])
+            self.main_layout.actual_marking.setStyleSheet("color: green;")  # set color to red
             self.main_layout.actual_marking.adjustSize()
             counter = 0
             for i in range(0, len(self.step_dict[self.image_number])):
@@ -489,6 +492,7 @@ class MainAplication(QtWidgets.QMainWindow):
             self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
             self.main_layout.actual_marking.setText(
                 self.actual_marking_dict[self.image_number-1])
+            self.main_layout.actual_marking.setStyleSheet("color: green;")  # set color to red
             self.main_layout.actual_marking.adjustSize()
             for i in self.step_dict[self.image_number-1]:
                 self.k += 1
@@ -1593,9 +1597,11 @@ class MainAplication(QtWidgets.QMainWindow):
             os.remove(f)
         M = reachability(self.net)
         if M is not None:
+            self.dict_final = {}
             self.image_number = 1
             self.fill_dict_pre_logical_net(M)
             self.image_number = 1
+            self.image_index = 1
             self.draw_net(0, 0)
             self.image_number += 1
             self.logical_petri_net(M)
@@ -1620,9 +1626,11 @@ class MainAplication(QtWidgets.QMainWindow):
             os.remove(f)
         M = reachability(self.net)
         if M is not None:
+            self.dict_final = {}
             self.image_number = 1
             self.fill_dict_pre_fuzzy_net(M)
             self.image_number = 1
+            self.image_index = 1
             self.draw_net(0, 0)
             self.image_number += 1
             self.fuzzy_petri_net(M)
@@ -1647,9 +1655,11 @@ class MainAplication(QtWidgets.QMainWindow):
             os.remove(f)
         M = reachability(self.net)
         if M is not None:
+            self.dict_final = {}
             self.image_number = 1
             self.fill_dict_pre_fuzzy_with_weights(M)
             self.image_number = 1
+            self.image_index = 1
             self.draw_net(0, 0)
             self.image_number += 1
             self.fuzzy_petri_net_with_weights(M)
@@ -1674,9 +1684,11 @@ class MainAplication(QtWidgets.QMainWindow):
             os.remove(f)
         M = reachability(self.net)
         if M is not None:
+            self.dict_final = {}
             self.image_number = 1
             self.fill_dict_pre_fuzzy_with_weights_and_thresholds(M)
             self.image_number = 1
+            self.image_index = 1
             self.draw_net(0, 0)
             self.image_number += 1
             self.fuzzy_petri_net_with_weights_thresholds(M)
@@ -1725,23 +1737,41 @@ class DialogWindow(QtWidgets.QDialog):
             self.main_application = MainAplication()
             self.main_application.database_output_table1 = self.patient_records
             self.main_application.main_layout.table.setColumnCount(7)
-            self.main_application.main_layout.table.setHorizontalHeaderLabels(
-                ["Meno", "Priezvisko", "Vek", "Pohlavie", "Výška", "Váha", "Choroba"])
+            self.main_application.main_layout.table.setHorizontalHeaderLabels(["Meno", "Priezvisko", "Vek", "Pohlavie", "Výška", "Váha", "Choroba"])
+
+            header = self.main_application.main_layout.table.horizontalHeader()
+            header.setStyleSheet("color: black;")
+
             self.main_application.main_layout.table.setRowCount(1)
-            self.main_application.main_layout.table.setItem(0, 0, QtWidgets.QTableWidgetItem(
-                self.patient_records[1]))
-            self.main_application.main_layout.table.setItem(0, 1, QtWidgets.QTableWidgetItem(
-                self.patient_records[2]))
-            self.main_application.main_layout.table.setItem(0, 2, QtWidgets.QTableWidgetItem(
-                str(self.patient_records[3])))  # Need to convert integer to string
-            self.main_application.main_layout.table.setItem(0, 3, QtWidgets.QTableWidgetItem(
-                self.patient_records[4]))
-            self.main_application.main_layout.table.setItem(0, 4, QtWidgets.QTableWidgetItem(
-                str(self.patient_records[5])))  # Need to convert float to string
-            self.main_application.main_layout.table.setItem(0, 5, QtWidgets.QTableWidgetItem(
-                str(self.patient_records[6])))  # Need to convert float to string
-            self.main_application.main_layout.table.setItem(0, 6, QtWidgets.QTableWidgetItem(
-                self.patient_records[7]))
+
+            item_0 = QtWidgets.QTableWidgetItem(self.patient_records[1])
+            item_0.setForeground(QtGui.QColor("white"))
+            self.main_application.main_layout.table.setItem(0, 0, item_0)
+
+            item_1 = QtWidgets.QTableWidgetItem(self.patient_records[2])
+            item_1.setForeground(QtGui.QColor("white"))
+            self.main_application.main_layout.table.setItem(0, 1, item_1)
+
+            item_2 = QtWidgets.QTableWidgetItem(str(self.patient_records[3]))
+            item_2.setForeground(QtGui.QColor("white"))
+            self.main_application.main_layout.table.setItem(0, 2, item_2)
+
+            item_3 = QtWidgets.QTableWidgetItem(self.patient_records[4])
+            item_3.setForeground(QtGui.QColor("white"))
+            self.main_application.main_layout.table.setItem(0, 3, item_3)
+
+            item_4 = QtWidgets.QTableWidgetItem(str(self.patient_records[5]))
+            item_4.setForeground(QtGui.QColor("white"))
+            self.main_application.main_layout.table.setItem(0, 4, item_4)
+
+            item_5 = QtWidgets.QTableWidgetItem(str(self.patient_records[6]))
+            item_5.setForeground(QtGui.QColor("white"))
+            self.main_application.main_layout.table.setItem(0, 5, item_5)
+
+            item_6 = QtWidgets.QTableWidgetItem(self.patient_records[7])
+            item_6.setForeground(QtGui.QColor("white"))
+            self.main_application.main_layout.table.setItem(0, 6, item_6)
+
             self.main_application.database_output_table2 = self.patient_problems
             self.main_application.show()
         else:
@@ -1779,7 +1809,7 @@ class DialogWindow(QtWidgets.QDialog):
 if __name__ == '__main__':
     result, result1, result2 = connect()
     # qdarktheme.enable_hi_dpi()
-    app = QtWidgets.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     # qdarktheme.setup_theme()
     #☺window = MainAplication()
     #window.show()

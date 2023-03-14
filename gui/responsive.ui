@@ -14,7 +14,9 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background: #bdbdbd;</string>
+   <string notr="true">QMainWindow::titleBar {
+    background-color: black;
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout" rowstretch="5,0">
@@ -272,6 +274,9 @@
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
            <widget class="QLabel" name="initial_marking_label">
+            <property name="styleSheet">
+             <string notr="true">color: #00FF00;</string>
+            </property>
             <property name="text">
              <string>Počiatočné označenie</string>
             </property>
@@ -279,6 +284,9 @@
           </item>
           <item>
            <widget class="QLabel" name="marking">
+            <property name="styleSheet">
+             <string notr="true">color: #00FF00;</string>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -286,6 +294,9 @@
           </item>
           <item>
            <widget class="QLabel" name="label_2">
+            <property name="styleSheet">
+             <string notr="true">color: #00FF00;</string>
+            </property>
             <property name="text">
              <string>Aktuálne značenie</string>
             </property>
@@ -338,6 +349,16 @@
              <number>10</number>
             </property>
             <item>
+             <widget class="QLabel" name="label_3">
+              <property name="styleSheet">
+               <string notr="true">color: #00FF00;</string>
+              </property>
+              <property name="text">
+               <string>Údaje o pacientovi</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QTableWidget" name="table">
               <property name="maximumSize">
                <size>
@@ -352,6 +373,9 @@
             </item>
             <item>
              <widget class="QLabel" name="label">
+              <property name="styleSheet">
+               <string notr="true">color: #00FF00;</string>
+              </property>
               <property name="text">
                <string>Postupnosť krokov</string>
               </property>
@@ -382,6 +406,9 @@
                 <width>500</width>
                 <height>200</height>
                </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: #808080;</string>
               </property>
              </widget>
             </item>
