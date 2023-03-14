@@ -121,15 +121,10 @@ class MainAplication(QtWidgets.QMainWindow):
         self.dict_transitions = {}
         self.database_output_table1 = ()
         self.database_output_table2 = ()
-
         self.image_index = 1
         self.dict_final = {}
-        self.places_end = []
-        self.transitions_end = []
         self.transitions_to_change = []
-        self.counter_first_draw = 0
         self.fuzzyfication = 0
-        self.fuzzyficated_M0 = []
         self.list_edit_widgets = []
         self.fuzzyficated_M0 = [1, 0, 1, 0, 0, 0, 0, 0]
         self.anotherWindow.fuzzyficate_run.clicked.connect(self.fuzzyficate)
@@ -398,7 +393,6 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.dict_weights), self.delete_text(self.dict_weights)])
 
         if self.tresholds_flag:
-            self.anotherWindow.OK2.show()
             self.anotherWindow.OK2.setDisabled(False)
             self.anotherWindow.OK3.setDisabled(False)
             tresholdsLayout = QtWidgets.QVBoxLayout()
@@ -626,16 +620,14 @@ class MainAplication(QtWidgets.QMainWindow):
                                                                  .label] = graph_data['edges'][i]
 
             if isinstance(i[0], Place):
-
                 if i[0].label not in self.dict_final:
-
                     self.dict_final[i[0].label] = {
                         "typ": "p",
                         "suradnice": [],
                         "hodnoty": [{
                             "label": i[0].label,
                             "image": self.image_index,
-                            "tokeny": i[0].tokens
+                            "tokeny": i[0].tokens if self.fuzzy_flag or thresholds or weights else int(i[0].tokens)
                         }],
                         "sipky": {
                             i[1].label: graph_data['edges'][i]
@@ -646,7 +638,7 @@ class MainAplication(QtWidgets.QMainWindow):
                         self.dict_final[i[0].label]["hodnoty"].append({
                             "label": i[0].label,
                             "image": self.image_index,
-                            "tokeny": i[0].tokens
+                            "tokeny": i[0].tokens if self.fuzzy_flag or thresholds or weights else int(i[0].tokens)
                         })
                     if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
                         self.dict_final[i[0].label]["sipky"][i[1]
@@ -671,7 +663,7 @@ class MainAplication(QtWidgets.QMainWindow):
                     "hodnoty": [{
                         "label": i.label,
                         "image": self.image_index,
-                        "tokeny": i.tokens
+                        "tokeny": i.tokens if self.fuzzy_flag or thresholds or weights else int(i.tokens)
                     }],
                     "sipky": {}
                 }
@@ -680,7 +672,7 @@ class MainAplication(QtWidgets.QMainWindow):
                     self.dict_final[i.label]["hodnoty"].append({
                         "label": i.label,
                         "image": self.image_index,
-                        "tokeny": i.tokens
+                        "tokeny": i.tokens if self.fuzzy_flag or thresholds or weights else int(i.tokens)
                     })
 
         for i in self.missing_transitions:
@@ -854,16 +846,7 @@ class MainAplication(QtWidgets.QMainWindow):
 
         cv2.imwrite(f"./images/{self.image_index}.png", img)
 
-    def fill_dict_pre_logical_net(self, M):
-        self.transitions_to_change = {}
-        Wo = M[0].state
-        nRows = len(self.net.getPlaces())
-        nColumns = len(self.net.getTransitions())
-        inputMatrix = np.array([[0 for _ in range(nColumns)]
-                                for _ in range(nRows)])
-        outputMatrix = np.array([[0 for _ in range(nColumns)]
-                                for _ in range(nRows)])
-
+    def fill_matrixes(self, inputMatrix, outputMatrix):
         # fill each matrix with the proper data
         for arc in self.net.getArcs():
             sourceId = arc.getSourceId()
@@ -886,6 +869,28 @@ class MainAplication(QtWidgets.QMainWindow):
                 destinationIdInNetList = self.net.getPlaces().index(destination)
                 outputMatrix[destinationIdInNetList,
                              sourceIdInNetList] = arc.getMultiplicity()
+        return inputMatrix, outputMatrix
+
+    def settting_image(self):
+        self.image_number = 1
+        prem = QImage(self.image_dict[self.image_number])
+        pixmap = QPixmap.fromImage(prem)
+        self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
+        ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+        self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+
+    def fill_dict_pre_logical_net(self, M):
+        self.transitions_to_change = {}
+        Wo = M[0].state
+        nRows = len(self.net.getPlaces())
+        nColumns = len(self.net.getTransitions())
+        inputMatrix = np.array([[0 for _ in range(nColumns)]
+                                for _ in range(nRows)])
+        outputMatrix = np.array([[0 for _ in range(nColumns)]
+                                for _ in range(nRows)])
+        inputMatrix, outputMatrix = self.fill_matrixes(
+            inputMatrix, outputMatrix)
+
         Wk = []
         i = 0
         while not np.array_equal(Wo, Wk):
@@ -916,7 +921,6 @@ class MainAplication(QtWidgets.QMainWindow):
                     changed_places.append(True)
                 else:
                     changed_places.append(False)
-
             count_place = 0
             for place in self.net.getPlaces():
                 count_place += 1
@@ -944,28 +948,8 @@ class MainAplication(QtWidgets.QMainWindow):
         outputMatrix = np.array([[0 for _ in range(nColumns)]
                                 for _ in range(nRows)])
 
-        # fill each matrix with the proper data
-        for arc in self.net.getArcs():
-            sourceId = arc.getSourceId()
-            destinationId = arc.getDestinationId()
-            source = None
-            destination = None
-            if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
-                source = self.net.getPlaceById(sourceId)
-                destination = self.net.getTransitionById(destinationId)
-            elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
-                source = self.net.getTransitionById(sourceId)
-                destination = self.net.getPlaceById(destinationId)
-            if type(source) == Place:
-                sourceIdInNetList = self.net.getPlaces().index(source)
-                destinationIdInNetList = self.net.getTransitions().index(destination)
-                inputMatrix[sourceIdInNetList,
-                            destinationIdInNetList] = arc.getMultiplicity()
-            if type(source) == Transition:
-                sourceIdInNetList = self.net.getTransitions().index(source)
-                destinationIdInNetList = self.net.getPlaces().index(destination)
-                outputMatrix[destinationIdInNetList,
-                             sourceIdInNetList] = arc.getMultiplicity()
+        inputMatrix, outputMatrix = self.fill_matrixes(
+            inputMatrix, outputMatrix)
         Wk = []
         i = 0
         while not np.array_equal(Wo, Wk):
@@ -1023,12 +1007,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
 
-        self.image_number = 1
-        prem = QImage(self.image_dict[self.image_number])
-        pixmap = QPixmap.fromImage(prem)
-        self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
-        ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-        self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+        self.settting_image()
 
     def fill_dict_pre_fuzzy_net(self, M):
         self.transitions_to_change = {}
@@ -1039,28 +1018,8 @@ class MainAplication(QtWidgets.QMainWindow):
                                 for _ in range(nRows)])
         outputMatrix = np.array([[0 for _ in range(nColumns)]
                                 for _ in range(nRows)])
-        # fill each matrix with the proper data
-        for arc in self.net.getArcs():
-            sourceId = arc.getSourceId()
-            destinationId = arc.getDestinationId()
-            source = None
-            destination = None
-            if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
-                source = self.net.getPlaceById(sourceId)
-                destination = self.net.getTransitionById(destinationId)
-            elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
-                source = self.net.getTransitionById(sourceId)
-                destination = self.net.getPlaceById(destinationId)
-            if type(source) == Place:
-                sourceIdInNetList = self.net.getPlaces().index(source)
-                destinationIdInNetList = self.net.getTransitions().index(destination)
-                inputMatrix[sourceIdInNetList,
-                            destinationIdInNetList] = arc.getMultiplicity()
-            if type(source) == Transition:
-                sourceIdInNetList = self.net.getTransitions().index(source)
-                destinationIdInNetList = self.net.getPlaces().index(destination)
-                outputMatrix[destinationIdInNetList,
-                             sourceIdInNetList] = arc.getMultiplicity()
+        inputMatrix, outputMatrix = self.fill_matrixes(
+            inputMatrix, outputMatrix)
         Wk = []
         i = 0
         while not np.array_equal(Wo, Wk):
@@ -1130,28 +1089,8 @@ class MainAplication(QtWidgets.QMainWindow):
                                 for _ in range(nRows)])
         outputMatrix = np.array([[0 for _ in range(nColumns)]
                                 for _ in range(nRows)])
-        # fill each matrix with the proper data
-        for arc in self.net.getArcs():
-            sourceId = arc.getSourceId()
-            destinationId = arc.getDestinationId()
-            source = None
-            destination = None
-            if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
-                source = self.net.getPlaceById(sourceId)
-                destination = self.net.getTransitionById(destinationId)
-            elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
-                source = self.net.getTransitionById(sourceId)
-                destination = self.net.getPlaceById(destinationId)
-            if type(source) == Place:
-                sourceIdInNetList = self.net.getPlaces().index(source)
-                destinationIdInNetList = self.net.getTransitions().index(destination)
-                inputMatrix[sourceIdInNetList,
-                            destinationIdInNetList] = arc.getMultiplicity()
-            if type(source) == Transition:
-                sourceIdInNetList = self.net.getTransitions().index(source)
-                destinationIdInNetList = self.net.getPlaces().index(destination)
-                outputMatrix[destinationIdInNetList,
-                             sourceIdInNetList] = arc.getMultiplicity()
+        inputMatrix, outputMatrix = self.fill_matrixes(
+            inputMatrix, outputMatrix)
         Wk = []
         i = 0
         while not np.array_equal(Wo, Wk):
@@ -1222,12 +1161,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 print("Wk: ", Wk)
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
-        self.image_number = 1
-        prem = QImage(self.image_dict[self.image_number])
-        pixmap = QPixmap.fromImage(prem)
-        self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
-        ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-        self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+        self.settting_image()
 
     def fill_dict_pre_fuzzy_with_weights(self, M):
         self.transitions_to_change = {}
@@ -1418,12 +1352,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 print("Wk: ", Wk)
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
-        self.image_number = 1
-        prem = QImage(self.image_dict[self.image_number])
-        pixmap = QPixmap.fromImage(prem)
-        self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
-        ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-        self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+        self.settting_image()
 
     def fill_dict_pre_fuzzy_with_weights_and_thresholds(self, M):
         self.transitions_to_change = {}
@@ -1434,29 +1363,8 @@ class MainAplication(QtWidgets.QMainWindow):
                                 for _ in range(nRows)])
         outputMatrix = np.array([[0.0 for _ in range(nColumns)]
                                 for _ in range(nRows)])
-
-        # fill each matrix with the proper data
-        for arc in self.net.getArcs():
-            sourceId = arc.getSourceId()
-            destinationId = arc.getDestinationId()
-            source = None
-            destination = None
-            if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
-                source = self.net.getPlaceById(sourceId)
-                destination = self.net.getTransitionById(destinationId)
-            elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
-                source = self.net.getTransitionById(sourceId)
-                destination = self.net.getPlaceById(destinationId)
-            if type(source) == Place:
-                sourceIdInNetList = self.net.getPlaces().index(source)
-                destinationIdInNetList = self.net.getTransitions().index(destination)
-                inputMatrix[sourceIdInNetList,
-                            destinationIdInNetList] = arc.getMultiplicity()
-            if type(source) == Transition:
-                sourceIdInNetList = self.net.getTransitions().index(source)
-                destinationIdInNetList = self.net.getPlaces().index(destination)
-                outputMatrix[destinationIdInNetList,
-                             sourceIdInNetList] = arc.getMultiplicity()
+        inputMatrix, outputMatrix = self.fill_matrixes(
+            inputMatrix, outputMatrix)
         Wk = []
         i = 0
         while not np.array_equal(Wo, Wk):
@@ -1531,29 +1439,8 @@ class MainAplication(QtWidgets.QMainWindow):
                                 for _ in range(nRows)])
         outputMatrix = np.array([[0.0 for _ in range(nColumns)]
                                 for _ in range(nRows)])
-
-        # fill each matrix with the proper data
-        for arc in self.net.getArcs():
-            sourceId = arc.getSourceId()
-            destinationId = arc.getDestinationId()
-            source = None
-            destination = None
-            if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
-                source = self.net.getPlaceById(sourceId)
-                destination = self.net.getTransitionById(destinationId)
-            elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
-                source = self.net.getTransitionById(sourceId)
-                destination = self.net.getPlaceById(destinationId)
-            if type(source) == Place:
-                sourceIdInNetList = self.net.getPlaces().index(source)
-                destinationIdInNetList = self.net.getTransitions().index(destination)
-                inputMatrix[sourceIdInNetList,
-                            destinationIdInNetList] = arc.getMultiplicity()
-            if type(source) == Transition:
-                sourceIdInNetList = self.net.getTransitions().index(source)
-                destinationIdInNetList = self.net.getPlaces().index(destination)
-                outputMatrix[destinationIdInNetList,
-                             sourceIdInNetList] = arc.getMultiplicity()
+        inputMatrix, outputMatrix = self.fill_matrixes(
+            inputMatrix, outputMatrix)
         Wk = []
         i = 0
         while not np.array_equal(Wo, Wk):
@@ -1627,12 +1514,7 @@ class MainAplication(QtWidgets.QMainWindow):
                 print("Wk: ", Wk)
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
-        self.image_number = 1
-        prem = QImage(self.image_dict[self.image_number])
-        pixmap = QPixmap.fromImage(prem)
-        self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
-        ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-        self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+        self.settting_image()
 
     def error_message_box(self):
         dialog = QMessageBox(text="Siet je neohranicena")
