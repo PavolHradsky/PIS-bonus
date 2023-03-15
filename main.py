@@ -92,7 +92,8 @@ class MainAplication(QMainWindow):
         self.main_layout.nextButton.clicked.connect(self.next)
         self.main_layout.clearAll.clicked.connect(self.clear)
         self.main_layout.clearAll.setEnabled(False)
-        #self.main_layout.steps.setStyleSheet("background-color: black;")
+        self.main_layout.steps.setStyleSheet(
+            "background-color: black; color: green;")
         self.main_layout.table.setStyleSheet("background-color: black;")
         self.image_dict = {}
         self.step_dict = {}
@@ -110,6 +111,7 @@ class MainAplication(QMainWindow):
             "QMainWindow::titleBar { background-color: black; }")
         self.anotherWindow.setGeometry(200, 200, 800, 600)
         self.anotherWindow.setWindowTitle("Nastavenie váh a prahov pravidiel")
+        self.anotherWindow.table.setStyleSheet("background-color: black;")
         self.ui.close()
         self.net = None
         self.root = None
@@ -138,7 +140,7 @@ class MainAplication(QMainWindow):
                     color: green;
                 }
                 QPushButton:disabled:!checked {
-                    background-color: red;
+                    background-color: rgba(255,0,0,0.5);
                 }
             """)
         if len(self.dict_final) == 0:
@@ -148,7 +150,7 @@ class MainAplication(QMainWindow):
                     color: green;
                 }
                 QPushButton:disabled:!checked {
-                    background-color: red;
+                    background-color: rgba(255,0,0,0.5);
                 }
             """)
 
@@ -186,21 +188,37 @@ class MainAplication(QMainWindow):
         print(self.main_layout.comboBox.currentText())
 
     def run(self):
-
         self.anotherWindow.table.setColumnCount(5)
         self.anotherWindow.table.setHorizontalHeaderLabels(
             ["Pacient ID", "Pulz", "Okysličenie krvi", "Systolický KT", "Diastolický KT"])
+        header = self.anotherWindow.table.horizontalHeader()
+        header.setStyleSheet("background-color: black; color: black;")
+        header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.anotherWindow.table.setRowCount(1)
-        self.anotherWindow.table.setItem(0, 0, QtWidgets.QTableWidgetItem(
-            str(self.database_output_table2[1])))
-        self.anotherWindow.table.setItem(0, 1, QtWidgets.QTableWidgetItem(
-            str(self.database_output_table2[2])))
-        self.anotherWindow.table.setItem(0, 2, QtWidgets.QTableWidgetItem(
-            str(self.database_output_table2[3])))  # Need to convert integer to string
-        self.anotherWindow.table.setItem(0, 3, QtWidgets.QTableWidgetItem(
-            str(self.database_output_table2[4])))
-        self.anotherWindow.table.setItem(0, 4, QtWidgets.QTableWidgetItem(
-            str(self.database_output_table2[5])))  # Need to convert float to string
+        item_0 = QtWidgets.QTableWidgetItem(
+            str(self.database_output_table2[1]))
+        item_0.setForeground(QtGui.QColor("white"))
+        self.anotherWindow.table.setItem(0, 0, item_0)
+
+        item_1 = QtWidgets.QTableWidgetItem(
+            str(self.database_output_table2[2]))
+        item_1.setForeground(QtGui.QColor("white"))
+        self.anotherWindow.table.setItem(0, 1, item_1)
+
+        item_2 = QtWidgets.QTableWidgetItem(
+            str(self.database_output_table2[3]))
+        item_2.setForeground(QtGui.QColor("white"))
+        self.anotherWindow.table.setItem(0, 2, item_2)
+
+        item_3 = QtWidgets.QTableWidgetItem(
+            str(self.database_output_table2[4]))
+        item_3.setForeground(QtGui.QColor("white"))
+        self.anotherWindow.table.setItem(0, 3, item_3)
+
+        item_4 = QtWidgets.QTableWidgetItem(
+            str(self.database_output_table2[5]))
+        item_4.setForeground(QtGui.QColor("white"))
+        self.anotherWindow.table.setItem(0, 4, item_4)
 
         if self.file_path:
             self.tree = ET.parse(self.file_path)
@@ -333,6 +351,8 @@ class MainAplication(QMainWindow):
         # self.database_output_table2
         self.net.M0 = self.fuzzyficated_M0
         placesLayout = self.anotherWindow.placesWidget.layout()
+        self.anotherWindow.placesWidget.setStyleSheet(
+            "background-color: black;")
         counter = 0
         for i, key in enumerate(self.dict_places):
             placeLabel = QtWidgets.QLabel(key)
@@ -368,6 +388,8 @@ class MainAplication(QMainWindow):
             self.dict_transitions[transition.getId()] = transition.label
         placesLayout = QtWidgets.QVBoxLayout()
         self.anotherWindow.placesWidget.setLayout(placesLayout)
+        self.anotherWindow.placesWidget.setStyleSheet(
+            "background-color: black;")
         for i, key in enumerate(self.dict_places):
             placeLabel = QtWidgets.QLabel(key)
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
@@ -376,6 +398,7 @@ class MainAplication(QMainWindow):
             entry.setMaximumWidth(50)
             entry.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$"))) if self.logical_flag else entry.setValidator(
                 QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0(\.\d+)?|1)$")))
+            entry.setStyleSheet("color: white;")
             self.list_edit_widgets.append(entry)
             self.list_edit_widgets.append(placeLabel)
             self.dict_marks[key] = entry
@@ -389,22 +412,31 @@ class MainAplication(QMainWindow):
             self.anotherWindow.placesWidget)
         self.anotherWindow.OK1.clicked.connect(
             lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
+        self.anotherWindow.tresholdsWidget.setStyleSheet(
+            "background-color: black;")
+        self.anotherWindow.weightsWidget.setStyleSheet(
+            "background-color: black;")
 
-        if self.fuzzy_flag and not self.weights_flag and not self.tresholds_flag:
+        if self.fuzzy_flag or self.logical_flag and not self.weights_flag and not self.tresholds_flag:
             self.anotherWindow.OK3.setDisabled(True)
             weightsLayout = QtWidgets.QVBoxLayout()
             self.anotherWindow.weightsWidget.setLayout(weightsLayout)
             self.anotherWindow.weight.setText("Prechody")
+            self.anotherWindow.weightsWidget.setStyleSheet(
+                "background-color: black;")
             for i, key in enumerate(self.dict_transitions):
                 transitionLabel0 = QtWidgets.QLabel(self.dict_transitions[key])
                 transitionLabel0.setFont(
                     QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+                transitionLabel0.setStyleSheet("color: green;")
                 weightLayout = QtWidgets.QVBoxLayout()
                 weightLayout.addWidget(transitionLabel0)
                 weightsLayout.addLayout(weightLayout)
             self.anotherWindow.weightsScrollArea.setWidget(
                 self.anotherWindow.weightsWidget)
             self.anotherWindow.OK2.setDisabled(True)
+            self.anotherWindow.tresholdsWidget.setStyleSheet(
+                "background-color: black;")
 
         if self.weights_flag:
             self.anotherWindow.OK3.setDisabled(True)
@@ -413,6 +445,8 @@ class MainAplication(QMainWindow):
             weightsLayout = QtWidgets.QVBoxLayout()
             self.anotherWindow.weightsWidget = QtWidgets.QWidget()
             self.anotherWindow.weightsWidget.setLayout(weightsLayout)
+            self.anotherWindow.weightsWidget.setStyleSheet(
+                "background-color: black;")
             for i, key in enumerate(self.dict_transitions):
                 weightLabel = QtWidgets.QLabel(self.dict_transitions[key])
                 weightLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
@@ -421,6 +455,7 @@ class MainAplication(QMainWindow):
                 entry2.setMaximumWidth(50)
                 entry2.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression(
                     "^(0(\.\d+)?|1)$"))) if not self.logical_flag else entry2.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$")))
+                entry2.setStyleSheet("color: white;")
                 self.dict_weights[key] = entry2
                 weightLayout = QtWidgets.QVBoxLayout()
                 weightLayout.addWidget(weightLabel)
@@ -438,15 +473,18 @@ class MainAplication(QMainWindow):
             tresholdsLayout = QtWidgets.QVBoxLayout()
             self.anotherWindow.tresholdsWidget = QtWidgets.QWidget()
             self.anotherWindow.tresholdsWidget.setLayout(tresholdsLayout)
+            self.anotherWindow.tresholdsWidget.setStyleSheet(
+                "background-color: black;")
             for i, key in enumerate(self.dict_transitions):
                 transitionLabel = QtWidgets.QLabel(self.dict_transitions[key])
                 transitionLabel.setFont(QtGui.QFont(
                     "Arial", 10, QtGui.QFont.Bold))
-                transitionLabel.setStyleSheet("color: white;")
+                transitionLabel.setStyleSheet("color: green;")
                 entry3 = QtWidgets.QLineEdit()
                 entry3.setMaximumWidth(50)
                 entry3.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression(
                     "^(0(\.\d+)?|1)$"))) if not self.logical_flag else entry3.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$")))
+                entry3.setStyleSheet("color: white;")
                 self.dict_tresholds[key] = entry3
                 transitionLayout = QtWidgets.QVBoxLayout()
                 transitionLayout.addWidget(transitionLabel)
@@ -499,7 +537,7 @@ class MainAplication(QMainWindow):
             self.main_layout.nextButton.setEnabled(True)
             self.main_layout.nextButton.setStyleSheet("""
                 QPushButton:enabled {
-                    color: red;
+                    color: rgba(255,0,0,0.5);
                 }
                 QPushButton:enabled:!checked {
                     background-color: green;
@@ -512,7 +550,7 @@ class MainAplication(QMainWindow):
                     color: green;
                 }
                 QPushButton:disabled:!checked {
-                    background-color: red;
+                    background-color: rgba(255,0,0,0.5);
                 }
             """)
             self.image_number -= 1
@@ -539,7 +577,7 @@ class MainAplication(QMainWindow):
                     color: green;
                 }
                 QPushButton:disabled:!checked {
-                    background-color: red;
+                    background-color: rgba(255,0,0,0.5);
                 }
             """)
             self.image_number = 1
@@ -548,9 +586,9 @@ class MainAplication(QMainWindow):
         if self.image_number < len(self.image_dict):
             # set button active
             self.main_layout.prevButton.setEnabled(True)
-            self.main_layout.nextButton.setStyleSheet("""
+            self.main_layout.prevButton.setStyleSheet("""
                 QPushButton:enabled {
-                    color: red;
+                    color: rgba(255,0,0,0.5);
                 }
                 QPushButton:enabled:!checked {
                     background-color: green;
@@ -563,7 +601,7 @@ class MainAplication(QMainWindow):
                     color: green;
                 }
                 QPushButton:disabled:!checked {
-                    background-color: red;
+                    background-color: rgba(255,0,0,0.5);
                 }
             """)
             self.image_number += 1
@@ -851,7 +889,7 @@ class MainAplication(QMainWindow):
         self.main_layout.nextButton.setEnabled(True)
         self.main_layout.nextButton.setStyleSheet("""
                 QPushButton:enabled {
-                    color: red;
+                    color: rgba(255,0,0,0.5);
                 }
                 QPushButton:enabled:!checked {
                     background-color: green;
@@ -859,7 +897,7 @@ class MainAplication(QMainWindow):
         """)
         self.main_layout.prevButton.setStyleSheet("""
                 QPushButton:enabled {
-                    color: red;
+                    color: rgba(255,0,0,0.5);
                 }
                 QPushButton:enabled:!checked {
                     background-color: green;
@@ -1845,6 +1883,7 @@ class DialogWindow(QtWidgets.QDialog):
             self.main_application.main_layout.table.setHorizontalHeaderLabels(
                 ["Meno", "Priezvisko", "Vek", "Pohlavie", "Výška", "Váha", "Choroba"])
             header = self.main_application.main_layout.table.horizontalHeader()
+            header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
             header.setStyleSheet("color: black;")
             self.main_application.main_layout.table.setRowCount(1)
             item_0 = QtWidgets.QTableWidgetItem(self.patient_records[1])
@@ -1910,15 +1949,15 @@ class DialogWindow(QtWidgets.QDialog):
 
 
 if __name__ == '__main__':
-    #result, result1, result2 = connect()
+    result, result1, result2 = connect()
     app = QApplication(sys.argv)
-    window = MainAplication()
-    window.show()
-    """
+   # window = MainAplication()
+    # window.show()
+
     dialog = DialogWindow()
     dialog.database_output_table1 = result
     dialog.database_output_table2 = result1
     dialog.hashed = result2
     dialog.parsing_database()
-    """
+
     sys.exit(app.exec())
