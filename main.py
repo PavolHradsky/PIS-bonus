@@ -14,7 +14,7 @@ from Rpn import Rpn
 from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QMessageBox
-from PySide6.QtCore import QFile
+from PySide6.QtCore import QFile, QTimer, QTime
 import os
 import glob
 from PySide6.QtGui import QPixmap, QImage
@@ -72,9 +72,13 @@ class MainAplication(QMainWindow):
         self.setWindowIcon(QtGui.QIcon(
             'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.setStyleSheet("QMainWindow::titleBar { background-color: black; }")
+        self.setStyleSheet(
+            "QMainWindow::titleBar { background-color: black; }")
         self.setGeometry(200, 200, 800, 600)
         self.setWindowTitle("Chronické zlyhávanie srdca")
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_time)
+        self.timer.start(1000)
         self.image_number = 1
         self.main_layout.loadFile.clicked.connect(self.open_dialog)
         self.main_layout.comboBox.addItems(["Logická Petriho sieť",
@@ -101,6 +105,9 @@ class MainAplication(QMainWindow):
         self.anotherWindow = self.loader.load(self.ui)
         self.anotherWindow.setWindowIcon(QtGui.QIcon(
             'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
+        self.anotherWindow.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.anotherWindow.setStyleSheet(
+            "QMainWindow::titleBar { background-color: black; }")
         self.anotherWindow.setGeometry(200, 200, 800, 600)
         self.anotherWindow.setWindowTitle("Nastavenie váh a prahov pravidiel")
         self.ui.close()
@@ -126,6 +133,32 @@ class MainAplication(QMainWindow):
         self.anotherWindow.fuzzyficate_run.clicked.connect(self.fuzzyficate)
         if self.image_number == 1:
             self.main_layout.prevButton.setEnabled(False)
+            self.main_layout.prevButton.setStyleSheet("""
+                QPushButton:disabled {
+                    color: green;
+                }
+                QPushButton:disabled:!checked {
+                    background-color: red;
+                }
+            """)
+        if len(self.dict_final) == 0:
+            self.main_layout.nextButton.setEnabled(False)
+            self.main_layout.nextButton.setStyleSheet("""
+                QPushButton:disabled {
+                    color: green;
+                }
+                QPushButton:disabled:!checked {
+                    background-color: red;
+                }
+            """)
+
+    def update_time(self):
+        # Get the current system time
+        current_time = QTime.currentTime()
+        # Format the time as HH:mm:ss
+        formatted_time = current_time.toString('HH:mm:ss')
+        # Update the time label
+        self.main_layout.time_actual.setText(formatted_time)
 
     def resizeEvent(self, event):
         if len(self.image_dict) > 0:
@@ -153,7 +186,7 @@ class MainAplication(QMainWindow):
         print(self.main_layout.comboBox.currentText())
 
     def run(self):
-        
+
         self.anotherWindow.table.setColumnCount(5)
         self.anotherWindow.table.setHorizontalHeaderLabels(
             ["Pacient ID", "Pulz", "Okysličenie krvi", "Systolický KT", "Diastolický KT"])
@@ -168,7 +201,7 @@ class MainAplication(QMainWindow):
             str(self.database_output_table2[4])))
         self.anotherWindow.table.setItem(0, 4, QtWidgets.QTableWidgetItem(
             str(self.database_output_table2[5])))  # Need to convert float to string
-        
+
         if self.file_path:
             self.tree = ET.parse(self.file_path)
             self.root = self.tree.getroot()
@@ -306,6 +339,8 @@ class MainAplication(QMainWindow):
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
             placeLabelM0 = QtWidgets.QLabel(str(self.fuzzyficated_M0[i]))
             placeLabelM0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+            placeLabel.setStyleSheet("color: green;")
+            placeLabelM0.setStyleSheet("color: green;")
             for j in range(2):
                 edit = self.list_edit_widgets[i+j+counter]
                 placeLayout = QtWidgets.QVBoxLayout()
@@ -321,7 +356,8 @@ class MainAplication(QMainWindow):
         self.anotherWindow.fuzzyficate_run.setEnabled(False)
 
     def set_marking_initial(self):
-        print(self.logical_flag, self.fuzzy_flag, self.weights_flag, self.tresholds_flag)
+        print(self.logical_flag, self.fuzzy_flag,
+              self.weights_flag, self.tresholds_flag)
         self.dict_marks = {}
         self.dict_weights = {}
         self.dict_tresholds = {}
@@ -335,9 +371,11 @@ class MainAplication(QMainWindow):
         for i, key in enumerate(self.dict_places):
             placeLabel = QtWidgets.QLabel(key)
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+            placeLabel.setStyleSheet("color: green;")
             entry = QtWidgets.QLineEdit()
             entry.setMaximumWidth(50)
-            entry.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$"))) if self.logical_flag else entry.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0(\.\d+)?|1)$")))
+            entry.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$"))) if self.logical_flag else entry.setValidator(
+                QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0(\.\d+)?|1)$")))
             self.list_edit_widgets.append(entry)
             self.list_edit_widgets.append(placeLabel)
             self.dict_marks[key] = entry
@@ -378,9 +416,11 @@ class MainAplication(QMainWindow):
             for i, key in enumerate(self.dict_transitions):
                 weightLabel = QtWidgets.QLabel(self.dict_transitions[key])
                 weightLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+                weightLabel.setStyleSheet("color: green;")
                 entry2 = QtWidgets.QLineEdit()
                 entry2.setMaximumWidth(50)
-                entry2.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0(\.\d+)?|1)$"))) if not self.logical_flag else entry2.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$")))
+                entry2.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression(
+                    "^(0(\.\d+)?|1)$"))) if not self.logical_flag else entry2.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$")))
                 self.dict_weights[key] = entry2
                 weightLayout = QtWidgets.QVBoxLayout()
                 weightLayout.addWidget(weightLabel)
@@ -402,9 +442,11 @@ class MainAplication(QMainWindow):
                 transitionLabel = QtWidgets.QLabel(self.dict_transitions[key])
                 transitionLabel.setFont(QtGui.QFont(
                     "Arial", 10, QtGui.QFont.Bold))
+                transitionLabel.setStyleSheet("color: white;")
                 entry3 = QtWidgets.QLineEdit()
                 entry3.setMaximumWidth(50)
-                entry3.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0(\.\d+)?|1)$"))) if not self.logical_flag else entry3.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$")))
+                entry3.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression(
+                    "^(0(\.\d+)?|1)$"))) if not self.logical_flag else entry3.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$")))
                 self.dict_tresholds[key] = entry3
                 transitionLayout = QtWidgets.QVBoxLayout()
                 transitionLayout.addWidget(transitionLabel)
@@ -455,8 +497,24 @@ class MainAplication(QMainWindow):
         if self.image_number > 1:
             #  set button active
             self.main_layout.nextButton.setEnabled(True)
+            self.main_layout.nextButton.setStyleSheet("""
+                QPushButton:enabled {
+                    color: red;
+                }
+                QPushButton:enabled:!checked {
+                    background-color: green;
+                }
+            """)
             if self.image_number == 2:
                 self.main_layout.prevButton.setEnabled(False)
+                self.main_layout.prevButton.setStyleSheet("""
+                QPushButton:disabled {
+                    color: green;
+                }
+                QPushButton:disabled:!checked {
+                    background-color: red;
+                }
+            """)
             self.image_number -= 1
             prem = QImage(self.image_dict[self.image_number])
             pixmap = QPixmap.fromImage(prem)
@@ -465,7 +523,8 @@ class MainAplication(QMainWindow):
             self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
             self.main_layout.actual_marking.setText(
                 self.actual_marking_dict[self.image_number-1])
-            self.main_layout.actual_marking.setStyleSheet("color: green;")  # set color to red
+            self.main_layout.actual_marking.setStyleSheet(
+                "color: green;")  # set color to red
             self.main_layout.actual_marking.adjustSize()
             counter = 0
             for i in range(0, len(self.step_dict[self.image_number])):
@@ -475,14 +534,38 @@ class MainAplication(QMainWindow):
         else:
             # set button inactive
             self.main_layout.prevButton.setEnabled(False)
+            self.main_layout.prevButton.setStyleSheet("""
+                QPushButton:disabled {
+                    color: green;
+                }
+                QPushButton:disabled:!checked {
+                    background-color: red;
+                }
+            """)
             self.image_number = 1
 
     def next(self):
         if self.image_number < len(self.image_dict):
             # set button active
             self.main_layout.prevButton.setEnabled(True)
+            self.main_layout.nextButton.setStyleSheet("""
+                QPushButton:enabled {
+                    color: red;
+                }
+                QPushButton:enabled:!checked {
+                    background-color: green;
+                }
+            """)
             if self.image_number == len(self.image_dict)-1:
                 self.main_layout.nextButton.setEnabled(False)
+                self.main_layout.nextButton.setStyleSheet("""
+                QPushButton:disabled {
+                    color: green;
+                }
+                QPushButton:disabled:!checked {
+                    background-color: red;
+                }
+            """)
             self.image_number += 1
             prem = QImage(self.image_dict[self.image_number])
             pixmap = QPixmap.fromImage(prem)
@@ -492,7 +575,8 @@ class MainAplication(QMainWindow):
             self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
             self.main_layout.actual_marking.setText(
                 self.actual_marking_dict[self.image_number-1])
-            self.main_layout.actual_marking.setStyleSheet("color: green;")  # set color to red
+            self.main_layout.actual_marking.setStyleSheet(
+                "color: green;")  # set color to red
             self.main_layout.actual_marking.adjustSize()
             for i in self.step_dict[self.image_number-1]:
                 self.k += 1
@@ -763,6 +847,24 @@ class MainAplication(QMainWindow):
         self.image_dict[self.image_number] = path
         print("path: ", path)
         self.generate_image()
+
+        self.main_layout.nextButton.setEnabled(True)
+        self.main_layout.nextButton.setStyleSheet("""
+                QPushButton:enabled {
+                    color: red;
+                }
+                QPushButton:enabled:!checked {
+                    background-color: green;
+                }
+        """)
+        self.main_layout.prevButton.setStyleSheet("""
+                QPushButton:enabled {
+                    color: red;
+                }
+                QPushButton:enabled:!checked {
+                    background-color: green;
+                }
+        """)
         self.image_index += 1
 
     def generate_image(self):
@@ -1713,6 +1815,9 @@ class DialogWindow(QtWidgets.QDialog):
         self.ui.open(QFile.ReadOnly)
         self.main_layout = self.loader.load(self.ui)
         self.ui.close()
+        self.main_layout.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.main_layout.setStyleSheet(
+            "QDialog::titleBar { background-color: black; }")
         self.main_layout.setWindowIcon(QtGui.QIcon(
             'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
         self.main_layout.setWindowTitle("Výber pacienta")
@@ -1737,13 +1842,11 @@ class DialogWindow(QtWidgets.QDialog):
             self.main_application = MainAplication()
             self.main_application.database_output_table1 = self.patient_records
             self.main_application.main_layout.table.setColumnCount(7)
-            self.main_application.main_layout.table.setHorizontalHeaderLabels(["Meno", "Priezvisko", "Vek", "Pohlavie", "Výška", "Váha", "Choroba"])
-
+            self.main_application.main_layout.table.setHorizontalHeaderLabels(
+                ["Meno", "Priezvisko", "Vek", "Pohlavie", "Výška", "Váha", "Choroba"])
             header = self.main_application.main_layout.table.horizontalHeader()
             header.setStyleSheet("color: black;")
-
             self.main_application.main_layout.table.setRowCount(1)
-
             item_0 = QtWidgets.QTableWidgetItem(self.patient_records[1])
             item_0.setForeground(QtGui.QColor("white"))
             self.main_application.main_layout.table.setItem(0, 0, item_0)
@@ -1807,15 +1910,15 @@ class DialogWindow(QtWidgets.QDialog):
 
 
 if __name__ == '__main__':
-    result, result1, result2 = connect()
-    # qdarktheme.enable_hi_dpi()
+    #result, result1, result2 = connect()
     app = QApplication(sys.argv)
-    # qdarktheme.setup_theme()
-    #☺window = MainAplication()
-    #window.show()
+    window = MainAplication()
+    window.show()
+    """
     dialog = DialogWindow()
     dialog.database_output_table1 = result
     dialog.database_output_table2 = result1
     dialog.hashed = result2
     dialog.parsing_database()
+    """
     sys.exit(app.exec())

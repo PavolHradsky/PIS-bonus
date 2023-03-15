@@ -25,6 +25,11 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow::titleBar {
+    background-color: black;
+}</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
     <property name="leftMargin">
@@ -110,6 +115,9 @@
                    <height>30</height>
                   </size>
                  </property>
+                 <property name="styleSheet">
+                  <string notr="true">color: #00FF00;</string>
+                 </property>
                  <property name="text">
                   <string>Miesta</string>
                  </property>
@@ -138,6 +146,12 @@
                    <height>500</height>
                   </size>
                  </property>
+                 <property name="autoFillBackground">
+                  <bool>true</bool>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">color: #000000;</string>
+                 </property>
                  <property name="widgetResizable">
                   <bool>true</bool>
                  </property>
@@ -155,6 +169,9 @@
                </item>
                <item>
                 <widget class="QPushButton" name="OK1">
+                 <property name="autoFillBackground">
+                  <bool>true</bool>
+                 </property>
                  <property name="text">
                   <string>OK</string>
                  </property>
@@ -208,6 +225,9 @@
                    <height>30</height>
                   </size>
                  </property>
+                 <property name="styleSheet">
+                  <string notr="true">color: #00FF00;</string>
+                 </property>
                  <property name="text">
                   <string>Váhy prechodov</string>
                  </property>
@@ -239,6 +259,12 @@
                    <height>500</height>
                   </size>
                  </property>
+                 <property name="autoFillBackground">
+                  <bool>true</bool>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">color: #000000;</string>
+                 </property>
                  <property name="widgetResizable">
                   <bool>true</bool>
                  </property>
@@ -256,6 +282,9 @@
                </item>
                <item>
                 <widget class="QPushButton" name="OK2">
+                 <property name="autoFillBackground">
+                  <bool>true</bool>
+                 </property>
                  <property name="text">
                   <string>OK</string>
                  </property>
@@ -309,6 +338,9 @@
                    <height>30</height>
                   </size>
                  </property>
+                 <property name="styleSheet">
+                  <string notr="true">color: #00FF00;</string>
+                 </property>
                  <property name="text">
                   <string>Prahy prechodov</string>
                  </property>
@@ -337,6 +369,12 @@
                    <height>500</height>
                   </size>
                  </property>
+                 <property name="autoFillBackground">
+                  <bool>true</bool>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">color: #000000;</string>
+                 </property>
                  <property name="widgetResizable">
                   <bool>true</bool>
                  </property>
@@ -354,6 +392,9 @@
                </item>
                <item>
                 <widget class="QPushButton" name="OK3">
+                 <property name="autoFillBackground">
+                  <bool>true</bool>
+                 </property>
                  <property name="text">
                   <string>OK</string>
                  </property>
@@ -416,6 +457,9 @@
                   <height>25</height>
                  </size>
                 </property>
+                <property name="autoFillBackground">
+                 <bool>true</bool>
+                </property>
                 <property name="text">
                  <string>Fuzzyficate</string>
                 </property>
@@ -434,6 +478,9 @@
                   <width>100</width>
                   <height>25</height>
                  </size>
+                </property>
+                <property name="autoFillBackground">
+                 <bool>true</bool>
                 </property>
                 <property name="text">
                  <string>SAVE</string>

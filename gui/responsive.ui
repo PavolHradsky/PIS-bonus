@@ -61,7 +61,7 @@
        </spacer>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,0,6">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,0,0,6">
         <property name="spacing">
          <number>10</number>
         </property>
@@ -102,6 +102,9 @@
               <width>75</width>
               <height>25</height>
              </size>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Open file</string>
@@ -148,6 +151,9 @@
               <height>25</height>
              </size>
             </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
             <property name="text">
              <string>Run</string>
             </property>
@@ -184,12 +190,31 @@
               <height>25</height>
              </size>
             </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
             <property name="text">
              <string>Clear all</string>
             </property>
            </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="QLabel" name="time_actual">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: #00FF00;</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer">
@@ -244,6 +269,12 @@
               <height>25</height>
              </size>
             </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: #00FF00;</string>
+            </property>
             <property name="text">
              <string>Prev</string>
             </property>
@@ -262,6 +293,12 @@
               <width>75</width>
               <height>25</height>
              </size>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: #00FF00;</string>
             </property>
             <property name="text">
              <string>Next</string>
@@ -407,8 +444,11 @@
                 <height>200</height>
                </size>
               </property>
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="styleSheet">
-               <string notr="true">color: #808080;</string>
+               <string notr="true">color: #000000;</string>
               </property>
              </widget>
             </item>

@@ -13,6 +13,14 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog::titleBar {
+    background-color: black;
+}</string>
+  </property>
   <widget class="QComboBox" name="patientPicker">
    <property name="geometry">
     <rect>
@@ -21,6 +29,15 @@
      <width>171</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #000000;</string>
+   </property>
+   <property name="frame">
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QLabel" name="patientPick">
@@ -31,6 +48,9 @@
      <width>101</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #00FF00;</string>
    </property>
    <property name="text">
     <string>Výber pacienta</string>
@@ -45,6 +65,9 @@
      <height>16</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">color: #00FF00;</string>
+   </property>
    <property name="text">
     <string>Heslo</string>
    </property>
@@ -58,6 +81,9 @@
      <height>22</height>
     </rect>
    </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QPushButton" name="enroll">
    <property name="geometry">
@@ -67,6 +93,12 @@
      <width>93</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #00FF00;</string>
    </property>
    <property name="text">
     <string>OK</string>
@@ -80,6 +112,12 @@
      <width>93</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #880808;</string>
    </property>
    <property name="text">
     <string>CANCEL</string>
