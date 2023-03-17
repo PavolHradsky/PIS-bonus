@@ -376,8 +376,6 @@ class MainAplication(QMainWindow):
         self.anotherWindow.fuzzyficate_run.setEnabled(False)
 
     def set_marking_initial(self):
-        print(self.logical_flag, self.fuzzy_flag,
-              self.weights_flag, self.tresholds_flag)
         self.dict_marks = {}
         self.dict_weights = {}
         self.dict_tresholds = {}
@@ -441,6 +439,7 @@ class MainAplication(QMainWindow):
         if self.weights_flag:
             self.anotherWindow.OK3.setDisabled(True)
             self.anotherWindow.OK2.show()
+            self.anotherWindow.OK2.setEnabled(True)
             self.anotherWindow.weight.setText("Váhy prechodov")
             weightsLayout = QtWidgets.QVBoxLayout()
             self.anotherWindow.weightsWidget = QtWidgets.QWidget()
@@ -659,7 +658,7 @@ class MainAplication(QMainWindow):
                 arc.getSourceId(), arc.getDestinationId())] = arc.getMultiplicity()
 
         for i in graph_data['edges']:
-            print(i[0])
+            # print(i[0])
             if isinstance(i[0], Transition):
 
                 if i[0].label not in self.dict_final:
@@ -880,7 +879,7 @@ class MainAplication(QMainWindow):
                     "main_coords": (round(x + x1), round(y + y1))}
         path = './images/' + str(self.image_number) + '.png'
         self.image_dict[self.image_number] = path
-        print("path: ", path)
+
         self.generate_image()
 
         self.main_layout.nextButton.setEnabled(True)
@@ -987,15 +986,17 @@ class MainAplication(QMainWindow):
                 else:
                     text_pos = (x1 - text_size[0] //
                                 2, y1 - 50 - text_size[1] // 2)
-                
-                threshold_text = self.dict_final[i]["hodnoty"][self.image_index - 1]["prah"] if self.dict_final[i]["hodnoty"][self.image_index - 1].get("prah") else None
-                weights_text = self.dict_final[i]["hodnoty"][self.image_index - 1]["vaha"] if self.dict_final[i]["hodnoty"][self.image_index - 1].get("vaha") else None
+
+                threshold_text = self.dict_final[i]["hodnoty"][self.image_index -
+                                                               1]["prah"] if self.dict_final[i]["hodnoty"][self.image_index - 1].get("prah") else None
+                weights_text = self.dict_final[i]["hodnoty"][self.image_index -
+                                                             1]["vaha"] if self.dict_final[i]["hodnoty"][self.image_index - 1].get("vaha") else None
                 if threshold_text:
-                    cv2.putText(img, f"T: {str(threshold_text)}", (x1-20, y1-20),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+                    cv2.putText(img, f"T:{str(threshold_text)}", (x1-25, y1-14),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1)
                 if weights_text:
-                    cv2.putText(img, f"W: {str(weights_text)}", (x1-20, y1+20),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1)
+                    cv2.putText(img, f"W:{str(weights_text)}", (x1-25, y1+20),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1)
 
                 cv2.putText(img, str(self.dict_final[i]['hodnoty'][0]['label']), text_pos,
                             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
@@ -1615,7 +1616,6 @@ class MainAplication(QMainWindow):
                     changed_places.append(False)
             count_place = 0
             for place in self.net.getPlaces():
-                place.tokens = Wk[self.net.getPlaces().index(place)]
                 count_place += 1
                 for arc in self.net.getArcs():
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
@@ -1802,7 +1802,7 @@ class MainAplication(QMainWindow):
             self.fill_dict_pre_fuzzy_with_weights(M)
             self.image_number = 1
             self.image_index = 1
-            self.draw_net(0, 0)
+            self.draw_net(1, 0)
             self.image_number += 1
             self.fuzzy_petri_net_with_weights(M)
             dir_path = os.path.dirname(self.file_path)
@@ -1831,7 +1831,7 @@ class MainAplication(QMainWindow):
             self.fill_dict_pre_fuzzy_with_weights_and_thresholds(M)
             self.image_number = 1
             self.image_index = 1
-            self.draw_net(0, 0)
+            self.draw_net(1, 1)
             self.image_number += 1
             self.fuzzy_petri_net_with_weights_thresholds(M)
             dir_path = os.path.dirname(self.file_path)
@@ -1953,8 +1953,8 @@ class DialogWindow(QtWidgets.QDialog):
 if __name__ == '__main__':
     result, result1, result2 = connect()
     app = QApplication(sys.argv)
-    window = MainAplication()
-    window.show()
+    #window = MainAplication()
+    # window.show()
 
     dialog = DialogWindow()
     dialog.database_output_table1 = result
