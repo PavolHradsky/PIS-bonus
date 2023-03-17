@@ -878,9 +878,6 @@ class MainAplication(QMainWindow):
                 y1 = rad * sin(angle*i * pi/180)
                 self.dict_final[dict_keys[i-1]]["suradnice"] = {
                     "main_coords": (round(x + x1), round(y + y1))}
-                # print label and coordinates
-                print("XXXXXXXXXXXXXXX", self.dict_final[dict_keys[i-1]]["hodnoty"][0]
-                      ["label"], self.dict_final[dict_keys[i-1]]["suradnice"]["main_coords"])
         path = './images/' + str(self.image_number) + '.png'
         self.image_dict[self.image_number] = path
         print("path: ", path)
@@ -914,11 +911,6 @@ class MainAplication(QMainWindow):
             y1 = self.dict_final[i]["suradnice"]["main_coords"][1]
             if x1 > 600:
                 pos = "right"
-            # elif x1 <= 670 and x1 >= 530:
-            #     if y1 > 400:
-            #         pos = "bottom"
-            #     else:
-            #         pos = "top"
             else:
                 pos = "left"
 
@@ -995,6 +987,16 @@ class MainAplication(QMainWindow):
                 else:
                     text_pos = (x1 - text_size[0] //
                                 2, y1 - 50 - text_size[1] // 2)
+                
+                threshold_text = self.dict_final[i]["hodnoty"][self.image_index - 1]["prah"] if self.dict_final[i]["hodnoty"][self.image_index - 1].get("prah") else None
+                weights_text = self.dict_final[i]["hodnoty"][self.image_index - 1]["vaha"] if self.dict_final[i]["hodnoty"][self.image_index - 1].get("vaha") else None
+                if threshold_text:
+                    cv2.putText(img, f"T: {str(threshold_text)}", (x1-20, y1-20),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+                if weights_text:
+                    cv2.putText(img, f"W: {str(weights_text)}", (x1-20, y1+20),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1)
+
                 cv2.putText(img, str(self.dict_final[i]['hodnoty'][0]['label']), text_pos,
                             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
                 if self.dict_final[i]['sipky']:
@@ -1951,8 +1953,8 @@ class DialogWindow(QtWidgets.QDialog):
 if __name__ == '__main__':
     result, result1, result2 = connect()
     app = QApplication(sys.argv)
-   # window = MainAplication()
-    # window.show()
+    window = MainAplication()
+    window.show()
 
     dialog = DialogWindow()
     dialog.database_output_table1 = result
