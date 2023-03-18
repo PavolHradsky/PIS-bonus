@@ -48,7 +48,7 @@
 		<x>260</x>
 		<y>140</y>
 		<label>prve miesto</label>
-		<tokens>1</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -56,7 +56,7 @@
 		<x>260</x>
 		<y>300</y>
 		<label>druhe miesto</label>
-		<tokens>1</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -64,7 +64,7 @@
 		<x>380</x>
 		<y>180</y>
 		<label>tretie miesto</label>
-		<tokens>1</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -72,7 +72,7 @@
 		<x>460</x>
 		<y>260</y>
 		<label>stvrte miesto</label>
-		<tokens>1</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -80,7 +80,7 @@
 		<x>460</x>
 		<y>140</y>
 		<label>piate miesto</label>
-		<tokens>1</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -88,7 +88,7 @@
 		<x>620</x>
 		<y>140</y>
 		<label>sieste miesto</label>
-		<tokens>1</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -96,7 +96,7 @@
 		<x>700</x>
 		<y>300</y>
 		<label>siedme miesto</label>
-		<tokens>1</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -104,7 +104,7 @@
 		<x>740</x>
 		<y>140</y>
 		<label>osme miesto</label>
-		<tokens>1</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<arc>
