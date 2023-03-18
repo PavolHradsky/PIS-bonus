@@ -376,6 +376,7 @@ class MainAplication(QMainWindow):
         self.anotherWindow.fuzzyficate_run.setEnabled(False)
 
     def set_marking_initial(self):
+        print(self.logical_flag, self.fuzzy_flag, self.weights_flag, self.tresholds_flag)
         self.dict_marks = {}
         self.dict_weights = {}
         self.dict_tresholds = {}
@@ -388,14 +389,22 @@ class MainAplication(QMainWindow):
         self.anotherWindow.placesWidget.setLayout(placesLayout)
         self.anotherWindow.placesWidget.setStyleSheet(
             "background-color: black;")
+        print(self.logical_flag, self.fuzzy_flag, self.weights_flag, self.tresholds_flag)
+   
         for i, key in enumerate(self.dict_places):
             placeLabel = QtWidgets.QLabel(key)
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
             placeLabel.setStyleSheet("color: green;")
+            old_entry = self.dict_marks.get(key)
+            if old_entry:
+                placesLayout.removeWidget(old_entry)
+                old_entry.deleteLater()
             entry = QtWidgets.QLineEdit()
             entry.setMaximumWidth(50)
-            entry.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$"))) if self.logical_flag else entry.setValidator(
-                QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0(\.\d+)?|1)$")))
+            if not self.logical_flag:
+                entry.setValidator(QtGui.QDoubleValidator(0.0, 1.0, 2))
+            else:
+                entry.setValidator(QtGui.QIntValidator(0, 1))
             entry.setStyleSheet("color: white;")
             self.list_edit_widgets.append(entry)
             self.list_edit_widgets.append(placeLabel)
@@ -1122,7 +1131,7 @@ class MainAplication(QMainWindow):
             if Wk != Wo:
                 self.image_number += 1
         self.transitions_to_change[self.image_number] = "END"
-        print("transitions_to_change: ", self.transitions_to_change)
+        #print("transitions_to_change: ", self.transitions_to_change)
 
     def logical_petri_net(self, M):
         array_steps = []
@@ -1130,6 +1139,10 @@ class MainAplication(QMainWindow):
         self.main_layout.marking.setText(
             "( "+', '.join([str(int(elem)) for i, elem in enumerate(Wo)])+" )")
         self.main_layout.marking.adjustSize()
+        self.main_layout.actual_marking.setText(
+            "( "+', '.join([str(int(elem)) for i, elem in enumerate(Wo)])+" )")
+        self.main_layout.actual_marking.adjustSize()
+      
         self.actual_marking_dict[0] = "( "+', '.join([str(int(elem))
                                                       for i, elem in enumerate(Wo)])+" )"
 
@@ -1269,7 +1282,7 @@ class MainAplication(QMainWindow):
             if Wk != Wo:
                 self.image_number += 1
         self.transitions_to_change[self.image_number] = "END"
-        print("transitions_to_change: ", self.transitions_to_change)
+        #print("transitions_to_change: ", self.transitions_to_change)
 
     def fuzzy_petri_net(self, M):
         array_steps = []
@@ -1278,6 +1291,10 @@ class MainAplication(QMainWindow):
         self.main_layout.marking.setText(
             "( "+', '.join([str(elem) for i, elem in enumerate(Wo)])+" )")
         self.main_layout.marking.adjustSize()
+        self.main_layout.actual_marking.setText(
+            "( "+', '.join([str(elem) for i, elem in enumerate(Wo)])+" )")
+        self.main_layout.actual_marking.adjustSize()
+
         self.actual_marking_dict[0] = "( "+', '.join([str(elem)
                                                       for i, elem in enumerate(Wo)])+" )"
         nRows = len(self.net.getPlaces())
@@ -1447,7 +1464,7 @@ class MainAplication(QMainWindow):
             if Wk != Wo:
                 self.image_number += 1
         self.transitions_to_change[self.image_number] = "END"
-        print("transitions_to_change: ", self.transitions_to_change)
+        #print("transitions_to_change: ", self.transitions_to_change)
 
     def fuzzy_petri_net_with_weights(self, M):
         array_steps = []
@@ -1455,6 +1472,10 @@ class MainAplication(QMainWindow):
         self.main_layout.marking.setText(
             "( "+', '.join([str(elem) for _, elem in enumerate(Wo)])+" )")
         self.main_layout.marking.adjustSize()
+        self.main_layout.actual_marking.setText(
+            "( "+', '.join([str(elem) for _, elem in enumerate(Wo)])+" )")
+        self.main_layout.actual_marking.adjustSize()
+
         self.actual_marking_dict[0] = "( "+', '.join([str(elem)
                                                       for _, elem in enumerate(Wo)])+" )"
 
@@ -1628,7 +1649,7 @@ class MainAplication(QMainWindow):
             if Wk != Wo:
                 self.image_number += 1
         self.transitions_to_change[self.image_number] = "END"
-        print("transitions_to_change: ", self.transitions_to_change)
+        #print("transitions_to_change: ", self.transitions_to_change)
 
     def fuzzy_petri_net_with_weights_thresholds(self, M):
         array_steps = []
@@ -1637,6 +1658,9 @@ class MainAplication(QMainWindow):
         self.main_layout.marking.setText(
             "( "+', '.join([str(elem) for i, elem in enumerate(Wo)])+" )")
         self.main_layout.marking.adjustSize()
+        self.main_layout.actual_marking.setText( "( "+', '.join([str(elem) for i, elem in enumerate(Wo)])+" )")
+        self.main_layout.actual_marking.adjustSize()
+
         self.actual_marking_dict[0] = "( "+', '.join([str(elem)
                                                       for i, elem in enumerate(Wo)])+" )"
         nRows = len(self.net.getPlaces())
@@ -1707,7 +1731,7 @@ class MainAplication(QMainWindow):
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
                         print(result_string)
-            print("transitions_to_change: ", self.transitions_to_change)
+            #☺print("transitions_to_change: ", self.transitions_to_change)
             if Wk != Wo:
                 self.step_dict[self.image_number-1] = array_steps
                 array_steps = []
