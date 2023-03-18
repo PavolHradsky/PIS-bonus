@@ -389,22 +389,15 @@ class MainAplication(QMainWindow):
         self.anotherWindow.placesWidget.setLayout(placesLayout)
         self.anotherWindow.placesWidget.setStyleSheet(
             "background-color: black;")
-        print(self.logical_flag, self.fuzzy_flag, self.weights_flag, self.tresholds_flag)
-   
         for i, key in enumerate(self.dict_places):
             placeLabel = QtWidgets.QLabel(key)
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
             placeLabel.setStyleSheet("color: green;")
-            old_entry = self.dict_marks.get(key)
-            if old_entry:
-                placesLayout.removeWidget(old_entry)
-                old_entry.deleteLater()
             entry = QtWidgets.QLineEdit()
             entry.setMaximumWidth(50)
-            if not self.logical_flag:
-                entry.setValidator(QtGui.QDoubleValidator(0.0, 1.0, 2))
-            else:
-                entry.setValidator(QtGui.QIntValidator(0, 1))
+            entry.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression(
+                    "^(0(\.\d+)?|1)$"))) if not self.logical_flag else entry.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^(0|1)$")))
+            
             entry.setStyleSheet("color: white;")
             self.list_edit_widgets.append(entry)
             self.list_edit_widgets.append(placeLabel)
