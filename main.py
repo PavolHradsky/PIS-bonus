@@ -113,7 +113,7 @@ class MainAplication(QMainWindow):
         self.anotherWindow.setWindowTitle("Nastavenie váh a prahov pravidiel")
         self.anotherWindow.table.setStyleSheet("background-color: black;")
         self.ui.close()
-
+        """
         self.ui = QFile(".\\gui\\anotherWindowFinal.ui")
         self.ui.open(QFile.ReadOnly)
         self.anotherWindow_logical = self.loader.load(self.ui)
@@ -126,6 +126,7 @@ class MainAplication(QMainWindow):
         self.anotherWindow_logical.setWindowTitle("Nastavenie váh a prahov pravidiel")
         self.anotherWindow_logical.table.setStyleSheet("background-color: black;")
         self.ui.close()
+        """
         self.net = None
         self.root = None
         self.tresholds_flag = 0
@@ -147,7 +148,8 @@ class MainAplication(QMainWindow):
         self.logical_validator = QtCore.QRegularExpression("^(0|1)$") 
         self.fuzzy_validator = QtCore.QRegularExpression("^(0(\.\d+)?|1)$")
         self.fuzzyficated_M0 = [1, 0, 1, 0, 0, 0, 0, 0]
-        self.anotherWindow.fuzzyficate_run.clicked.connect(self.fuzzyficate)
+        #self.anotherWindow.fuzzyficate_run.clicked.connect(self.fuzzyficate)
+        #self.anotherWindow_logical.fuzzyficate_run.clicked.connect(self.fuzzyficate)
         if self.image_number == 1:
             self.main_layout.prevButton.setEnabled(False)
             self.main_layout.prevButton.setStyleSheet("""
@@ -247,14 +249,14 @@ class MainAplication(QMainWindow):
             if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = 1
                 self.fuzzy_flag = 0
-                self.anotherWindow_logical.show()
+                self.anotherWindow.show()
                 self.set_marking_initial(self.logical_validator)
-                self.anotherWindow_logical.enter.clicked.connect(self.run_final)
+                self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť":
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
                 self.anotherWindow.show()
-                self.set_marking_initial(self.fuzzy_validator, True)
+                self.set_marking_initial(self.fuzzy_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
                 self.weights_flag = 1
@@ -289,10 +291,7 @@ class MainAplication(QMainWindow):
 
     def run_final(self):
         l = 0
-        if self.logical_flag:
-            self.anotherWindow_logical.close()
-        else:
-            self.anotherWindow.close()
+        self.anotherWindow.close()
         for rank in self.root.iter('place'):
             for value in rank:
                 if value.tag == 'tokens':
@@ -393,6 +392,11 @@ class MainAplication(QMainWindow):
         self.anotherWindow.OK1.setEnabled(False)
         self.anotherWindow.fuzzyficate_run.setEnabled(False)
 
+
+    def evaluate_inputs(self):
+        self.set_marking(self.dict_marks)
+        self.delete_text(self.dict_marks)
+
     def set_marking_initial(self,validator):
         print(self.logical_flag, self.fuzzy_flag, self.weights_flag, self.tresholds_flag)
         self.dict_marks = {}
@@ -404,73 +408,38 @@ class MainAplication(QMainWindow):
         for transition in self.net.getTransitions():
             self.dict_transitions[transition.getId()] = transition.label
         placesLayout = QtWidgets.QVBoxLayout()
-        if self.logical_flag:
-            self.anotherWindow_logical.placesWidget.setLayout(placesLayout)
-            self.anotherWindow_logical.placesWidget.setStyleSheet(
-                "background-color: black;")
-            for i, key in enumerate(self.dict_places):
-                placeLabel = QtWidgets.QLabel(key)
-                placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-                placeLabel.setStyleSheet("color: green;")
-                entry = QtWidgets.QLineEdit()
-                entry.setMaximumWidth(50)
-                entry.setValidator(QtGui.QRegularExpressionValidator(validator))
-                entry.setStyleSheet("color: white;")
-                self.list_edit_widgets.append(entry)
-                self.list_edit_widgets.append(placeLabel)
-                self.dict_marks[key] = entry
-                placeLayout = QtWidgets.QVBoxLayout()
-                placeLayout.addWidget(placeLabel)
-                placeLayout.addWidget(entry)
-                placeLayout.addStretch()
-                placesLayout.addLayout(placeLayout)
+        self.anotherWindow.placesWidget.setLayout(placesLayout)
+        self.anotherWindow.placesWidget.setStyleSheet(
+             "background-color: black;")
+        for i, key in enumerate(self.dict_places):
+            placeLabel = QtWidgets.QLabel(key)
+            placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+            placeLabel.setStyleSheet("color: green;")
+            entry = QtWidgets.QLineEdit()
+            entry.setMaximumWidth(50)
+            entry.setValidator(QtGui.QRegularExpressionValidator(validator))
+            entry.setStyleSheet("color: white;")
+            self.list_edit_widgets.append(entry)
+            self.list_edit_widgets.append(placeLabel)
+            self.dict_marks[key] = entry
+            placeLayout = QtWidgets.QVBoxLayout()
+            placeLayout.addWidget(placeLabel)
+            placeLayout.addWidget(entry)
+            placeLayout.addStretch()
+            placesLayout.addLayout(placeLayout)
 
-            self.anotherWindow_logical.placesScrollArea.setWidget(
-                self.anotherWindow_logical.placesWidget)
-            self.anotherWindow_logical.OK1.clicked.connect(
-                lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
-            self.anotherWindow_logical.tresholdsWidget.setStyleSheet(
-                "background-color: black;")
-            self.anotherWindow_logical.weightsWidget.setStyleSheet(
-                "background-color: black;")
-            
-        if self.fuzzy_flag:
-            self.anotherWindow.placesWidget.setLayout(placesLayout)
-            self.anotherWindow.placesWidget.setStyleSheet(
-                "background-color: black;")
-            for i, key in enumerate(self.dict_places):
-                placeLabel = QtWidgets.QLabel(key)
-                placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-                placeLabel.setStyleSheet("color: green;")
-                entry = QtWidgets.QLineEdit()
-                entry.setMaximumWidth(50)
-                entry.setValidator(QtGui.QRegularExpressionValidator(validator))
-                entry.setStyleSheet("color: white;")
-                self.list_edit_widgets.append(entry)
-                self.list_edit_widgets.append(placeLabel)
-                self.dict_marks[key] = entry
-                placeLayout = QtWidgets.QVBoxLayout()
-                placeLayout.addWidget(placeLabel)
-                placeLayout.addWidget(entry)
-                placeLayout.addStretch()
-                placesLayout.addLayout(placeLayout)
-
-            self.anotherWindow.placesScrollArea.setWidget(
-                self.anotherWindow.placesWidget)
-            self.anotherWindow.OK1.clicked.connect(
-                lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
-            self.anotherWindow.tresholdsWidget.setStyleSheet(
-                "background-color: black;")
-            self.anotherWindow.weightsWidget.setStyleSheet(
-                "background-color: black;")
+        self.anotherWindow.placesScrollArea.setWidget(
+            self.anotherWindow.placesWidget)
+        self.anotherWindow.OK1.clicked.connect(
+            lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
+        self.anotherWindow.tresholdsWidget.setStyleSheet(
+            "background-color: black;")
+        self.anotherWindow.weightsWidget.setStyleSheet(
+            "background-color: black;")
                 
         if self.fuzzy_flag or self.logical_flag and not self.weights_flag and not self.tresholds_flag:
-            if self.logical_flag:
-                self.anotherWindow_logical.OK2.setEnabled(False)
-                self.anotherWindow_logical.OK3.setEnabled(False)
-            if self.fuzzy_flag:
-                self.anotherWindow.OK2.setEnabled(False)
-                self.anotherWindow.OK3.setEnabled(False)
+            self.anotherWindow.OK2.setEnabled(False)
+            self.anotherWindow.OK3.setEnabled(False)
             weightsLayout = QtWidgets.QVBoxLayout()
             self.anotherWindow.weightsWidget.setLayout(weightsLayout)
             self.anotherWindow.weight.setText("Prechody")
