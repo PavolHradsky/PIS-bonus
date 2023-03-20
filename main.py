@@ -103,16 +103,7 @@ class MainAplication(QMainWindow):
         self.tree = None
         self.ui = QFile(".\\gui\\anotherWindowFinal.ui")
         self.ui.open(QFile.ReadOnly)
-        self.anotherWindow = self.loader.load(self.ui)
-        self.anotherWindow.setWindowIcon(QtGui.QIcon(
-            'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
-        self.anotherWindow.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.anotherWindow.setStyleSheet(
-            "QMainWindow::titleBar { background-color: black; }")
-        self.anotherWindow.setGeometry(200, 200, 800, 600)
-        self.anotherWindow.setWindowTitle("Nastavenie váh a prahov pravidiel")
-        self.anotherWindow.table.setStyleSheet("background-color: black;")
-        self.ui.close()
+        self.openAnotherWindow()
         """
         self.ui = QFile(".\\gui\\anotherWindowFinal.ui")
         self.ui.open(QFile.ReadOnly)
@@ -171,6 +162,21 @@ class MainAplication(QMainWindow):
                 }
             """)
 
+    def openAnotherWindow(self):
+        self.anotherWindow = None
+        self.ui.open(QFile.ReadOnly)
+        self.anotherWindow = self.loader.load(self.ui)
+        self.anotherWindow.setWindowIcon(QtGui.QIcon(
+            'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
+        self.anotherWindow.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.anotherWindow.setStyleSheet(
+            "QMainWindow::titleBar { background-color: black; }")
+        self.anotherWindow.setGeometry(200, 200, 800, 600)
+        self.anotherWindow.setWindowTitle("Nastavenie váh a prahov pravidiel")
+        self.anotherWindow.table.setStyleSheet("background-color: black;")
+        self.anotherWindow.show()
+        self.ui.close()
+
     def update_time(self):
         # Get the current system time
         current_time = QTime.currentTime()
@@ -205,41 +211,41 @@ class MainAplication(QMainWindow):
         print(self.main_layout.comboBox.currentText())
 
     def run(self):
-        self.anotherWindow.table.setColumnCount(5)
-        self.anotherWindow.table.setHorizontalHeaderLabels(
-            ["Pacient ID", "Pulz", "Okysličenie krvi", "Systolický KT", "Diastolický KT"])
-        header = self.anotherWindow.table.horizontalHeader()
-        header.setStyleSheet("background-color: black; color: black;")
-        header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.anotherWindow.table.setRowCount(1)
-        item_0 = QtWidgets.QTableWidgetItem(
-            str(self.database_output_table2[1]))
-        item_0.setForeground(QtGui.QColor("white"))
-        self.anotherWindow.table.setItem(0, 0, item_0)
-
-        item_1 = QtWidgets.QTableWidgetItem(
-            str(self.database_output_table2[2]))
-        item_1.setForeground(QtGui.QColor("white"))
-        self.anotherWindow.table.setItem(0, 1, item_1)
-
-        item_2 = QtWidgets.QTableWidgetItem(
-            str(self.database_output_table2[3]))
-        item_2.setForeground(QtGui.QColor("white"))
-        self.anotherWindow.table.setItem(0, 2, item_2)
-
-        item_3 = QtWidgets.QTableWidgetItem(
-            str(self.database_output_table2[4]))
-        item_3.setForeground(QtGui.QColor("white"))
-        self.anotherWindow.table.setItem(0, 3, item_3)
-
-        item_4 = QtWidgets.QTableWidgetItem(
-            str(self.database_output_table2[5]))
-        item_4.setForeground(QtGui.QColor("white"))
-        self.anotherWindow.table.setItem(0, 4, item_4)
-
         if self.file_path:
             self.tree = ET.parse(self.file_path)
             self.root = self.tree.getroot()
+            self.anotherWindow.table.setColumnCount(5)
+            self.anotherWindow.table.setHorizontalHeaderLabels(
+                ["Pacient ID", "Pulz", "Okysličenie krvi", "Systolický KT", "Diastolický KT"])
+            header = self.anotherWindow.table.horizontalHeader()
+            header.setStyleSheet("background-color: black; color: black;")
+            header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+            self.anotherWindow.table.setRowCount(1)
+            item_0 = QtWidgets.QTableWidgetItem(
+                str(self.database_output_table2[1]))
+            item_0.setForeground(QtGui.QColor("white"))
+            self.anotherWindow.table.setItem(0, 0, item_0)
+
+            item_1 = QtWidgets.QTableWidgetItem(
+                str(self.database_output_table2[2]))
+            item_1.setForeground(QtGui.QColor("white"))
+            self.anotherWindow.table.setItem(0, 1, item_1)
+
+            item_2 = QtWidgets.QTableWidgetItem(
+                str(self.database_output_table2[3]))
+            item_2.setForeground(QtGui.QColor("white"))
+            self.anotherWindow.table.setItem(0, 2, item_2)
+
+            item_3 = QtWidgets.QTableWidgetItem(
+                str(self.database_output_table2[4]))
+            item_3.setForeground(QtGui.QColor("white"))
+            self.anotherWindow.table.setItem(0, 3, item_3)
+
+            item_4 = QtWidgets.QTableWidgetItem(
+                str(self.database_output_table2[5]))
+            item_4.setForeground(QtGui.QColor("white"))
+            self.anotherWindow.table.setItem(0, 4, item_4)
+
             if "fuzzy" in self.file_name:
                 self.fuzzy_flag = 1
             else:
@@ -249,13 +255,13 @@ class MainAplication(QMainWindow):
             if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = 1
                 self.fuzzy_flag = 0
-                self.anotherWindow.show()
+                self.openAnotherWindow()
                 self.set_marking_initial(self.logical_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť":
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
-                self.anotherWindow.show()
+                self.openAnotherWindow()
                 self.set_marking_initial(self.fuzzy_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
@@ -263,7 +269,7 @@ class MainAplication(QMainWindow):
                 self.tresholds_flag = 0
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
-                self.anotherWindow.show()
+                self.openAnotherWindow()
                 self.set_marking_initial(self.fuzzy_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
@@ -271,7 +277,7 @@ class MainAplication(QMainWindow):
                 self.weights_flag = 1
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
-                self.anotherWindow.show()
+                self.openAnotherWindow()
                 self.set_marking_initial(self.fuzzy_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
         else:
@@ -1988,7 +1994,7 @@ class DialogWindow(QtWidgets.QDialog):
 if __name__ == '__main__':
     result, result1, result2 = connect()
     app = QApplication(sys.argv)
-    #window = MainAplication()
+    # window = MainAplication()
     # window.show()
 
     dialog = DialogWindow()
