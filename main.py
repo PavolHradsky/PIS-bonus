@@ -103,7 +103,7 @@ class MainAplication(QMainWindow):
         self.tree = None
         self.ui = QFile(".\\gui\\anotherWindowFinal.ui")
         self.ui.open(QFile.ReadOnly)
-        self.openAnotherWindow()
+        #self.openAnotherWindow()
         """
         self.ui = QFile(".\\gui\\anotherWindowFinal.ui")
         self.ui.open(QFile.ReadOnly)
@@ -176,6 +176,7 @@ class MainAplication(QMainWindow):
         self.anotherWindow.table.setStyleSheet("background-color: black;")
         self.anotherWindow.show()
         self.ui.close()
+        self.anotherWindow.fuzzyficate_run.clicked.connect(self.fuzzyficate)
 
     def update_time(self):
         # Get the current system time
@@ -212,6 +213,7 @@ class MainAplication(QMainWindow):
 
     def run(self):
         if self.file_path:
+            self.openAnotherWindow()
             self.tree = ET.parse(self.file_path)
             self.root = self.tree.getroot()
             self.anotherWindow.table.setColumnCount(5)
@@ -255,13 +257,13 @@ class MainAplication(QMainWindow):
             if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = 1
                 self.fuzzy_flag = 0
-                self.openAnotherWindow()
+               # self.openAnotherWindow()
                 self.set_marking_initial(self.logical_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť":
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
-                self.openAnotherWindow()
+                #self.openAnotherWindow()
                 self.set_marking_initial(self.fuzzy_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
@@ -269,7 +271,7 @@ class MainAplication(QMainWindow):
                 self.tresholds_flag = 0
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
-                self.openAnotherWindow()
+                #self.openAnotherWindow()
                 self.set_marking_initial(self.fuzzy_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
@@ -277,7 +279,7 @@ class MainAplication(QMainWindow):
                 self.weights_flag = 1
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
-                self.openAnotherWindow()
+               # self.openAnotherWindow()
                 self.set_marking_initial(self.fuzzy_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
         else:
@@ -297,6 +299,11 @@ class MainAplication(QMainWindow):
 
     def run_final(self):
         l = 0
+        self.k = 0
+        self.main_layout.prevButton.setEnabled(False)
+        self.main_layout.nextButton.setEnabled(True)
+        if self.main_layout.steps != None:
+            self.main_layout.steps.clear()
         self.anotherWindow.close()
         for rank in self.root.iter('place'):
             for value in rank:
