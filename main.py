@@ -18,7 +18,9 @@ from PySide6.QtCore import QFile, QTimer, QTime
 import os
 import glob
 from PySide6.QtGui import QPixmap, QImage
-
+import FuzzyficateFunctions
+import matplotlib
+matplotlib.use('tkagg')
 
 def loading_data(name_file, fuzzy_flag, weights_flag, threshold_flag, flag):
     places, transitions, arcs, role = read_xml(
@@ -343,6 +345,15 @@ class MainAplication(QMainWindow):
         # TODO to the future there will be a function that will fuzzyficate the input data from database and results will be stored in self.fuzzyficated_M0
         # self.database_output_table1
         # self.database_output_table2
+        print(self.database_output_table2)
+        counter = 0
+        for record in self.database_output_table2:
+            if counter ==0:
+                self.fuzzyficated_M0[0] = FuzzyficateFunctions.obtain_triangular_fuzzy_value(int(record[2]), 0, 70, 150)
+                FuzzyficateFunctions.draw_triangular_fuzzy_value(np.arange(0, 150, 0.1), int(record[2]), 0, 70, 150)
+                counter += 1
+        print(self.fuzzyficated_M0)
+        self.fuzzyficated_M0 = self.fuzzyficated_M0
         self.net.M0 = self.fuzzyficated_M0
         placesLayout = self.anotherWindow.placesWidget.layout()
         self.anotherWindow.placesWidget.setStyleSheet(
