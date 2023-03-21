@@ -103,21 +103,6 @@ class MainAplication(QMainWindow):
         self.tree = None
         self.ui = QFile(".\\gui\\anotherWindowFinal.ui")
         self.ui.open(QFile.ReadOnly)
-        #self.openAnotherWindow()
-        """
-        self.ui = QFile(".\\gui\\anotherWindowFinal.ui")
-        self.ui.open(QFile.ReadOnly)
-        self.anotherWindow_logical = self.loader.load(self.ui)
-        self.anotherWindow_logical.setWindowIcon(QtGui.QIcon(
-            'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
-        self.anotherWindow_logical.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.anotherWindow_logical.setStyleSheet(
-            "QMainWindow::titleBar { background-color: black; }")
-        self.anotherWindow_logical.setGeometry(200, 200, 800, 600)
-        self.anotherWindow_logical.setWindowTitle("Nastavenie váh a prahov pravidiel")
-        self.anotherWindow_logical.table.setStyleSheet("background-color: black;")
-        self.ui.close()
-        """
         self.net = None
         self.root = None
         self.tresholds_flag = 0
@@ -143,24 +128,8 @@ class MainAplication(QMainWindow):
         #self.anotherWindow_logical.fuzzyficate_run.clicked.connect(self.fuzzyficate)
         if self.image_number == 1:
             self.main_layout.prevButton.setEnabled(False)
-            self.main_layout.prevButton.setStyleSheet("""
-                QPushButton:disabled {
-                    color: green;
-                }
-                QPushButton:disabled:!checked {
-                    background-color: rgba(255,0,0,0.5);
-                }
-            """)
         if len(self.dict_final) == 0:
             self.main_layout.nextButton.setEnabled(False)
-            self.main_layout.nextButton.setStyleSheet("""
-                QPushButton:disabled {
-                    color: green;
-                }
-                QPushButton:disabled:!checked {
-                    background-color: rgba(255,0,0,0.5);
-                }
-            """)
 
     def openAnotherWindow(self):
         self.anotherWindow = None
@@ -222,32 +191,31 @@ class MainAplication(QMainWindow):
             header = self.anotherWindow.table.horizontalHeader()
             header.setStyleSheet("background-color: black; color: black;")
             header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-            self.anotherWindow.table.setRowCount(1)
-            item_0 = QtWidgets.QTableWidgetItem(
-                str(self.database_output_table2[1]))
-            item_0.setForeground(QtGui.QColor("white"))
-            self.anotherWindow.table.setItem(0, 0, item_0)
+            row = 0
+            for record in self.database_output_table2:
+                self.anotherWindow.table.insertRow(row)
 
-            item_1 = QtWidgets.QTableWidgetItem(
-                str(self.database_output_table2[2]))
-            item_1.setForeground(QtGui.QColor("white"))
-            self.anotherWindow.table.setItem(0, 1, item_1)
+                item_0 = QtWidgets.QTableWidgetItem(str(record[1]))
+                item_0.setForeground(QtGui.QColor("white"))
+                self.anotherWindow.table.setItem(row, 0, item_0)
 
-            item_2 = QtWidgets.QTableWidgetItem(
-                str(self.database_output_table2[3]))
-            item_2.setForeground(QtGui.QColor("white"))
-            self.anotherWindow.table.setItem(0, 2, item_2)
+                item_1 = QtWidgets.QTableWidgetItem(str(record[2]))
+                item_1.setForeground(QtGui.QColor("white"))
+                self.anotherWindow.table.setItem(row, 1, item_1)
 
-            item_3 = QtWidgets.QTableWidgetItem(
-                str(self.database_output_table2[4]))
-            item_3.setForeground(QtGui.QColor("white"))
-            self.anotherWindow.table.setItem(0, 3, item_3)
+                item_2 = QtWidgets.QTableWidgetItem(str(record[3]))
+                item_2.setForeground(QtGui.QColor("white"))
+                self.anotherWindow.table.setItem(row, 2, item_2)
 
-            item_4 = QtWidgets.QTableWidgetItem(
-                str(self.database_output_table2[5]))
-            item_4.setForeground(QtGui.QColor("white"))
-            self.anotherWindow.table.setItem(0, 4, item_4)
+                item_3 = QtWidgets.QTableWidgetItem(str(record[4]))
+                item_3.setForeground(QtGui.QColor("white"))
+                self.anotherWindow.table.setItem(row, 3, item_3)
 
+                item_4 = QtWidgets.QTableWidgetItem(str(record[5]))
+                item_4.setForeground(QtGui.QColor("white"))
+                self.anotherWindow.table.setItem(row, 4, item_4)
+
+                row += 1
             if "fuzzy" in self.file_name:
                 self.fuzzy_flag = 1
             else:
@@ -257,13 +225,11 @@ class MainAplication(QMainWindow):
             if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = 1
                 self.fuzzy_flag = 0
-               # self.openAnotherWindow()
                 self.set_marking_initial(self.logical_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť":
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
-                #self.openAnotherWindow()
                 self.set_marking_initial(self.fuzzy_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
@@ -271,7 +237,6 @@ class MainAplication(QMainWindow):
                 self.tresholds_flag = 0
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
-                #self.openAnotherWindow()
                 self.set_marking_initial(self.fuzzy_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
@@ -279,7 +244,6 @@ class MainAplication(QMainWindow):
                 self.weights_flag = 1
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
-               # self.openAnotherWindow()
                 self.set_marking_initial(self.fuzzy_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
         else:
@@ -567,24 +531,9 @@ class MainAplication(QMainWindow):
         if self.image_number > 1:
             #  set button active
             self.main_layout.nextButton.setEnabled(True)
-            self.main_layout.nextButton.setStyleSheet("""
-                QPushButton:enabled {
-                    color: rgba(255,0,0,0.5);
-                }
-                QPushButton:enabled:!checked {
-                    background-color: green;
-                }
-            """)
+            
             if self.image_number == 2:
                 self.main_layout.prevButton.setEnabled(False)
-                self.main_layout.prevButton.setStyleSheet("""
-                QPushButton:disabled {
-                    color: green;
-                }
-                QPushButton:disabled:!checked {
-                    background-color: rgba(255,0,0,0.5);
-                }
-            """)
             self.image_number -= 1
             prem = QImage(self.image_dict[self.image_number])
             pixmap = QPixmap.fromImage(prem)
@@ -604,38 +553,15 @@ class MainAplication(QMainWindow):
         else:
             # set button inactive
             self.main_layout.prevButton.setEnabled(False)
-            self.main_layout.prevButton.setStyleSheet("""
-                QPushButton:disabled {
-                    color: green;
-                }
-                QPushButton:disabled:!checked {
-                    background-color: rgba(255,0,0,0.5);
-                }
-            """)
             self.image_number = 1
 
     def next(self):
         if self.image_number < len(self.image_dict):
             # set button active
             self.main_layout.prevButton.setEnabled(True)
-            self.main_layout.prevButton.setStyleSheet("""
-                QPushButton:enabled {
-                    color: rgba(255,0,0,0.5);
-                }
-                QPushButton:enabled:!checked {
-                    background-color: green;
-                }
-            """)
             if self.image_number == len(self.image_dict)-1:
                 self.main_layout.nextButton.setEnabled(False)
-                self.main_layout.nextButton.setStyleSheet("""
-                QPushButton:disabled {
-                    color: green;
-                }
-                QPushButton:disabled:!checked {
-                    background-color: rgba(255,0,0,0.5);
-                }
-            """)
+               
             self.image_number += 1
             prem = QImage(self.image_dict[self.image_number])
             pixmap = QPixmap.fromImage(prem)
@@ -916,22 +842,6 @@ class MainAplication(QMainWindow):
         self.generate_image()
 
         self.main_layout.nextButton.setEnabled(True)
-        self.main_layout.nextButton.setStyleSheet("""
-                QPushButton:enabled {
-                    color: rgba(255,0,0,0.5);
-                }
-                QPushButton:enabled:!checked {
-                    background-color: green;
-                }
-        """)
-        self.main_layout.prevButton.setStyleSheet("""
-                QPushButton:enabled {
-                    color: rgba(255,0,0,0.5);
-                }
-                QPushButton:enabled:!checked {
-                    background-color: green;
-                }
-        """)
         self.image_index += 1
 
     def generate_image(self):
@@ -1915,7 +1825,7 @@ class DialogWindow(QtWidgets.QDialog):
         self.main_layout.enroll.clicked.connect(self.open_main_application)
         self.main_layout.interrupt.clicked.connect(self.main_layout.close)
         self.patient_records = None
-        self.patient_problems = None
+        self.patient_problems = []
         self.hashed = None
         self.main_layout.password.setEchoMode(QtWidgets.QLineEdit.Password)
 
@@ -1974,19 +1884,22 @@ class DialogWindow(QtWidgets.QDialog):
 
     def combo_changed(self, index):
         if index >= 0:
+            self.patient_problems = []
             patient_name = self.main_layout.patientPicker.itemText(index)
         else:
             # No item selected, use the first item
+            self.patient_problems = []
             patient_name = self.main_layout.patientPicker.itemText(0)
         selected_records = [
             i for i in self.database_output_table1 if i[1] + " " + i[2] == patient_name]
         if selected_records:
             self.patient_records = selected_records[0]
-            self.patient_problems = next(
-                (j for j in self.database_output_table2 if j[0] == self.patient_records[0]), None)
+            for record in self.database_output_table2:
+                if record[1]== self.patient_records[0]:
+                    self.patient_problems.append(record)
         else:
             self.patient_records = None
-            self.patient_problems = None
+            self.patient_problems = []
             print("No records found for selected patient.")
 
     def parsing_database(self):
@@ -2003,11 +1916,9 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     # window = MainAplication()
     # window.show()
-
     dialog = DialogWindow()
     dialog.database_output_table1 = result
     dialog.database_output_table2 = result1
     dialog.hashed = result2
     dialog.parsing_database()
-
     sys.exit(app.exec())

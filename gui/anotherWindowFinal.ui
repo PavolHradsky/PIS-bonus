@@ -176,10 +176,19 @@
                  </widget>
                 </widget>
                </item>
-               <item>
+               <item alignment="Qt::AlignHCenter">
                 <widget class="QPushButton" name="OK1">
                  <property name="autoFillBackground">
-                  <bool>true</bool>
+                  <bool>false</bool>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QPushButton:hover
+{
+   background-color:white;
+}
+QPushButton:enabled {
+                    color: green;
+}</string>
                  </property>
                  <property name="text">
                   <string>OK</string>
@@ -292,10 +301,19 @@
                  </widget>
                 </widget>
                </item>
-               <item>
+               <item alignment="Qt::AlignHCenter">
                 <widget class="QPushButton" name="OK2">
                  <property name="autoFillBackground">
-                  <bool>true</bool>
+                  <bool>false</bool>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QPushButton:hover
+{
+   background-color:white;
+}
+QPushButton:enabled {
+                    color: green;
+}</string>
                  </property>
                  <property name="text">
                   <string>OK</string>
@@ -405,10 +423,19 @@
                  </widget>
                 </widget>
                </item>
-               <item>
+               <item alignment="Qt::AlignHCenter">
                 <widget class="QPushButton" name="OK3">
                  <property name="autoFillBackground">
-                  <bool>true</bool>
+                  <bool>false</bool>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QPushButton:hover
+{
+   background-color:white;
+}
+QPushButton:enabled {
+                    color: green;
+}</string>
                  </property>
                  <property name="text">
                   <string>OK</string>
@@ -473,7 +500,13 @@
                  </size>
                 </property>
                 <property name="autoFillBackground">
-                 <bool>true</bool>
+                 <bool>false</bool>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton:hover
+{
+   background-color:white;
+}</string>
                 </property>
                 <property name="text">
                  <string>Fuzzyficate</string>
@@ -495,7 +528,16 @@
                  </size>
                 </property>
                 <property name="autoFillBackground">
-                 <bool>true</bool>
+                 <bool>false</bool>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton:hover
+{
+   background-color:white;
+}
+QPushButton:enabled {
+                    color: green;
+}</string>
                 </property>
                 <property name="text">
                  <string>SAVE</string>
