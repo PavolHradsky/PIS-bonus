@@ -16,7 +16,10 @@ class FuzzyPy():
     def trapmf(self, x, a, b, c, d):
         X1 = (x - a) / (b - a)
         X2 = np.ones(x.size)
-        X3 = (d - x) / (d - c)
+        if d == c:
+            X3 = np.ones(x.size)
+        else:
+            X3 = (d - x) / (d - c)
         X4 = np.minimum(np.minimum(X1, X2), X3)
         X5 = np.zeros(x.size)
         y = np.maximum(X4, X5)
@@ -37,7 +40,6 @@ class Triangle(FuzzyPy):
 
 class Trapezoid(FuzzyPy):
     def __init__(self, x, low, middle, high):
-        self.x = x
         self.low = self.trapmf(x, low[0], low[1], low[2], low[3])
         self.middle = self.trapmf(
             x, middle[0], middle[1], middle[2], middle[3])
@@ -78,11 +80,12 @@ def draw_triangular_fuzzy_value(range_values, measured_value, left, center, righ
     plt.plot(range_values, value.middle, 'g', linewidth=1.5, label='middle')
     plt.plot(range_values, value.high, 'r', linewidth=1.5, label='high')
     plt.title('Triangle')
-    plt.axvline(x=measured_value, color='r')
+    plt.axvline(x=measured_value, color='g')
     plt.axhline(y=triangle_fuzzy_value(
         measured_value, left, center, right), color='g')
-    plt.legend()
+    plt.savefig('images_fuzzyfication/Triangle.png')
     plt.show()
+
 # trapezoid fuzzy function
 
 
@@ -111,14 +114,15 @@ def draw_trapezoid_fuzzy_value(range_values, measured_value, left, center_left, 
     plt.plot(range_values, value.middle, 'g', linewidth=1.5, label='middle')
     plt.plot(range_values, value.high, 'r', linewidth=1.5, label='high')
     plt.title('Trapezoid')
-    plt.axvline(x=measured_value, color='r')
+    plt.axvline(x=measured_value, color='g')
     plt.axhline(y=trapezoid_fuzzy_value(measured_value, left,
                 center_left, center_right, right), color='g')
-    plt.legend()
+    plt.savefig('images_fuzzyfication/Trapezoid.png')
     plt.show()
 
-
 # gaussian fuzzy fuction
+
+
 def gaussian_fuzzy_value(x, center, sigma):
     return np.exp(-((x - center) ** 2) / (2 * sigma ** 2))
 
@@ -137,15 +141,14 @@ def draw_gaussian_fuzzy_value(range_values, measured_value, center, sigma):
     plt.plot(range_values, value.middle, 'g', linewidth=1.5, label='middle')
     plt.plot(range_values, value.high, 'r', linewidth=1.5, label='high')
     plt.title('Gaussian')
-    plt.axvline(x=measured_value, color='r')
+    plt.axvline(x=measured_value, color='g')
     plt.axhline(y=gaussian_fuzzy_value(
         measured_value, center, sigma), color='g')
-    plt.legend()
+    plt.savefig('images_fuzzyfication/Gaussian.png')
     plt.show()
 
+
 # sigmoid fuzzy function
-
-
 def sigmoid_fuzzy_value(x, center, sigma):
     return 1 / (1 + np.exp(-((x - center) / sigma)))
 
@@ -164,8 +167,8 @@ def draw_sigmoid_fuzzy_value(range_values, measured_value, center, sigma):
     plt.plot(range_values, value.middle, 'g', linewidth=1.5, label='middle')
     plt.plot(range_values, value.high, 'r', linewidth=1.5, label='high')
     plt.title('Sigmoid')
-    plt.axvline(x=measured_value, color='r')
+    plt.axvline(x=measured_value, color='g')
     plt.axhline(y=sigmoid_fuzzy_value(
         measured_value, center, sigma), color='g')
-    plt.legend()
+    plt.savefig('images_fuzzyfication/Sigmoid.png')
     plt.show()

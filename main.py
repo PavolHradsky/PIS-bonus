@@ -125,7 +125,7 @@ class MainAplication(QMainWindow):
         self.list_edit_widgets = []
         self.logical_validator = QtCore.QRegularExpression("^(0|1)$") 
         self.fuzzy_validator = QtCore.QRegularExpression("^(0(\.\d+)?|1)$")
-        self.fuzzyficated_M0 = [1, 0, 1, 0, 0, 0, 0, 0]
+        self.fuzzyficated_M0 = []
         #self.anotherWindow.fuzzyficate_run.clicked.connect(self.fuzzyficate)
         #self.anotherWindow_logical.fuzzyficate_run.clicked.connect(self.fuzzyficate)
         if self.image_number == 1:
@@ -187,9 +187,9 @@ class MainAplication(QMainWindow):
             self.openAnotherWindow()
             self.tree = ET.parse(self.file_path)
             self.root = self.tree.getroot()
-            self.anotherWindow.table.setColumnCount(5)
+            self.anotherWindow.table.setColumnCount(6)
             self.anotherWindow.table.setHorizontalHeaderLabels(
-                ["Pacient ID", "Pulz", "Okysličenie krvi", "Systolický KT", "Diastolický KT"])
+                ["Záznam","Pacient ID", "Pulz", "Okysličenie krvi", "Systolický KT", "Diastolický KT"])
             header = self.anotherWindow.table.horizontalHeader()
             header.setStyleSheet("background-color: black; color: black;")
             header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
@@ -197,25 +197,29 @@ class MainAplication(QMainWindow):
             for record in self.database_output_table2:
                 self.anotherWindow.table.insertRow(row)
 
-                item_0 = QtWidgets.QTableWidgetItem(str(record[1]))
+                item_0 = QtWidgets.QTableWidgetItem(str(record[0]))
                 item_0.setForeground(QtGui.QColor("white"))
                 self.anotherWindow.table.setItem(row, 0, item_0)
 
-                item_1 = QtWidgets.QTableWidgetItem(str(record[2]))
+                item_1 = QtWidgets.QTableWidgetItem(str(record[1]))
                 item_1.setForeground(QtGui.QColor("white"))
                 self.anotherWindow.table.setItem(row, 1, item_1)
 
-                item_2 = QtWidgets.QTableWidgetItem(str(record[3]))
+                item_2 = QtWidgets.QTableWidgetItem(str(record[2]))
                 item_2.setForeground(QtGui.QColor("white"))
                 self.anotherWindow.table.setItem(row, 2, item_2)
 
-                item_3 = QtWidgets.QTableWidgetItem(str(record[4]))
+                item_3 = QtWidgets.QTableWidgetItem(str(record[3]))
                 item_3.setForeground(QtGui.QColor("white"))
                 self.anotherWindow.table.setItem(row, 3, item_3)
 
-                item_4 = QtWidgets.QTableWidgetItem(str(record[5]))
+                item_4 = QtWidgets.QTableWidgetItem(str(record[4]))
                 item_4.setForeground(QtGui.QColor("white"))
                 self.anotherWindow.table.setItem(row, 4, item_4)
+
+                item_5 = QtWidgets.QTableWidgetItem(str(record[5]))
+                item_5.setForeground(QtGui.QColor("white"))
+                self.anotherWindow.table.setItem(row, 5, item_5)
 
                 row += 1
             if "fuzzy" in self.file_name:
@@ -346,11 +350,16 @@ class MainAplication(QMainWindow):
         # self.database_output_table1
         # self.database_output_table2
         print(self.database_output_table2)
+        self.fuzzyficated_M0 = [0 for _ in range(len(self.dict_places))]
         counter = 0
         for record in self.database_output_table2:
-            if counter ==0:
-                self.fuzzyficated_M0[0] = FuzzyficateFunctions.obtain_triangular_fuzzy_value(int(record[2]), 0, 70, 150)
+            if counter == 0:
+                self.fuzzyficated_M0[0] = round(FuzzyficateFunctions.obtain_triangular_fuzzy_value(int(record[2]), 0, 70, 150),2)
                 FuzzyficateFunctions.draw_triangular_fuzzy_value(np.arange(0, 150, 0.1), int(record[2]), 0, 70, 150)
+                self.fuzzyficated_M0[0] = round(FuzzyficateFunctions.obtain_gaussian_fuzzy_value(int(record[2]), 70, 20),2)
+                FuzzyficateFunctions.draw_gaussian_fuzzy_value(np.arange(0, 150, 0.1), int(record[2]), 70, 20)
+                self.fuzzyficated_M0[1] = round(FuzzyficateFunctions.obtain_trapezoid_fuzzy_value(int(record[3]), 0, 90, 100, 100),2)
+                FuzzyficateFunctions.draw_trapezoid_fuzzy_value(np.arange(0, 100, 0.1), int(record[3]), 0, 90, 100, 100)
                 counter += 1
         print(self.fuzzyficated_M0)
         self.fuzzyficated_M0 = self.fuzzyficated_M0
