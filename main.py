@@ -145,9 +145,14 @@ class MainAplication(QMainWindow):
         self.anotherWindow.setGeometry(200, 200, 800, 600)
         self.anotherWindow.setWindowTitle("Nastavenie váh a prahov pravidiel")
         self.anotherWindow.table.setStyleSheet("background-color: black;")
+        if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
+            self.anotherWindow.fuzzyficate_run.setEnabled(False)
+        else:
+            self.anotherWindow.fuzzyficate_run.setEnabled(True)
+            self.anotherWindow.fuzzyficate_run.clicked.connect(self.fuzzyficate)
         self.anotherWindow.show()
         self.ui.close()
-        self.anotherWindow.fuzzyficate_run.clicked.connect(self.fuzzyficate)
+        
 
     def update_time(self):
         # Get the current system time
@@ -157,7 +162,7 @@ class MainAplication(QMainWindow):
         # Update the time label
         self.main_layout.time_actual.setText(formatted_time)
 
-    def resizeEvent(self, event):
+    def resizeEvent(self, event): 
         if len(self.image_dict) > 0:
             prem = QImage(self.image_dict[self.image_number])
             pixmap = QPixmap.fromImage(prem)
@@ -228,6 +233,9 @@ class MainAplication(QMainWindow):
                 self.fuzzy_flag = 0
             self.net = loading_data(
                 self.file_name, self.fuzzy_flag, self.weights_flag, self.tresholds_flag, 0)
+            self.draw_net_initial()
+            self.setting_first_image()
+
             if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = 1
                 self.fuzzy_flag = 0
@@ -364,7 +372,6 @@ class MainAplication(QMainWindow):
         print(self.fuzzyficated_M0)
         self.fuzzyficated_M0 = self.fuzzyficated_M0
         self.net.M0 = self.fuzzyficated_M0
-        placesLayout = self.anotherWindow.placesWidget.layout()
         self.anotherWindow.placesWidget.setStyleSheet(
             "background-color: black;")
         counter = 0
@@ -375,18 +382,12 @@ class MainAplication(QMainWindow):
             placeLabelM0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
             placeLabel.setStyleSheet("color: green;")
             placeLabelM0.setStyleSheet("color: green;")
-            for j in range(2):
-                edit = self.list_edit_widgets[i+j+counter]
-                placeLayout = QtWidgets.QVBoxLayout()
-                # remove edit widget from layout
-                placeLayout.removeWidget(edit)
-                edit.setParent(None)
-                placeLayout.addWidget(placeLabel)
-                placeLayout.addWidget(placeLabelM0)
-                placeLayout.addStretch()
-                placesLayout.addLayout(placeLayout)
-            counter += 1
-        self.anotherWindow.OK1.setEnabled(False)
+           
+            edit = self.list_edit_widgets[i]
+            edit.setText(str(self.fuzzyficated_M0[i]))
+            edit.setEnabled(False)
+
+        self.anotherWindow.OK1.setEnabled(True)
         self.anotherWindow.fuzzyficate_run.setEnabled(False)
 
 
@@ -417,7 +418,7 @@ class MainAplication(QMainWindow):
             entry.setValidator(QtGui.QRegularExpressionValidator(validator))
             entry.setStyleSheet("color: white;")
             self.list_edit_widgets.append(entry)
-            self.list_edit_widgets.append(placeLabel)
+            #self.list_edit_widgets.append(placeLabel)
             self.dict_marks[key] = entry
             placeLayout = QtWidgets.QVBoxLayout()
             placeLayout.addWidget(placeLabel)
@@ -454,6 +455,7 @@ class MainAplication(QMainWindow):
                 self.anotherWindow.weightsWidget)
             self.anotherWindow.tresholdsWidget.setStyleSheet(
                 "background-color: black;")
+            self.anotherWindow.widget_2.hide()
 
         if self.weights_flag:
             self.anotherWindow.OK3.setDisabled(True)
@@ -485,6 +487,7 @@ class MainAplication(QMainWindow):
                 self.dict_weights), self.delete_text(self.dict_weights)])
 
         if self.tresholds_flag:
+            self.anotherWindow.widget_2.show()
             self.anotherWindow.OK2.setDisabled(False)
             self.anotherWindow.OK3.setDisabled(False)
             tresholdsLayout = QtWidgets.QVBoxLayout()
@@ -615,6 +618,120 @@ class MainAplication(QMainWindow):
         self.main_layout.prevButton.setEnabled(False)
         self.main_layout.nextButton.setEnabled(True)
         self.main_layout.clearAll.setEnabled(False)
+
+    def draw_net_initial(self, weights =False, thresholds = False):
+        graph_data = {
+            'places': [],
+            'transitions': [],
+            'edges': {},
+        }
+        for arc in self.net.getArcs():
+            if isinstance(arc.src, Place):
+                graph_data['places'].append(arc.getSourceId())
+            else:
+                graph_data['transitions'].append(arc.getSourceId())
+            if isinstance(arc.dest, Place):
+                graph_data['places'].append(arc.getDestinationId())
+            else:
+                graph_data['transitions'].append(arc.getDestinationId())
+            graph_data['edges'][(
+                arc.getSourceId(), arc.getDestinationId())] = arc.getMultiplicity()
+
+        for i in graph_data['edges']:
+            if isinstance(i[0], Transition):
+                if i[0].label not in self.dict_final:
+                    if not weights and not thresholds:
+                        self.dict_final[i[0].label] = {
+                            "typ": "t",
+                            "suradnice": [],
+                            "hodnoty": [{
+                                "label": i[0].label,
+                            }],
+                            "sipky": {
+                                i[1].label: graph_data['edges'][i]
+                            }
+                        }
+                else:
+                    if not weights and not thresholds:
+                        self.dict_final[i[0].label]["hodnoty"].append({
+                            "label": i[0].label,
+                        })
+                        if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
+                            self.dict_final[i[0].label]["sipky"][i[1]
+                                                                 .label] = graph_data['edges'][i]
+            if isinstance(i[0], Place):
+                if i[0].label not in self.dict_final:
+                    self.dict_final[i[0].label] = {
+                        "typ": "p",
+                        "suradnice": [],
+                        "hodnoty": [{
+                            "label": i[0].label,
+                        }],
+                        "sipky": {
+                            i[1].label: graph_data['edges'][i]
+                        }
+                    }
+                else:
+                    self.dict_final[i[0].label]["hodnoty"].append({
+                        "label": i[0].label,
+                    })
+                    if not self.dict_final[i[0].label]["sipky"].get(i[1].label):
+                        self.dict_final[i[0].label]["sipky"][i[1]
+                                                             .label] = graph_data['edges'][i]
+        self.missing_places = []
+        self.missing_transitions = []
+        for i in graph_data['places']:
+            if not self.dict_final.get(i.label):
+                self.missing_places.append(i)
+
+        for i in graph_data['transitions']:
+            if not self.dict_final.get(i.label):
+                self.missing_transitions.append(i)
+
+        for i in self.missing_places:
+            if not self.dict_final.get(i.label):
+                self.dict_final[i.label] = {
+                    "typ": "p",
+                    "suradnice": [],
+                    "hodnoty": [{
+                        "label": i.label,
+                    }],
+                    "sipky": {}
+                }
+            else:
+                self.dict_final[i.label]["hodnoty"].append({
+                    "label": i.label,
+                })
+
+        for i in self.missing_transitions:
+            if not self.dict_final.get(i.label):
+                if not weights and not thresholds:
+                    self.dict_final[i.label] = {
+                        "typ": "t",
+                        "suradnice": [],
+                        "hodnoty": [{
+                            "label": i.label,
+                        }]
+                    }
+            else:
+                if not weights and not thresholds:
+                    self.dict_final[i.label]["hodnoty"].append({
+                        "label": i.label,
+                    })
+        
+        dict_keys = list(self.dict_final)
+        x = 600
+        y = 400
+        rad = 300
+        amount = len(self.dict_final)
+        angle = 360/amount
+        for i in range(1, amount+1):
+            x1 = rad * cos(angle*i * pi/180)
+            y1 = rad * sin(angle*i * pi/180)
+            self.dict_final[dict_keys[i-1]]["suradnice"] = {
+                "main_coords": (round(x + x1), round(y + y1))}
+        self.generate_image_initial()
+
 
     def draw_net(self, weights=False, thresholds=False):
         graph_data = {
@@ -864,6 +981,118 @@ class MainAplication(QMainWindow):
         self.main_layout.nextButton.setEnabled(True)
         self.image_index += 1
 
+    def generate_image_initial(self):
+        img = np.zeros((800, 1200, 3), np.uint8)
+        img.fill(255)
+        for i in self.dict_final:
+            x1 = self.dict_final[i]["suradnice"]["main_coords"][0]
+            y1 = self.dict_final[i]["suradnice"]["main_coords"][1]
+            if x1 > 600:
+                pos = "right"
+            else:
+                pos = "left"
+
+            if self.dict_final[i]["typ"] == 'p':
+          
+                cv2.circle(img, (x1, y1), 30, (0, 0, 0), 2)
+
+                text_size, _ = cv2.getTextSize(
+                    str(self.dict_final[i]['hodnoty'][0]['label']), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
+                if pos == "right":
+                    text_pos = (x1 + 40, y1)
+                elif pos == "left":
+                    text_pos = (x1 - 40 - text_size[0], y1)
+                elif pos == "bottom":
+                    text_pos = (x1 - text_size[0] //
+                                2, y1 + 50 + text_size[1] // 2)
+                else:
+                    text_pos = (x1 - text_size[0] //
+                                2, y1 - 50 - text_size[1] // 2)
+                cv2.putText(img, str(self.dict_final[i]['hodnoty'][0]['label']), text_pos,
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+                if self.dict_final[i]['sipky']:
+                    for j in self.dict_final[i]['sipky']:
+                        x2 = self.dict_final[j]["suradnice"]["main_coords"][0]
+                        y2 = self.dict_final[j]["suradnice"]["main_coords"][1]
+                        radius1 = 32
+                        radius2 = 34
+                        fixed_arrow_length = 5
+                        arrow_tip_size = 5
+                        angle = atan2(y2 - y1, x2 - x1)
+                        point1_x = x1 + radius1 * cos(angle)
+                        point1_y = y1 + radius1 * sin(angle)
+                        point2_x = x2 - radius2 * cos(angle)
+                        point2_y = y2 - radius2 * sin(angle)
+                        distance = sqrt((x2 - x1)**2 + (y2 - y1)**2)
+                        mid_point = (int((point1_x + point2_x) / 2),
+                                     int((point1_y + point2_y) / 2))
+                        normalized_line_length = distance / fixed_arrow_length
+                        normalized_arrow_tip_size = arrow_tip_size / normalized_line_length
+                        cv2.arrowedLine(img, (int(point1_x), int(point1_y)),
+                                        (int(point2_x), int(point2_y)),
+                                        (0, 0, 0), 2, tipLength=normalized_arrow_tip_size)
+                        text = str(self.dict_final[i]['sipky'][j])
+                        text_size, _ = cv2.getTextSize(
+                            text, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+                        text_pos = (
+                            mid_point[0] - text_size[0] // 2, mid_point[1] + text_size[1] // 2 - 3)
+                        cv2.rectangle(img, (text_pos[0]-2, text_pos[1]+2), (text_pos[0] +
+                                      text_size[0], text_pos[1] - text_size[1]), (255, 255, 255), -1)
+                        cv2.putText(
+                            img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
+            else:
+                color = (0, 0, 255)
+                cv2.rectangle(img, (x1 - 30, y1 - 30),
+                              (x1 + 30, y1 + 30), color, 2)
+
+                text_size, _ = cv2.getTextSize(
+                    str(self.dict_final[i]['hodnoty'][0]['label']), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
+                if pos == "right":
+                    text_pos = (x1 + 40, y1)
+                elif pos == "left":
+                    text_pos = (x1 - 40 - text_size[0], y1)
+                elif pos == "bottom":
+                    text_pos = (x1 - text_size[0] //
+                                2, y1 + 50 + text_size[1] // 2)
+                else:
+                    text_pos = (x1 - text_size[0] //
+                                2, y1 - 50 - text_size[1] // 2)
+
+                cv2.putText(img, str(self.dict_final[i]['hodnoty'][0]['label']), text_pos,
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+                if self.dict_final[i]['sipky']:
+                    for j in self.dict_final[i]['sipky']:
+                        x2 = self.dict_final[j]["suradnice"]["main_coords"][0]
+                        y2 = self.dict_final[j]["suradnice"]["main_coords"][1]
+                        radius1 = 34
+                        radius2 = 32
+                        fixed_arrow_length = 5
+                        arrow_tip_size = 5
+                        angle = atan2(y2 - y1, x2 - x1)
+                        point1_x = x1 + radius1 * cos(angle)
+                        point1_y = y1 + radius1 * sin(angle)
+                        point2_x = x2 - radius2 * cos(angle)
+                        point2_y = y2 - radius2 * sin(angle)
+                        distance = sqrt((x2 - x1)**2 + (y2 - y1)**2)
+                        mid_point = (int((point1_x + point2_x) / 2),
+                                     int((point1_y + point2_y) / 2))
+                        normalized_line_length = distance / fixed_arrow_length
+                        normalized_arrow_tip_size = arrow_tip_size / normalized_line_length
+                        cv2.arrowedLine(img, (int(point1_x), int(point1_y)),
+                                        (int(point2_x), int(point2_y)),
+                                        (0, 0, 0), 2, tipLength=normalized_arrow_tip_size)
+                        text = str(self.dict_final[i]['sipky'][j])
+                        text_size, _ = cv2.getTextSize(
+                            text, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+                        text_pos = (
+                            mid_point[0] - text_size[0] // 2, mid_point[1] + text_size[1] // 2 - 3)
+                        cv2.rectangle(img, (text_pos[0]-2, text_pos[1]+2), (text_pos[0] +
+                                      text_size[0], text_pos[1] - text_size[1]), (255, 255, 255), -1)
+                        cv2.putText(
+                            img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
+        cv2.imwrite(f"./images/0.png", img)
+
+
     def generate_image(self):
         img = np.zeros((800, 1200, 3), np.uint8)
         img.fill(255)
@@ -1020,6 +1249,14 @@ class MainAplication(QMainWindow):
                 outputMatrix[destinationIdInNetList,
                              sourceIdInNetList] = arc.getMultiplicity()
         return inputMatrix, outputMatrix
+
+    def setting_first_image(self):
+        path = './images/0.png'
+        prem = QImage(path)
+        pixmap = QPixmap.fromImage(prem)
+        self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
+        ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+        self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
 
     def settting_image(self):
         self.image_number = 1
