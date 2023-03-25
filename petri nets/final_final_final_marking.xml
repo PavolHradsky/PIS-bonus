@@ -9,101 +9,102 @@
 	<transitionRole>false</transitionRole>
 	<transition>
 		<id>t1</id>
-		<x>380</x>
-		<y>140</y>
-		<label>prvy prechod</label>
+		<x>203</x>
+		<y>338</y>
+		<label>Podanie obkladu</label>
 	</transition>
 	<transition>
 		<id>t2</id>
-		<x>300</x>
-		<y>260</y>
-		<label>druhy prechod</label>
+		<x>409</x>
+		<y>339</y>
+		<label>Vykonať ďalšiu liečbu</label>
 	</transition>
 	<transition>
 		<id>t3</id>
-		<x>380</x>
-		<y>300</y>
-		<label>treti prechod</label>
+		<x>299</x>
+		<y>550</y>
+		<label>Nevykonať ďalšiu liečbu</label>
 	</transition>
 	<transition>
 		<id>t4</id>
-		<x>540</x>
-		<y>140</y>
-		<label>stvrty prechod</label>
+		<x>697</x>
+		<y>341</y>
+		<label>Zrealizovanie liečby</label>
 	</transition>
 	<transition>
 		<id>t5</id>
-		<x>580</x>
-		<y>300</y>
-		<label>piaty prechod</label>
+		<x>918</x>
+		<y>225</y>
+		<label>Podávanie liekov</label>
 	</transition>
 	<transition>
 		<id>t6</id>
-		<x>660</x>
-		<y>140</y>
-		<label>siesty prechod</label>
+		<x>912</x>
+		<y>456</y>
+		<label>Podávanie tekutín</label>
+	</transition>
+	<transition>
+		<id>t7</id>
+		<x>1156</x>
+		<y>342</y>
+		<label>Ukončenie liečby</label>
 	</transition>
 	<place>
 		<id>p1</id>
-		<x>260</x>
-		<y>140</y>
-		<label>prve miesto</label>
+		<x>64</x>
+		<y>338</y>
+		<label>Pacient má teplotu</label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p2</id>
-		<x>260</x>
-		<y>300</y>
-		<label>druhe miesto</label>
+		<x>299</x>
+		<y>339</y>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p3</id>
-		<x>380</x>
-		<y>180</y>
-		<label>tretie miesto</label>
+		<x>558</x>
+		<y>339</y>
+		<label>Pacient má stále teplotu</label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p4</id>
-		<x>460</x>
-		<y>260</y>
-		<label>stvrte miesto</label>
+		<x>766</x>
+		<y>227</y>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p5</id>
-		<x>460</x>
-		<y>140</y>
-		<label>piate miesto</label>
+		<x>770</x>
+		<y>455</y>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p6</id>
-		<x>620</x>
-		<y>140</y>
-		<label>sieste miesto</label>
+		<x>1042</x>
+		<y>228</y>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p7</id>
-		<x>700</x>
-		<y>300</y>
-		<label>siedme miesto</label>
+		<x>1049</x>
+		<y>456</y>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p8</id>
-		<x>740</x>
-		<y>140</y>
-		<label>osme miesto</label>
+		<x>1155</x>
+		<y>550</y>
+		<label>Pacient sa cíti lepšie</label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
@@ -118,76 +119,76 @@
 		<id>a2</id>
 		<type>regular</type>
 		<sourceId>t1</sourceId>
-		<destinationId>p5</destinationId>
+		<destinationId>p2</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a3</id>
 		<type>regular</type>
 		<sourceId>p2</sourceId>
-		<destinationId>t2</destinationId>
+		<destinationId>t3</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a4</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
 		<type>regular</type>
 		<sourceId>t2</sourceId>
 		<destinationId>p3</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
-		<id>a5</id>
-		<type>regular</type>
-		<sourceId>p3</sourceId>
-		<destinationId>t1</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
 		<id>a6</id>
 		<type>regular</type>
-		<sourceId>p2</sourceId>
-		<destinationId>t3</destinationId>
+		<sourceId>p3</sourceId>
+		<destinationId>t4</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a7</id>
 		<type>regular</type>
-		<sourceId>t3</sourceId>
+		<sourceId>t4</sourceId>
 		<destinationId>p4</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a8</id>
 		<type>regular</type>
-		<sourceId>p4</sourceId>
-		<destinationId>t5</destinationId>
+		<sourceId>t4</sourceId>
+		<destinationId>p5</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a9</id>
 		<type>regular</type>
-		<sourceId>t5</sourceId>
-		<destinationId>p7</destinationId>
+		<sourceId>p4</sourceId>
+		<destinationId>t5</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a10</id>
 		<type>regular</type>
-		<sourceId>p5</sourceId>
-		<destinationId>t4</destinationId>
+		<sourceId>t5</sourceId>
+		<destinationId>p6</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a11</id>
 		<type>regular</type>
-		<sourceId>t4</sourceId>
-		<destinationId>p6</destinationId>
+		<sourceId>p6</sourceId>
+		<destinationId>t7</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a12</id>
 		<type>regular</type>
-		<sourceId>p6</sourceId>
+		<sourceId>p5</sourceId>
 		<destinationId>t6</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
@@ -195,6 +196,27 @@
 		<id>a13</id>
 		<type>regular</type>
 		<sourceId>t6</sourceId>
+		<destinationId>p7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>regular</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a15</id>
+		<type>regular</type>
+		<sourceId>t7</sourceId>
+		<destinationId>p8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a16</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
 		<destinationId>p8</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>

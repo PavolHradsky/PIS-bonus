@@ -22,6 +22,7 @@ import FuzzyficateFunctions
 import matplotlib
 matplotlib.use('tkagg')
 
+
 def loading_data(name_file, fuzzy_flag, weights_flag, threshold_flag, flag):
     places, transitions, arcs, role = read_xml(
         name_file, fuzzy_flag, weights_flag, threshold_flag, flag)
@@ -104,7 +105,7 @@ class MainAplication(QMainWindow):
         self.k = 0
         self.tree = None
         self.ui = QFile(".\\gui\\anotherWindowFinal.ui")
-        self.ui.open(QFile.ReadOnly)
+        # self.ui.open(QFile.ReadOnly)
         self.net = None
         self.root = None
         self.tresholds_flag = 0
@@ -123,11 +124,9 @@ class MainAplication(QMainWindow):
         self.transitions_to_change = []
         self.fuzzyfication = 0
         self.list_edit_widgets = []
-        self.logical_validator = QtCore.QRegularExpression("^(0|1)$") 
+        self.logical_validator = QtCore.QRegularExpression("^(0|1)$")
         self.fuzzy_validator = QtCore.QRegularExpression("^(0(\.\d+)?|1)$")
         self.fuzzyficated_M0 = []
-        #self.anotherWindow.fuzzyficate_run.clicked.connect(self.fuzzyficate)
-        #self.anotherWindow_logical.fuzzyficate_run.clicked.connect(self.fuzzyficate)
         if self.image_number == 1:
             self.main_layout.prevButton.setEnabled(False)
         if len(self.dict_final) == 0:
@@ -149,10 +148,10 @@ class MainAplication(QMainWindow):
             self.anotherWindow.fuzzyficate_run.setEnabled(False)
         else:
             self.anotherWindow.fuzzyficate_run.setEnabled(True)
-            self.anotherWindow.fuzzyficate_run.clicked.connect(self.fuzzyficate)
+            self.anotherWindow.fuzzyficate_run.clicked.connect(
+                self.fuzzyficate)
         self.anotherWindow.show()
         self.ui.close()
-        
 
     def update_time(self):
         # Get the current system time
@@ -162,7 +161,7 @@ class MainAplication(QMainWindow):
         # Update the time label
         self.main_layout.time_actual.setText(formatted_time)
 
-    def resizeEvent(self, event): 
+    def resizeEvent(self, event):
         if len(self.image_dict) > 0:
             prem = QImage(self.image_dict[self.image_number])
             pixmap = QPixmap.fromImage(prem)
@@ -194,7 +193,7 @@ class MainAplication(QMainWindow):
             self.root = self.tree.getroot()
             self.anotherWindow.table.setColumnCount(6)
             self.anotherWindow.table.setHorizontalHeaderLabels(
-                ["Záznam","Pacient ID", "Pulz", "Okysličenie krvi", "Systolický KT", "Diastolický KT"])
+                ["Záznam", "Pacient ID", "Pulz", "Okysličenie krvi", "Systolický KT", "Diastolický KT"])
             header = self.anotherWindow.table.horizontalHeader()
             header.setStyleSheet("background-color: black; color: black;")
             header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
@@ -362,12 +361,18 @@ class MainAplication(QMainWindow):
         counter = 0
         for record in self.database_output_table2:
             if counter == 0:
-                self.fuzzyficated_M0[0] = round(FuzzyficateFunctions.obtain_triangular_fuzzy_value(int(record[2]), 0, 70, 150),2)
-                FuzzyficateFunctions.draw_triangular_fuzzy_value(np.arange(0, 150, 0.1), int(record[2]), 0, 70, 150)
-                self.fuzzyficated_M0[0] = round(FuzzyficateFunctions.obtain_gaussian_fuzzy_value(int(record[2]), 70, 20),2)
-                FuzzyficateFunctions.draw_gaussian_fuzzy_value(np.arange(0, 150, 0.1), int(record[2]), 70, 20)
-                self.fuzzyficated_M0[1] = round(FuzzyficateFunctions.obtain_trapezoid_fuzzy_value(int(record[3]), 0, 90, 100, 100),2)
-                FuzzyficateFunctions.draw_trapezoid_fuzzy_value(np.arange(0, 100, 0.1), int(record[3]), 0, 90, 100, 100)
+                self.fuzzyficated_M0[0] = round(
+                    FuzzyficateFunctions.obtain_triangular_fuzzy_value(int(record[2]), 0, 70, 150), 2)
+                FuzzyficateFunctions.draw_triangular_fuzzy_value(
+                    np.arange(0, 150, 0.1), int(record[2]), 0, 70, 150)
+                self.fuzzyficated_M0[0] = round(
+                    FuzzyficateFunctions.obtain_gaussian_fuzzy_value(int(record[2]), 70, 20), 2)
+                FuzzyficateFunctions.draw_gaussian_fuzzy_value(
+                    np.arange(0, 150, 0.1), int(record[2]), 70, 20)
+                self.fuzzyficated_M0[1] = round(FuzzyficateFunctions.obtain_trapezoid_fuzzy_value(
+                    int(record[3]), 0, 90, 100, 100), 2)
+                FuzzyficateFunctions.draw_trapezoid_fuzzy_value(
+                    np.arange(0, 100, 0.1), int(record[3]), 0, 90, 100, 100)
                 counter += 1
         print(self.fuzzyficated_M0)
         self.fuzzyficated_M0 = self.fuzzyficated_M0
@@ -382,7 +387,6 @@ class MainAplication(QMainWindow):
             placeLabelM0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
             placeLabel.setStyleSheet("color: green;")
             placeLabelM0.setStyleSheet("color: green;")
-           
             edit = self.list_edit_widgets[i]
             edit.setText(str(self.fuzzyficated_M0[i]))
             edit.setEnabled(False)
@@ -390,13 +394,7 @@ class MainAplication(QMainWindow):
         self.anotherWindow.OK1.setEnabled(True)
         self.anotherWindow.fuzzyficate_run.setEnabled(False)
 
-
-    def evaluate_inputs(self):
-        self.set_marking(self.dict_marks)
-        self.delete_text(self.dict_marks)
-
-    def set_marking_initial(self,validator):
-        print(self.logical_flag, self.fuzzy_flag, self.weights_flag, self.tresholds_flag)
+    def set_marking_initial(self, validator):
         self.dict_marks = {}
         self.dict_weights = {}
         self.dict_tresholds = {}
@@ -408,7 +406,7 @@ class MainAplication(QMainWindow):
         placesLayout = QtWidgets.QVBoxLayout()
         self.anotherWindow.placesWidget.setLayout(placesLayout)
         self.anotherWindow.placesWidget.setStyleSheet(
-             "background-color: black;")
+            "background-color: black;")
         for i, key in enumerate(self.dict_places):
             placeLabel = QtWidgets.QLabel(key)
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
@@ -418,7 +416,7 @@ class MainAplication(QMainWindow):
             entry.setValidator(QtGui.QRegularExpressionValidator(validator))
             entry.setStyleSheet("color: white;")
             self.list_edit_widgets.append(entry)
-            #self.list_edit_widgets.append(placeLabel)
+            # self.list_edit_widgets.append(placeLabel)
             self.dict_marks[key] = entry
             placeLayout = QtWidgets.QVBoxLayout()
             placeLayout.addWidget(placeLabel)
@@ -434,7 +432,7 @@ class MainAplication(QMainWindow):
             "background-color: black;")
         self.anotherWindow.weightsWidget.setStyleSheet(
             "background-color: black;")
-                
+
         if self.fuzzy_flag or self.logical_flag and not self.weights_flag and not self.tresholds_flag:
             self.anotherWindow.OK2.setEnabled(False)
             self.anotherWindow.OK3.setEnabled(False)
@@ -473,7 +471,8 @@ class MainAplication(QMainWindow):
                 weightLabel.setStyleSheet("color: green;")
                 entry2 = QtWidgets.QLineEdit()
                 entry2.setMaximumWidth(50)
-                entry2.setValidator(QtGui.QRegularExpressionValidator(validator))
+                entry2.setValidator(
+                    QtGui.QRegularExpressionValidator(validator))
                 entry2.setStyleSheet("color: white;")
                 self.dict_weights[key] = entry2
                 weightLayout = QtWidgets.QVBoxLayout()
@@ -502,7 +501,8 @@ class MainAplication(QMainWindow):
                 transitionLabel.setStyleSheet("color: green;")
                 entry3 = QtWidgets.QLineEdit()
                 entry3.setMaximumWidth(50)
-                entry3.setValidator(QtGui.QRegularExpressionValidator(validator))
+                entry3.setValidator(
+                    QtGui.QRegularExpressionValidator(validator))
                 entry3.setStyleSheet("color: white;")
                 self.dict_tresholds[key] = entry3
                 transitionLayout = QtWidgets.QVBoxLayout()
@@ -554,7 +554,7 @@ class MainAplication(QMainWindow):
         if self.image_number > 1:
             #  set button active
             self.main_layout.nextButton.setEnabled(True)
-            
+
             if self.image_number == 2:
                 self.main_layout.prevButton.setEnabled(False)
             self.image_number -= 1
@@ -584,7 +584,7 @@ class MainAplication(QMainWindow):
             self.main_layout.prevButton.setEnabled(True)
             if self.image_number == len(self.image_dict)-1:
                 self.main_layout.nextButton.setEnabled(False)
-               
+
             self.image_number += 1
             prem = QImage(self.image_dict[self.image_number])
             pixmap = QPixmap.fromImage(prem)
@@ -619,7 +619,7 @@ class MainAplication(QMainWindow):
         self.main_layout.nextButton.setEnabled(True)
         self.main_layout.clearAll.setEnabled(False)
 
-    def draw_net_initial(self, weights =False, thresholds = False):
+    def draw_net_initial(self, weights=False, thresholds=False):
         graph_data = {
             'places': [],
             'transitions': [],
@@ -718,7 +718,7 @@ class MainAplication(QMainWindow):
                     self.dict_final[i.label]["hodnoty"].append({
                         "label": i.label,
                     })
-        
+
         dict_keys = list(self.dict_final)
         x = 600
         y = 400
@@ -731,7 +731,6 @@ class MainAplication(QMainWindow):
             self.dict_final[dict_keys[i-1]]["suradnice"] = {
                 "main_coords": (round(x + x1), round(y + y1))}
         self.generate_image_initial()
-
 
     def draw_net(self, weights=False, thresholds=False):
         graph_data = {
@@ -993,7 +992,7 @@ class MainAplication(QMainWindow):
                 pos = "left"
 
             if self.dict_final[i]["typ"] == 'p':
-          
+
                 cv2.circle(img, (x1, y1), 30, (0, 0, 0), 2)
 
                 text_size, _ = cv2.getTextSize(
@@ -1091,7 +1090,6 @@ class MainAplication(QMainWindow):
                         cv2.putText(
                             img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
         cv2.imwrite(f"./images/0.png", img)
-
 
     def generate_image(self):
         img = np.zeros((800, 1200, 3), np.uint8)
@@ -1246,8 +1244,12 @@ class MainAplication(QMainWindow):
             if type(source) == Transition:
                 sourceIdInNetList = self.net.getTransitions().index(source)
                 destinationIdInNetList = self.net.getPlaces().index(destination)
-                outputMatrix[destinationIdInNetList,
-                             sourceIdInNetList] = arc.getMultiplicity()
+                if self.weights_flag or self.tresholds_flag:
+                    outputMatrix[destinationIdInNetList,
+                                 sourceIdInNetList] = self.net.getWeights()[sourceIdInNetList]
+                else:
+                    outputMatrix[destinationIdInNetList,
+                                 sourceIdInNetList] = arc.getMultiplicity()
         return inputMatrix, outputMatrix
 
     def setting_first_image(self):
@@ -1300,7 +1302,19 @@ class MainAplication(QMainWindow):
                 if Vo[i] > 1:
                     Vo[i] = 1.0
             Uo = [abs(1 - i) for i in Vo]
-            Wk = [int((outputMatrix @ Uo)[i] or Wo[i]) for i in range(len(Wo))]
+
+            almost_result = []
+            sub_result = []
+            for i in outputMatrix:
+                for index, k in enumerate(i):
+                    sub_result.append(min(k, Uo[index]))
+                almost_result.append(int(max(sub_result)))
+                sub_result = []
+            Wk = []
+            for i in range(len(Wo)):
+                Wk.append(int(max(Wo[i], almost_result[i])))
+
+           #Wk = [int((outputMatrix @ Uo)[i] or Wo[i]) for i in range(len(Wo))]
 
             changed_places = []
             for num in range(len(Wo)):
@@ -1322,7 +1336,6 @@ class MainAplication(QMainWindow):
             if Wk != Wo:
                 self.image_number += 1
         self.transitions_to_change[self.image_number] = "END"
-        #print("transitions_to_change: ", self.transitions_to_change)
 
     def logical_petri_net(self, M):
         array_steps = []
@@ -1333,7 +1346,7 @@ class MainAplication(QMainWindow):
         self.main_layout.actual_marking.setText(
             "( "+', '.join([str(int(elem)) for i, elem in enumerate(Wo)])+" )")
         self.main_layout.actual_marking.adjustSize()
-      
+
         self.actual_marking_dict[0] = "( "+', '.join([str(int(elem))
                                                       for i, elem in enumerate(Wo)])+" )"
 
@@ -1363,13 +1376,22 @@ class MainAplication(QMainWindow):
                     sub_result.append(min(k, neg_Wo[index]))
                 Vo.append(float(max(sub_result)))
                 sub_result = []
-
             for i in range(len(Vo)):
                 if Vo[i] > 1:
-                    Vo[i] = 1.0
-            Uo = [abs(1 - i) for i in Vo]
-            Wk = [int((outputMatrix @ Uo)[i] or Wo[i]) for i in range(len(Wo))]
+                    Vo[i] = 1
+            Uo = [int(abs(1 - i)) for i in Vo]
 
+            almost_result = []
+            sub_result = []
+            for i in outputMatrix:
+                for index, k in enumerate(i):
+                    sub_result.append(min(k, Uo[index]))
+                almost_result.append(int(max(sub_result)))
+                sub_result = []
+            Wk = []
+            for i in range(len(Wo)):
+                Wk.append(int(max(Wo[i], almost_result[i])))
+            #Wk = [int(Wo[i] or (outputMatrix @ Uo)[i]) for i in range(len(Wo))]
             changed_places = []
             for num in range(len(Wo)):
                 if Wk[num] != Wo[num]:
@@ -1448,10 +1470,7 @@ class MainAplication(QMainWindow):
                 sub_result = []
             Wk = []
             for i in range(len(Wo)):
-                if Wo[i] > almost_result[i]:
-                    Wk.append(Wo[i])
-                else:
-                    Wk.append(almost_result[i])
+                Wk.append(max(Wo[i], almost_result[i]))
 
             changed_places = []
             for num in range(len(Wo)):
@@ -1473,12 +1492,10 @@ class MainAplication(QMainWindow):
             if Wk != Wo:
                 self.image_number += 1
         self.transitions_to_change[self.image_number] = "END"
-        #print("transitions_to_change: ", self.transitions_to_change)
 
     def fuzzy_petri_net(self, M):
         array_steps = []
         Wo = M[0].state
-        # print("Počiatočné ohodnotenie: ", Wo)
         self.main_layout.marking.setText(
             "( "+', '.join([str(elem) for i, elem in enumerate(Wo)])+" )")
         self.main_layout.marking.adjustSize()
@@ -1528,10 +1545,7 @@ class MainAplication(QMainWindow):
                 sub_result = []
             Wk = []
             for i in range(len(Wo)):
-                if Wo[i] > almost_result[i]:
-                    Wk.append(Wo[i])
-                else:
-                    Wk.append(almost_result[i])
+                Wk.append(max(Wo[i], almost_result[i]))
 
             changed_places = []
             for num in range(len(Wo)):
@@ -1578,29 +1592,8 @@ class MainAplication(QMainWindow):
         outputMatrix = np.array([[0.0 for _ in range(nColumns)]
                                 for _ in range(nRows)])
 
-        # fill each matrix with the proper data
-        for arc in self.net.getArcs():
-            sourceId = arc.getSourceId()
-            destinationId = arc.getDestinationId()
-            source = None
-            destination = None
-            if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
-                source = self.net.getPlaceById(sourceId)
-                destination = self.net.getTransitionById(destinationId)
-            elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
-                source = self.net.getTransitionById(sourceId)
-                destination = self.net.getPlaceById(destinationId)
-            if type(source) == Place:
-                sourceIdInNetList = self.net.getPlaces().index(source)
-                destinationIdInNetList = self.net.getTransitions().index(destination)
-                inputMatrix[sourceIdInNetList,
-                            destinationIdInNetList] = arc.getMultiplicity()
-            if type(source) == Transition:
-                sourceIdInNetList = self.net.getTransitions().index(source)
-                destinationIdInNetList = self.net.getPlaces().index(destination)
-                outputMatrix[destinationIdInNetList,
-                             sourceIdInNetList] = self.net.getWeights()[sourceIdInNetList]
-
+        inputMatrix, outputMatrix = self.fill_matrixes(
+            inputMatrix, outputMatrix)
         Wk = []
         i = 0
         while not np.array_equal(Wo, Wk):
@@ -1631,10 +1624,8 @@ class MainAplication(QMainWindow):
                 sub_result = []
             Wk = []
             for i in range(len(Wo)):
-                if Wo[i] > almost_result[i]:
-                    Wk.append(Wo[i])
-                else:
-                    Wk.append(almost_result[i])
+                Wk.append(max(Wo[i], almost_result[i]))
+
             changed_places = []
             for num in range(len(Wo)):
                 if Wk[num] != Wo[num]:
@@ -1655,7 +1646,6 @@ class MainAplication(QMainWindow):
             if Wk != Wo:
                 self.image_number += 1
         self.transitions_to_change[self.image_number] = "END"
-        #print("transitions_to_change: ", self.transitions_to_change)
 
     def fuzzy_petri_net_with_weights(self, M):
         array_steps = []
@@ -1677,29 +1667,8 @@ class MainAplication(QMainWindow):
         outputMatrix = np.array([[0.0 for _ in range(nColumns)]
                                 for _ in range(nRows)])
 
-        # fill each matrix with the proper data
-        for arc in self.net.getArcs():
-            sourceId = arc.getSourceId()
-            destinationId = arc.getDestinationId()
-            source = None
-            destination = None
-            if (self.net.getPlaceById(sourceId) is not None) and (self.net.getTransitionById(destinationId) is not None):
-                source = self.net.getPlaceById(sourceId)
-                destination = self.net.getTransitionById(destinationId)
-            elif (self.net.getTransitionById(sourceId) is not None) and (self.net.getPlaceById(destinationId) is not None):
-                source = self.net.getTransitionById(sourceId)
-                destination = self.net.getPlaceById(destinationId)
-            if type(source) == Place:
-                sourceIdInNetList = self.net.getPlaces().index(source)
-                destinationIdInNetList = self.net.getTransitions().index(destination)
-                inputMatrix[sourceIdInNetList,
-                            destinationIdInNetList] = arc.getMultiplicity()
-            if type(source) == Transition:
-                sourceIdInNetList = self.net.getTransitions().index(source)
-                destinationIdInNetList = self.net.getPlaces().index(destination)
-                outputMatrix[destinationIdInNetList,
-                             sourceIdInNetList] = self.net.getWeights()[sourceIdInNetList]
-
+        inputMatrix, outputMatrix = self.fill_matrixes(
+            inputMatrix, outputMatrix)
         Wk = []
         i = 0
         while not np.array_equal(Wo, Wk):
@@ -1730,10 +1699,8 @@ class MainAplication(QMainWindow):
                 sub_result = []
             Wk = []
             for i in range(len(Wo)):
-                if Wo[i] > almost_result[i]:
-                    Wk.append(Wo[i])
-                else:
-                    Wk.append(almost_result[i])
+                Wk.append(max(Wo[i], almost_result[i]))
+
             changed_places = []
             for num in range(len(Wo)):
                 if Wk[num] != Wo[num]:
@@ -1816,10 +1783,8 @@ class MainAplication(QMainWindow):
                 sub_result = []
             Wk = []
             for i in range(len(Wo)):
-                if Wo[i] > almost_result[i]:
-                    Wk.append(Wo[i])
-                else:
-                    Wk.append(almost_result[i])
+                Wk.append(max(Wo[i], almost_result[i]))
+
             changed_places = []
             for num in range(len(Wo)):
                 if Wk[num] != Wo[num]:
@@ -1840,7 +1805,6 @@ class MainAplication(QMainWindow):
             if Wk != Wo:
                 self.image_number += 1
         self.transitions_to_change[self.image_number] = "END"
-        #print("transitions_to_change: ", self.transitions_to_change)
 
     def fuzzy_petri_net_with_weights_thresholds(self, M):
         array_steps = []
@@ -1849,7 +1813,8 @@ class MainAplication(QMainWindow):
         self.main_layout.marking.setText(
             "( "+', '.join([str(elem) for i, elem in enumerate(Wo)])+" )")
         self.main_layout.marking.adjustSize()
-        self.main_layout.actual_marking.setText( "( "+', '.join([str(elem) for i, elem in enumerate(Wo)])+" )")
+        self.main_layout.actual_marking.setText(
+            "( "+', '.join([str(elem) for i, elem in enumerate(Wo)])+" )")
         self.main_layout.actual_marking.adjustSize()
 
         self.actual_marking_dict[0] = "( "+', '.join([str(elem)
@@ -1899,10 +1864,8 @@ class MainAplication(QMainWindow):
                 sub_result = []
             Wk = []
             for i in range(len(Wo)):
-                if Wo[i] > almost_result[i]:
-                    Wk.append(Wo[i])
-                else:
-                    Wk.append(almost_result[i])
+                Wk.append(max(Wo[i], almost_result[i]))
+
             changed_places = []
             for num in range(len(Wo)):
                 if Wk[num] != Wo[num]:
@@ -1922,7 +1885,6 @@ class MainAplication(QMainWindow):
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
                         print(result_string)
-            #☺print("transitions_to_change: ", self.transitions_to_change)
             if Wk != Wo:
                 self.step_dict[self.image_number-1] = array_steps
                 array_steps = []
@@ -2152,7 +2114,7 @@ class DialogWindow(QtWidgets.QDialog):
         if selected_records:
             self.patient_records = selected_records[0]
             for record in self.database_output_table2:
-                if record[1]== self.patient_records[0]:
+                if record[1] == self.patient_records[0]:
                     self.patient_problems.append(record)
         else:
             self.patient_records = None
