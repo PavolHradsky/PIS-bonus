@@ -1,3 +1,4 @@
+from PIL import Image, ImageDraw, ImageFont
 from math import sin, cos, pi, atan2, sqrt
 import bcrypt
 import cv2
@@ -162,6 +163,14 @@ class MainAplication(QMainWindow):
         self.main_layout.time_actual.setText(formatted_time)
 
     def resizeEvent(self, event):
+
+        if os.path.exists('./images/0.png'):
+            prem = QImage('./images/0.png')
+            pixmap = QPixmap.fromImage(prem)
+            self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
+            ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+            self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
+
         if len(self.image_dict) > 0:
             prem = QImage(self.image_dict[self.image_number])
             pixmap = QPixmap.fromImage(prem)
@@ -187,6 +196,12 @@ class MainAplication(QMainWindow):
         print(self.main_layout.comboBox.currentText())
 
     def run(self):
+        if self.main_layout.photo != None:
+            self.main_layout.photo.clear()
+        files = glob.glob('./images/*')
+        if files != None:
+            for f in files:
+                os.remove(f)
         if self.file_path:
             self.openAnotherWindow()
             self.tree = ET.parse(self.file_path)
@@ -232,9 +247,20 @@ class MainAplication(QMainWindow):
                 self.fuzzy_flag = 0
             self.net = loading_data(
                 self.file_name, self.fuzzy_flag, self.weights_flag, self.tresholds_flag, 0)
+            self.dict_final = {}
+            self.dict_weights = {}
+            self.dict_tresholds = {}
+            self.dict_marks = {}
+            self.dict_places = {}
+            self.dict_transitions = {}
             self.draw_net_initial()
             self.setting_first_image()
-
+            self.dict_weights = {}
+            self.dict_tresholds = {}
+            self.dict_marks = {}
+            self.dict_places = {}
+            self.dict_transitions = {}
+            self.dict_final = {}
             if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = 1
                 self.fuzzy_flag = 0
@@ -276,6 +302,7 @@ class MainAplication(QMainWindow):
 
     def run_final(self):
         l = 0
+        self.dict_final = {}
         self.k = 0
         self.main_layout.prevButton.setEnabled(False)
         self.main_layout.nextButton.setEnabled(True)
@@ -731,6 +758,9 @@ class MainAplication(QMainWindow):
             self.dict_final[dict_keys[i-1]]["suradnice"] = {
                 "main_coords": (round(x + x1), round(y + y1))}
         self.generate_image_initial()
+        self.dict_final = {}
+        self.missing_places = []
+        self.missing_transitions = []
 
     def draw_net(self, weights=False, thresholds=False):
         graph_data = {
@@ -992,11 +1022,14 @@ class MainAplication(QMainWindow):
                 pos = "left"
 
             if self.dict_final[i]["typ"] == 'p':
-
                 cv2.circle(img, (x1, y1), 30, (0, 0, 0), 2)
-
-                text_size, _ = cv2.getTextSize(
-                    str(self.dict_final[i]['hodnoty'][0]['label']), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
+                img_pil = Image.fromarray(img)
+                draw = ImageDraw.Draw(img_pil)
+                font = ImageFont.truetype("arial.ttf", 20)
+                text = str(self.dict_final[i]['hodnoty'][0]['label'])
+                text_bbox = draw.textbbox((0, 0), text, font=font)
+                text_size = (text_bbox[2] - text_bbox[0],
+                             text_bbox[3] - text_bbox[1])
                 if pos == "right":
                     text_pos = (x1 + 40, y1)
                 elif pos == "left":
@@ -1007,8 +1040,8 @@ class MainAplication(QMainWindow):
                 else:
                     text_pos = (x1 - text_size[0] //
                                 2, y1 - 50 - text_size[1] // 2)
-                cv2.putText(img, str(self.dict_final[i]['hodnoty'][0]['label']), text_pos,
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+                draw.text(text_pos, text, (0, 0, 0), font=font)
+                img = np.array(img_pil)
                 if self.dict_final[i]['sipky']:
                     for j in self.dict_final[i]['sipky']:
                         x2 = self.dict_final[j]["suradnice"]["main_coords"][0]
@@ -1043,9 +1076,13 @@ class MainAplication(QMainWindow):
                 color = (0, 0, 255)
                 cv2.rectangle(img, (x1 - 30, y1 - 30),
                               (x1 + 30, y1 + 30), color, 2)
-
-                text_size, _ = cv2.getTextSize(
-                    str(self.dict_final[i]['hodnoty'][0]['label']), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
+                img_pil = Image.fromarray(img)
+                draw = ImageDraw.Draw(img_pil)
+                font = ImageFont.truetype("arial.ttf", 20)
+                text = str(self.dict_final[i]['hodnoty'][0]['label'])
+                text_bbox = draw.textbbox((0, 0), text, font=font)
+                text_size = (text_bbox[2] - text_bbox[0],
+                             text_bbox[3] - text_bbox[1])
                 if pos == "right":
                     text_pos = (x1 + 40, y1)
                 elif pos == "left":
@@ -1057,8 +1094,9 @@ class MainAplication(QMainWindow):
                     text_pos = (x1 - text_size[0] //
                                 2, y1 - 50 - text_size[1] // 2)
 
-                cv2.putText(img, str(self.dict_final[i]['hodnoty'][0]['label']), text_pos,
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+                draw.text(text_pos, text, (0, 0, 0), font=font)
+                img = np.array(img_pil)
+
                 if self.dict_final[i]['sipky']:
                     for j in self.dict_final[i]['sipky']:
                         x2 = self.dict_final[j]["suradnice"]["main_coords"][0]
@@ -1114,8 +1152,14 @@ class MainAplication(QMainWindow):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
                 cv2.circle(img, (x1, y1), 30, (0, 0, 0), 2)
 
-                text_size, _ = cv2.getTextSize(
-                    str(self.dict_final[i]['hodnoty'][0]['label']), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
+                img_pil = Image.fromarray(img)
+                draw = ImageDraw.Draw(img_pil)
+                font = ImageFont.truetype("arial.ttf", 20)
+                text = str(self.dict_final[i]['hodnoty'][0]['label'])
+                text_bbox = draw.textbbox((0, 0), text, font=font)
+                text_size = (
+                    text_bbox[2] - text_bbox[0], text_bbox[3] - text_bbox[1])
+
                 if pos == "right":
                     text_pos = (x1 + 40, y1)
                 elif pos == "left":
@@ -1126,8 +1170,10 @@ class MainAplication(QMainWindow):
                 else:
                     text_pos = (x1 - text_size[0] //
                                 2, y1 - 50 - text_size[1] // 2)
-                cv2.putText(img, str(self.dict_final[i]['hodnoty'][0]['label']), text_pos,
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+
+                draw.text(text_pos, text, (0, 0, 0), font=font)
+                img = np.array(img_pil)
+
                 if self.dict_final[i]['sipky']:
                     for j in self.dict_final[i]['sipky']:
                         x2 = self.dict_final[j]["suradnice"]["main_coords"][0]
@@ -1163,9 +1209,14 @@ class MainAplication(QMainWindow):
                     0, 255, 0) if self.dict_final[i]["hodnoty"][self.image_index - 1]["farba"] else (0, 0, 255)
                 cv2.rectangle(img, (x1 - 30, y1 - 30),
                               (x1 + 30, y1 + 30), color, 2)
+                img_pil = Image.fromarray(img)
+                draw = ImageDraw.Draw(img_pil)
+                font = ImageFont.truetype("arial.ttf", 20)
+                text = str(self.dict_final[i]['hodnoty'][0]['label'])
+                text_bbox = draw.textbbox((0, 0), text, font=font)
+                text_size = (
+                    text_bbox[2] - text_bbox[0], text_bbox[3] - text_bbox[1])
 
-                text_size, _ = cv2.getTextSize(
-                    str(self.dict_final[i]['hodnoty'][0]['label']), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
                 if pos == "right":
                     text_pos = (x1 + 40, y1)
                 elif pos == "left":
@@ -1176,6 +1227,9 @@ class MainAplication(QMainWindow):
                 else:
                     text_pos = (x1 - text_size[0] //
                                 2, y1 - 50 - text_size[1] // 2)
+
+                draw.text(text_pos, text, (0, 0, 0), font=font)
+                img = np.array(img_pil)
 
                 threshold_text = self.dict_final[i]["hodnoty"][self.image_index -
                                                                1]["prah"] if self.dict_final[i]["hodnoty"][self.image_index - 1].get("prah") else None
@@ -1188,8 +1242,6 @@ class MainAplication(QMainWindow):
                     cv2.putText(img, f"W:{str(weights_text)}", (x1-25, y1+20),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1)
 
-                cv2.putText(img, str(self.dict_final[i]['hodnoty'][0]['label']), text_pos,
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
                 if self.dict_final[i]['sipky']:
                     for j in self.dict_final[i]['sipky']:
                         x2 = self.dict_final[j]["suradnice"]["main_coords"][0]
@@ -2057,6 +2109,10 @@ class DialogWindow(QtWidgets.QDialog):
         if hashed_str.encode('utf-8') == hashed:
             self.main_layout.close()
             self.main_application = MainAplication()
+            files = glob.glob('./images/*')
+            if files != None:
+                for f in files:
+                    os.remove(f)
             self.main_application.database_output_table1 = self.patient_records
             self.main_application.main_layout.table.setColumnCount(7)
             self.main_application.main_layout.table.setHorizontalHeaderLabels(
