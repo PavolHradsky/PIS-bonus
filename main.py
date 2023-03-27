@@ -196,8 +196,16 @@ class MainAplication(QMainWindow):
         print(self.main_layout.comboBox.currentText())
 
     def run(self):
+        if self.main_layout.steps != None:
+            self.main_layout.steps.clear()
         if self.main_layout.photo != None:
             self.main_layout.photo.clear()
+        if self.main_layout.actual_marking != None:
+            self.main_layout.actual_marking.clear()
+        if self.main_layout.marking != None:
+            self.main_layout.marking.clear()
+        self.main_layout.prevButton.setEnabled(False)
+        self.main_layout.nextButton.setEnabled(True)
         files = glob.glob('./images/*')
         if files != None:
             for f in files:
@@ -381,9 +389,27 @@ class MainAplication(QMainWindow):
 
     def fuzzyficate(self):
         # TODO to the future there will be a function that will fuzzyficate the input data from database and results will be stored in self.fuzzyficated_M0
-        # self.database_output_table1
-        # self.database_output_table2
-        print(self.database_output_table2)
+
+        records_dict = {"Vek": None,
+                        "Pohlavie": None,
+                        "Vyska": None,
+                        "Vaha": None,
+                        "Pulz": None,
+                        "Okyslicenie krvi": None,
+                        "Systolický krvný tlak": None,
+                        "Diastolický krvný tlak": None,
+                        }
+
+        for i, record in enumerate(self.database_output_table1[3:-1]):
+            records_dict[list(records_dict.keys())[i]] = record
+
+        for i, record in enumerate(self.database_output_table2[0][2:]):
+            print(i, record)
+            records_dict[list(records_dict.keys())[i+4]] = record
+
+        output = FuzzyficateFunctions.get_final_result(records_dict)
+        print(output)
+
         self.fuzzyficated_M0 = [0 for _ in range(len(self.dict_places))]
         counter = 0
         for record in self.database_output_table2:
@@ -406,7 +432,6 @@ class MainAplication(QMainWindow):
         self.net.M0 = self.fuzzyficated_M0
         self.anotherWindow.placesWidget.setStyleSheet(
             "background-color: black;")
-        counter = 0
         for i, key in enumerate(self.dict_places):
             placeLabel = QtWidgets.QLabel(key)
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
@@ -2110,6 +2135,10 @@ class DialogWindow(QtWidgets.QDialog):
             self.main_layout.close()
             self.main_application = MainAplication()
             files = glob.glob('./images/*')
+            if files != None:
+                for f in files:
+                    os.remove(f)
+            files = glob.glob('./images_fuzzyfication/*')
             if files != None:
                 for f in files:
                     os.remove(f)

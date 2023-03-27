@@ -84,7 +84,7 @@ def draw_triangular_fuzzy_value(range_values, measured_value, left, center, righ
     plt.axhline(y=triangle_fuzzy_value(
         measured_value, left, center, right), color='g')
     plt.savefig('images_fuzzyfication/Triangle.png')
-
+    plt.close()  # Close the plot window
 # trapezoid fuzzy function
 
 
@@ -117,7 +117,7 @@ def draw_trapezoid_fuzzy_value(range_values, measured_value, left, center_left, 
     plt.axhline(y=trapezoid_fuzzy_value(measured_value, left,
                 center_left, center_right, right), color='g')
     plt.savefig('images_fuzzyfication/Trapezoid.png')
-
+    plt.close()  # Close the plot window
 # gaussian fuzzy fuction
 
 
@@ -143,7 +143,7 @@ def draw_gaussian_fuzzy_value(range_values, measured_value, center, sigma):
     plt.axhline(y=gaussian_fuzzy_value(
         measured_value, center, sigma), color='g')
     plt.savefig('images_fuzzyfication/Gaussian.png')
-
+    plt.close()  # Close the plot window
 # sigmoid fuzzy function
 
 
@@ -169,3 +169,4 @@ def draw_sigmoid_fuzzy_value(range_values, measured_value, center, sigma):
     plt.axhline(y=sigmoid_fuzzy_value(
         measured_value, center, sigma), color='g')
     plt.savefig('images_fuzzyfication/Sigmoid.png')
+    plt.close()  # Close the plot window
