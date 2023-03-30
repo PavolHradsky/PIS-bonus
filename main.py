@@ -1,3 +1,5 @@
+import Inference
+import Fuzzyfication
 from PIL import Image, ImageDraw, ImageFont
 from math import sin, cos, pi, atan2, sqrt
 import bcrypt
@@ -272,11 +274,15 @@ class MainAplication(QMainWindow):
             if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = 1
                 self.fuzzy_flag = 0
+                self.weights_flag = 0
+                self.tresholds_flag = 0
                 self.set_marking_initial(self.logical_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť":
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
+                self.weights_flag = 0
+                self.tresholds_flag = 0
                 self.set_marking_initial(self.fuzzy_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
@@ -404,36 +410,45 @@ class MainAplication(QMainWindow):
             records_dict[list(records_dict.keys())[i]] = record
 
         for i, record in enumerate(self.database_output_table2[0][2:]):
-            print(i, record)
             records_dict[list(records_dict.keys())[i+4]] = record
 
-        output = FuzzyficateFunctions.get_final_result(records_dict)
+        output = Fuzzyfication.get_final_result(records_dict)
         print(output)
+        fuzzy_sickness = Inference.get_sickness(output)
+        print(fuzzy_sickness)
+        fuzzy_inputs = Fuzzyfication.fuzzify_inputs(fuzzy_sickness)
+        print(fuzzy_inputs)
+        degree_of_disease = Fuzzyfication.infer_degree_of_disease(fuzzy_inputs)
+        print(degree_of_disease)
 
         self.fuzzyficated_M0 = [0 for _ in range(len(self.dict_places))]
+
+        FuzzyficateFunctions.draw_trapezoid_fuzzy_value(
+            np.arange(0, 80, 0.1), int(self.database_output_table1[3]),  [0, 0, 29, 38], [0, 0, 38, 47], [0, 52, 60, 60])
         counter = 0
         for record in self.database_output_table2:
             if counter == 0:
-                self.fuzzyficated_M0[0] = round(
-                    FuzzyficateFunctions.obtain_triangular_fuzzy_value(int(record[2]), 0, 70, 150), 2)
-                FuzzyficateFunctions.draw_triangular_fuzzy_value(
-                    np.arange(0, 150, 0.1), int(record[2]), 0, 70, 150)
+                # self.fuzzyficated_M0[0] = round(
+                #    FuzzyficateFunctions.obtain_triangular_fuzzy_value(int(record[2]), 0, 70, 150), 2)
+                # FuzzyficateFunctions.draw_triangular_fuzzy_value(
+                #    np.arange(0, 150, 0.1), int(record[2]), 0, 70, 150)
                 self.fuzzyficated_M0[0] = round(
                     FuzzyficateFunctions.obtain_gaussian_fuzzy_value(int(record[2]), 70, 20), 2)
                 FuzzyficateFunctions.draw_gaussian_fuzzy_value(
                     np.arange(0, 150, 0.1), int(record[2]), 70, 20)
-                self.fuzzyficated_M0[1] = round(FuzzyficateFunctions.obtain_trapezoid_fuzzy_value(
-                    int(record[3]), 0, 90, 100, 100), 2)
-                FuzzyficateFunctions.draw_trapezoid_fuzzy_value(
-                    np.arange(0, 100, 0.1), int(record[3]), 0, 90, 100, 100)
+                # self.fuzzyficated_M0[1] = round(FuzzyficateFunctions.obtain_trapezoid_fuzzy_value(
+                # int(record[3]), 0, 90, 100, 100), 2)
+                # FuzzyficateFunctions.draw_trapezoid_fuzzy_value(
+                #    np.arange(0, 100, 0.1), int(record[3]), [0, 0, 80, 90], [85, 92, 97, 97], [95, 100, 100, 100])
                 counter += 1
-        print(self.fuzzyficated_M0)
-        self.fuzzyficated_M0 = self.fuzzyficated_M0
-        self.net.M0 = self.fuzzyficated_M0
+        for place in self.net.getPlaces():
+            place.tokens = self.fuzzyficated_M0[self.net.getPlaces().index(
+                place)]
+        self.net.M0 = [place.tokens for place in self.net.getPlaces()]
         self.anotherWindow.placesWidget.setStyleSheet(
             "background-color: black;")
         for i, key in enumerate(self.dict_places):
-            placeLabel = QtWidgets.QLabel(key)
+            placeLabel = QtWidgets.QLabel(key.label)
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
             placeLabelM0 = QtWidgets.QLabel(str(self.fuzzyficated_M0[i]))
             placeLabelM0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
@@ -452,15 +467,15 @@ class MainAplication(QMainWindow):
         self.dict_tresholds = {}
         self.list_edit_widgets = []
         for place in self.net.getPlaces():
-            self.dict_places[place.label] = place.tokens
+            self.dict_places[place] = place.tokens
         for transition in self.net.getTransitions():
-            self.dict_transitions[transition.getId()] = transition.label
+            self.dict_transitions[transition] = transition.label
         placesLayout = QtWidgets.QVBoxLayout()
         self.anotherWindow.placesWidget.setLayout(placesLayout)
         self.anotherWindow.placesWidget.setStyleSheet(
             "background-color: black;")
         for i, key in enumerate(self.dict_places):
-            placeLabel = QtWidgets.QLabel(key)
+            placeLabel = QtWidgets.QLabel(key.label)
             placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
             placeLabel.setStyleSheet("color: green;")
             entry = QtWidgets.QLineEdit()
@@ -494,7 +509,7 @@ class MainAplication(QMainWindow):
             self.anotherWindow.weightsWidget.setStyleSheet(
                 "background-color: black;")
             for i, key in enumerate(self.dict_transitions):
-                transitionLabel0 = QtWidgets.QLabel(self.dict_transitions[key])
+                transitionLabel0 = QtWidgets.QLabel(key.label)
                 transitionLabel0.setFont(
                     QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
                 transitionLabel0.setStyleSheet("color: green;")
@@ -518,7 +533,7 @@ class MainAplication(QMainWindow):
             self.anotherWindow.weightsWidget.setStyleSheet(
                 "background-color: black;")
             for i, key in enumerate(self.dict_transitions):
-                weightLabel = QtWidgets.QLabel(self.dict_transitions[key])
+                weightLabel = QtWidgets.QLabel(key.label)
                 weightLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
                 weightLabel.setStyleSheet("color: green;")
                 entry2 = QtWidgets.QLineEdit()
@@ -547,7 +562,7 @@ class MainAplication(QMainWindow):
             self.anotherWindow.tresholdsWidget.setStyleSheet(
                 "background-color: black;")
             for i, key in enumerate(self.dict_transitions):
-                transitionLabel = QtWidgets.QLabel(self.dict_transitions[key])
+                transitionLabel = QtWidgets.QLabel(key.label)
                 transitionLabel.setFont(QtGui.QFont(
                     "Arial", 10, QtGui.QFont.Bold))
                 transitionLabel.setStyleSheet("color: green;")
@@ -571,36 +586,47 @@ class MainAplication(QMainWindow):
         for _, value in entries.items():
             value.setText("")
 
-    def set_values(self, array, entries, flag):
-        for _, value in entries.items():
+    def set_values(self, entries, logical_flag, weights_flag, tresholds_flag):
+        for item, value in entries.items():
             if value.text() == '':
-                if flag:
-                    array.append(0)
+                if logical_flag:
+                    item.tokens = 0
                 else:
-                    array.append(0.0)
+                    item.tokens = 0.0
+                if weights_flag:
+                    item.weight = 0.0
+                if tresholds_flag:
+                    item.treshold = 0.0
             else:
                 try:
                     num = float(value.text().replace(',', '.'))
-                    array.append(num)
+                    item.tokens = num
+                    if weights_flag:
+                        item.weight = num
+                    if tresholds_flag:
+                        item.treshold = num
                 except ValueError:
                     QtWidgets.QMessageBox.warning(
                         self, "Invalid Input", "Please enter a valid number.")
                     return
-        return array
 
     def set_marking(self, entries):
-        M0 = []
-        self.net.M0 = self.set_values(M0, entries, self.logical_flag)
+        self.set_values(entries, self.logical_flag,
+                        self.weights_flag, self.tresholds_flag)
+        self.net.M0 = [place.tokens for place in self.net.getPlaces()]
 
     def set_tresholds(self, entries):
-        tresholds = []
-        self.net.tresholds = self.set_values(
-            tresholds, entries, self.logical_flag)
+        self.set_values(entries, self.logical_flag,
+                        self.weights_flag, self.tresholds_flag)
+        self.net.tresholds = [
+            transition.treshold for transition in self.net.getTransitions()]
         self.TR = self.net.tresholds
 
     def set_weights(self, entries):
-        weights = []
-        self.net.weights = self.set_values(weights, entries, self.logical_flag)
+        self.set_values(entries, self.logical_flag,
+                        self.weights_flag, self.tresholds_flag)
+        self.net.weights = [
+            transition.weight for transition in self.net.getTransitions()]
 
     def prev(self):
         if self.image_number > 1:
@@ -1390,9 +1416,7 @@ class MainAplication(QMainWindow):
             Wk = []
             for i in range(len(Wo)):
                 Wk.append(int(max(Wo[i], almost_result[i])))
-
            #Wk = [int((outputMatrix @ Uo)[i] or Wo[i]) for i in range(len(Wo))]
-
             changed_places = []
             for num in range(len(Wo)):
                 if Wk[num] != Wo[num]:
@@ -1487,8 +1511,6 @@ class MainAplication(QMainWindow):
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
-                        print(result_string)
-
             if Wk != Wo:
                 self.step_dict[self.image_number-1] = array_steps
                 array_steps = []
@@ -1643,8 +1665,6 @@ class MainAplication(QMainWindow):
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
-                        print(result_string)
-
             if Wk != Wo:
                 self.step_dict[self.image_number-1] = array_steps
                 array_steps = []
@@ -1797,7 +1817,6 @@ class MainAplication(QMainWindow):
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
-                        print(result_string)
             if Wk != Wo:
                 self.step_dict[self.image_number-1] = array_steps
                 array_steps = []
@@ -1961,7 +1980,6 @@ class MainAplication(QMainWindow):
                     if arc.dest.name == place.name and changed_places[count_place - 1]:
                         result_string = previous_place, " -> ", arc.src.label, " -> ", arc.dest.name, " : ", place.tokens
                         array_steps.append(result_string)
-                        print(result_string)
             if Wk != Wo:
                 self.step_dict[self.image_number-1] = array_steps
                 array_steps = []
