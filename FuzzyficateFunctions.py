@@ -2,6 +2,72 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+def sigmoid_fuzzy_value(x, center, sigma):
+    return 1 / (1 + np.exp(-((x - center) / sigma)))
+
+
+def plot_sigmoid_fuzzy_value(range_start, range_end, measured_value, center, sigma, label):
+    x = np.linspace(range_start, range_end, 1000)
+    y = sigmoid_fuzzy_value(x, center, sigma)
+    plt.plot(x, y, label=f'Center: {center}, Sigma: {sigma}')
+    plt.legend()
+    plt.xlabel('X')
+    plt.ylabel('Fuzzy Value')
+    plt.title(label)
+    plt.axvline(x=measured_value, color='k')
+    plt.axhline(y=sigmoid_fuzzy_value(
+        measured_value, center, sigma), color='k')
+    plt.savefig('images_fuzzyfication/'+label+'.png')
+    plt.show()
+
+
+def obtain_sigmoid_fuzzy_value(measured_value, center, sigma):
+    # call the function sigmoid_fuzzy_valuea and print the result
+    sigmoid_value = sigmoid_fuzzy_value(measured_value, center, sigma)
+    print(sigmoid_value)
+    return sigmoid_value
+
+
+def gaussian_fuzzy_value(x, center, sigma):
+    return np.exp(-((x - center) ** 2) / (2 * sigma ** 2))
+
+
+def obtain_gaussian_fuzzy_value(measured_value, center, sigma):
+    # call the function gaussian_fuzzy_valuea and print the result
+    gaussian_value = gaussian_fuzzy_value(measured_value, center, sigma)
+    print(gaussian_value)
+    return gaussian_value
+
+
+def obtain_cup_gaussian_fuzzy_value(measured_value, center, sigma):
+    # call the function gaussian_fuzzy_valuea and print the result
+    gaussian_value = cup_gaussian_fuzzy_value(measured_value, center, sigma)
+    print(gaussian_value)
+    return gaussian_value
+
+
+def cup_gaussian_fuzzy_value(x, center, sigma):
+    return 1 - (1 - 0.1) * np.exp(-((x - center) ** 2) / (2 * sigma ** 2))
+
+
+def plot_cup_gaussian_fuzzy_value(range_start, range_end, measured_value, center, sigma, label):
+    x = np.linspace(range_start, range_end, 1000)
+    y = cup_gaussian_fuzzy_value(x, center, sigma)
+    plt.plot(x, y, label=f'Center: {center}, Sigma: {sigma}')
+    plt.legend()
+    plt.xlabel('X')
+    plt.ylabel('Fuzzy Value')
+    plt.title(label)
+    plt.axvline(x=measured_value, color='k')
+    plt.axhline(y=cup_gaussian_fuzzy_value(
+        measured_value, center, sigma), color='k')
+    plt.savefig('images_fuzzyfication/'+label+'.png')
+    plt.show()
+
+
+print(plot_cup_gaussian_fuzzy_value(50, 200, 150, 165, 10, 'Cup Gaussian'))
+
+
 class FuzzyPy():
     # Defines TRiangular membership finction f:x->y, with 'a' and 'c' the base of triangle and 'b' is peak
     def trimf(self, x, a, b, c):
@@ -201,17 +267,6 @@ def draw_trapezoid_fuzzy_value(range_values, measured_value, low_plot, medium_pl
 # gaussian fuzzy fuction
 
 
-def gaussian_fuzzy_value(x, center, sigma):
-    return np.exp(-((x - center) ** 2) / (2 * sigma ** 2))
-
-
-def obtain_gaussian_fuzzy_value(measured_value, center, sigma):
-    # call the function gaussian_fuzzy_valuea and print the result
-    gaussian_value = gaussian_fuzzy_value(measured_value, center, sigma)
-    print(gaussian_value)
-    return gaussian_value
-
-
 def draw_gaussian_fuzzy_value(range_values, measured_value, center, sigma):
     value = Gauss(range_values, [center, sigma], [
                   center, sigma], [center, sigma])
@@ -229,13 +284,6 @@ def draw_gaussian_fuzzy_value(range_values, measured_value, center, sigma):
 
 def sigmoid_fuzzy_value(x, center, sigma):
     return 1 / (1 + np.exp(-((x - center) / sigma)))
-
-
-def obtain_sigmoid_fuzzy_value(measured_value, center, sigma):
-    # call the function sigmoid_fuzzy_valuea and print the result
-    sigmoid_value = sigmoid_fuzzy_value(measured_value, center, sigma)
-    print(sigmoid_value)
-    return sigmoid_value
 
 
 def draw_sigmoid_fuzzy_value(range_values, measured_value, center, sigma):

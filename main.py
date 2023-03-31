@@ -1,3 +1,4 @@
+from PySide6.QtCore import QObject, Signal
 import Inference
 import Fuzzyfication
 from PIL import Image, ImageDraw, ImageFont
@@ -62,6 +63,7 @@ def reachability(net):
 
 
 class MainAplication(QMainWindow):
+
     loader = QUiLoader()
     file_path = None
     file_name = None
@@ -81,7 +83,7 @@ class MainAplication(QMainWindow):
         self.setStyleSheet(
             "QMainWindow::titleBar { background-color: black; }")
         self.setGeometry(200, 200, 800, 600)
-        self.setWindowTitle("Chronické zlyhávanie srdca")
+        self.setWindowTitle("Liecba pacienta")
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_time)
         self.timer.start(1000)
@@ -101,6 +103,7 @@ class MainAplication(QMainWindow):
         self.main_layout.steps.setStyleSheet(
             "background-color: black; color: green;")
         self.main_layout.table.setStyleSheet("background-color: black;")
+
         self.image_dict = {}
         self.step_dict = {}
         self.actual_marking_dict = {}
@@ -414,12 +417,12 @@ class MainAplication(QMainWindow):
 
         output = Fuzzyfication.get_final_result(records_dict)
         print(output)
-        fuzzy_sickness = Inference.get_sickness(output)
-        print(fuzzy_sickness)
-        fuzzy_inputs = Fuzzyfication.fuzzify_inputs(fuzzy_sickness)
-        print(fuzzy_inputs)
-        degree_of_disease = Fuzzyfication.infer_degree_of_disease(fuzzy_inputs)
-        print(degree_of_disease)
+        #fuzzy_sickness = Inference.get_sickness(output)
+        # print(fuzzy_sickness)
+        #fuzzy_inputs = Fuzzyfication.fuzzify_inputs(fuzzy_sickness)
+        # print(fuzzy_inputs)
+        #degree_of_disease = Fuzzyfication.infer_degree_of_disease(fuzzy_inputs)
+        # print(degree_of_disease)
 
         self.fuzzyficated_M0 = [0 for _ in range(len(self.dict_places))]
 
@@ -1592,6 +1595,33 @@ class MainAplication(QMainWindow):
                 self.image_number += 1
         self.transitions_to_change[self.image_number] = "END"
 
+    def defuzzyfication_decision(self, result):
+        if 0.0 <= result <= 0.20:
+            self.main_layout.defuzzyfication_label.setText(
+                str(result) + " - Very low")
+            self.main_layout.defuzzyfication_label.setStyleSheet(
+                "color: green;")
+        elif 0.20 < result <= 0.40:
+            self.main_layout.defuzzyfication_label.setText(
+                str(result) + " - Low")
+            self.main_layout.defuzzyfication_label.setStyleSheet(
+                "color: yellow;")
+        elif 0.40 < result <= 0.60:
+            self.main_layout.defuzzyfication_label.setText(
+                str(result) + " - High")
+            self.main_layout.defuzzyfication_label.setStyleSheet(
+                "color: orange;")
+        elif 0.60 < result <= 0.80:
+            self.main_layout.defuzzyfication_label.setText(
+                str(result) + " - Very high")
+            self.main_layout.defuzzyfication_label.setStyleSheet("color: red;")
+        elif 0.80 < result <= 1.0:
+            self.main_layout.defuzzyfication_label.setText(
+                str(result) + " - Critical")
+            self.main_layout.defuzzyfication_label.setStyleSheet("color: red;")
+
+        self.main_layout.defuzzyfication_label.adjustSize()
+
     def fuzzy_petri_net(self, M):
         array_steps = []
         Wo = M[0].state
@@ -1677,6 +1707,7 @@ class MainAplication(QMainWindow):
                 print("Wk: ", Wk)
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
+        self.defuzzyfication_decision(Wk[len(Wk)-1])
         self.settting_image()
 
     def fill_dict_pre_fuzzy_with_weights(self, M):
@@ -1829,6 +1860,7 @@ class MainAplication(QMainWindow):
                 print("Wk: ", Wk)
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
+        self.defuzzyfication_decision(Wk[len(Wk)-1])
         self.settting_image()
 
     def fill_dict_pre_fuzzy_with_weights_and_thresholds(self, M):
@@ -1992,6 +2024,7 @@ class MainAplication(QMainWindow):
                 print("Wk: ", Wk)
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
+        self.defuzzyfication_decision(Wk[len(Wk)-1])
         self.settting_image()
 
     def error_message_box(self):

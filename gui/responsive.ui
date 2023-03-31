@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1130</width>
-    <height>789</height>
+    <height>788</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -321,7 +321,7 @@ QPushButton:hover {
        </spacer>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,0,0,6">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,0,0,6,0">
         <property name="spacing">
          <number>10</number>
         </property>
@@ -509,6 +509,30 @@ QPushButton:hover {
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="styleSheet">
+             <string notr="true">color: #00FF00;</string>
+            </property>
+            <property name="text">
+             <string>Výsledok</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="defuzzyfication_label">
+            <property name="styleSheet">
+             <string notr="true">color: #00FF00;</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>

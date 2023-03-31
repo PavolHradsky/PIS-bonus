@@ -18,7 +18,7 @@
 		<x>580</x>
 		<y>140</y>
 		<label>age</label>
-		<tokens>0.7</tokens>
+		<tokens>0.4</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -26,7 +26,7 @@
 		<x>580</x>
 		<y>300</y>
 		<label>chest pain</label>
-		<tokens>0.4</tokens>
+		<tokens>0.7</tokens>
 		<static>false</static>
 	</place>
 	<place>
