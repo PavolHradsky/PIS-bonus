@@ -16,7 +16,7 @@
 		<id>p1</id>
 		<x>580</x>
 		<y>140</y>
-		<label>age</label>
+		<label>Vek</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -24,7 +24,7 @@
 		<id>p2</id>
 		<x>580</x>
 		<y>300</y>
-		<label>chest pain</label>
+		<label>Vyska</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

@@ -452,7 +452,7 @@ QPushButton:enabled {
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,0">
+       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,0,0">
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -465,6 +465,16 @@ QPushButton:enabled {
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="fuzzification_result">
+          <property name="styleSheet">
+           <string notr="true">color: #00FF00;</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_4">

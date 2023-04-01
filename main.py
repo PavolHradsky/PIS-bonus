@@ -219,9 +219,9 @@ class MainAplication(QMainWindow):
             self.openAnotherWindow()
             self.tree = ET.parse(self.file_path)
             self.root = self.tree.getroot()
-            self.anotherWindow.table.setColumnCount(6)
+            self.anotherWindow.table.setColumnCount(9)
             self.anotherWindow.table.setHorizontalHeaderLabels(
-                ["Záznam", "Pacient ID", "Pulz", "Okysličenie krvi", "Systolický KT", "Diastolický KT"])
+                ["Záznam", "Pacient ID", " Systolický KT", "Diastolický KT", "Hladina cukru", "Cholesterol", "Tep", "EKG", "Bolesť v hrudi"])
             header = self.anotherWindow.table.horizontalHeader()
             header.setStyleSheet("background-color: black; color: black;")
             header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
@@ -252,6 +252,18 @@ class MainAplication(QMainWindow):
                 item_5 = QtWidgets.QTableWidgetItem(str(record[5]))
                 item_5.setForeground(QtGui.QColor("white"))
                 self.anotherWindow.table.setItem(row, 5, item_5)
+
+                item_6 = QtWidgets.QTableWidgetItem(str(record[6]))
+                item_6.setForeground(QtGui.QColor("white"))
+                self.anotherWindow.table.setItem(row, 6, item_6)
+
+                item_7 = QtWidgets.QTableWidgetItem(str(record[7]))
+                item_7.setForeground(QtGui.QColor("white"))
+                self.anotherWindow.table.setItem(row, 7, item_7)
+
+                item_8 = QtWidgets.QTableWidgetItem(str(record[8]))
+                item_8.setForeground(QtGui.QColor("white"))
+                self.anotherWindow.table.setItem(row, 8, item_8)
 
                 row += 1
             if "fuzzy" in self.file_name:
@@ -403,66 +415,69 @@ class MainAplication(QMainWindow):
                         "Pohlavie": None,
                         "Vyska": None,
                         "Vaha": None,
-                        "Pulz": None,
-                        "Okyslicenie krvi": None,
                         "Systolický krvný tlak": None,
                         "Diastolický krvný tlak": None,
+                        "Hladina cukru": None,
+                        "Cholesterol": None,
+                        "Tep": None,
+                        "EKG": None,
+                        "Bolesť v hrudi": None
                         }
 
-        for i, record in enumerate(self.database_output_table1[3:-1]):
+        for i, record in enumerate(self.database_output_table1[3:]):
             records_dict[list(records_dict.keys())[i]] = record
 
         for i, record in enumerate(self.database_output_table2[0][2:]):
             records_dict[list(records_dict.keys())[i+4]] = record
 
         output = Fuzzyfication.get_final_result(records_dict)
-        print(output)
-        #fuzzy_sickness = Inference.get_sickness(output)
-        # print(fuzzy_sickness)
-        #fuzzy_inputs = Fuzzyfication.fuzzify_inputs(fuzzy_sickness)
-        # print(fuzzy_inputs)
-        #degree_of_disease = Fuzzyfication.infer_degree_of_disease(fuzzy_inputs)
-        # print(degree_of_disease)
+        # iterate through records dict and update the values from output array
+        for i, key in enumerate(records_dict.keys()):
+            records_dict[key] = output[i]
+        print(records_dict)
 
         self.fuzzyficated_M0 = [0 for _ in range(len(self.dict_places))]
-
-        FuzzyficateFunctions.draw_trapezoid_fuzzy_value(
-            np.arange(0, 80, 0.1), int(self.database_output_table1[3]),  [0, 0, 29, 38], [0, 0, 38, 47], [0, 52, 60, 60])
+        # iterate through places labels in the net and update the values from records dict
         counter = 0
-        for record in self.database_output_table2:
-            if counter == 0:
-                # self.fuzzyficated_M0[0] = round(
-                #    FuzzyficateFunctions.obtain_triangular_fuzzy_value(int(record[2]), 0, 70, 150), 2)
-                # FuzzyficateFunctions.draw_triangular_fuzzy_value(
-                #    np.arange(0, 150, 0.1), int(record[2]), 0, 70, 150)
-                self.fuzzyficated_M0[0] = round(
-                    FuzzyficateFunctions.obtain_gaussian_fuzzy_value(int(record[2]), 70, 20), 2)
-                FuzzyficateFunctions.draw_gaussian_fuzzy_value(
-                    np.arange(0, 150, 0.1), int(record[2]), 70, 20)
-                # self.fuzzyficated_M0[1] = round(FuzzyficateFunctions.obtain_trapezoid_fuzzy_value(
-                # int(record[3]), 0, 90, 100, 100), 2)
-                # FuzzyficateFunctions.draw_trapezoid_fuzzy_value(
-                #    np.arange(0, 100, 0.1), int(record[3]), [0, 0, 80, 90], [85, 92, 97, 97], [95, 100, 100, 100])
-                counter += 1
-        for place in self.net.getPlaces():
-            place.tokens = self.fuzzyficated_M0[self.net.getPlaces().index(
-                place)]
-        self.net.M0 = [place.tokens for place in self.net.getPlaces()]
-        self.anotherWindow.placesWidget.setStyleSheet(
-            "background-color: black;")
-        for i, key in enumerate(self.dict_places):
-            placeLabel = QtWidgets.QLabel(key.label)
-            placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-            placeLabelM0 = QtWidgets.QLabel(str(self.fuzzyficated_M0[i]))
-            placeLabelM0.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
-            placeLabel.setStyleSheet("color: green;")
-            placeLabelM0.setStyleSheet("color: green;")
-            edit = self.list_edit_widgets[i]
-            edit.setText(str(self.fuzzyficated_M0[i]))
-            edit.setEnabled(False)
+        places = [place.label for place in self.net.getPlaces()]
+        for key, record in records_dict.items():
+            for i, place in enumerate(places):
+                if place == key:
+                    counter += 1
+                    self.fuzzyficated_M0[i] = record
+                    for place in self.net.getPlaces():
+                        place.tokens = self.fuzzyficated_M0[self.net.getPlaces().index(
+                            place)]
+        if counter == 0:
+            self.anotherWindow.fuzzification_result.setText(
+                "Fuzzyfikacia nebola mozna")
+            self.anotherWindow.fuzzification_result.setAlignment(
+                QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+            # set color to fuzzification_result to red
+            self.anotherWindow.fuzzification_result.setStyleSheet(
+                "color: red;")
+        else:
+            self.anotherWindow.fuzzification_result.setText(
+                "Fuzzyfikacia bola uspesna")
+            self.net.M0 = [place.tokens for place in self.net.getPlaces()]
+            self.anotherWindow.fuzzification_result.setAlignment(
+                QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+            self.anotherWindow.placesWidget.setStyleSheet(
+                "background-color: black;")
+            for i, key in enumerate(self.dict_places):
+                placeLabel = QtWidgets.QLabel(key.label)
+                placeLabel.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.Bold))
+                placeLabelM0 = QtWidgets.QLabel(str(self.fuzzyficated_M0[i]))
+                placeLabelM0.setFont(QtGui.QFont(
+                    "Arial", 10, QtGui.QFont.Bold))
+                placeLabel.setStyleSheet("color: green;")
+                placeLabelM0.setStyleSheet("color: green;")
+                edit = self.list_edit_widgets[i]
+                edit.setText(str(self.fuzzyficated_M0[i]))
+                edit.setEnabled(False)
 
-        self.anotherWindow.OK1.setEnabled(True)
-        self.anotherWindow.fuzzyficate_run.setEnabled(False)
+            self.anotherWindow.OK1.setEnabled(True)
+            self.anotherWindow.fuzzyficate_run.setEnabled(False)
 
     def set_marking_initial(self, validator):
         self.dict_marks = {}
@@ -2194,9 +2209,10 @@ class DialogWindow(QtWidgets.QDialog):
                 for f in files:
                     os.remove(f)
             self.main_application.database_output_table1 = self.patient_records
-            self.main_application.main_layout.table.setColumnCount(7)
+            self.main_application.main_layout.table.setColumnCount(
+                len(self.patient_records)-1)
             self.main_application.main_layout.table.setHorizontalHeaderLabels(
-                ["Meno", "Priezvisko", "Vek", "Pohlavie", "Výška", "Váha", "Choroba"])
+                ["Meno", "Priezvisko", "Vek", "Pohlavie", "Výška", "Váha"])
             header = self.main_application.main_layout.table.horizontalHeader()
             header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
             header.setStyleSheet("color: black;")
@@ -2224,10 +2240,6 @@ class DialogWindow(QtWidgets.QDialog):
             item_5 = QtWidgets.QTableWidgetItem(str(self.patient_records[6]))
             item_5.setForeground(QtGui.QColor("white"))
             self.main_application.main_layout.table.setItem(0, 5, item_5)
-
-            item_6 = QtWidgets.QTableWidgetItem(self.patient_records[7])
-            item_6.setForeground(QtGui.QColor("white"))
-            self.main_application.main_layout.table.setItem(0, 6, item_6)
 
             self.main_application.database_output_table2 = self.patient_problems
             self.main_application.show()

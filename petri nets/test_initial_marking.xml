@@ -12,21 +12,21 @@
 		<x>780</x>
 		<y>220</y>
 		<label>treatement</label>
-	</transition>
+	<treshold>0.5</treshold><weight>0.2</weight></transition>
 	<place>
 		<id>p1</id>
 		<x>580</x>
 		<y>140</y>
-		<label>age</label>
-		<tokens>0.4</tokens>
+		<label>Vek</label>
+		<tokens>0.18</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p2</id>
 		<x>580</x>
 		<y>300</y>
-		<label>chest pain</label>
-		<tokens>0.7</tokens>
+		<label>Vyska</label>
+		<tokens>0.27</tokens>
 		<static>false</static>
 	</place>
 	<place>
