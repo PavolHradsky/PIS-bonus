@@ -137,6 +137,19 @@ class MainAplication(QMainWindow):
             self.main_layout.prevButton.setEnabled(False)
         if len(self.dict_final) == 0:
             self.main_layout.nextButton.setEnabled(False)
+        self.currentScale = 1.0
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)  # add this line
+        self.dialog_window = None  # initialize dialog window as None
+        self.main_layout.closeEvent = self.closeEvent  # add this line
+
+    def closeEvent(self, event):
+        if self.dialog_window is not None and self.dialog_window.isVisible():
+            self.dialog_window.close()
+        self.hide()
+        self.dialog_window = DialogWindow()
+        # call parsing_database in self.dialog_window
+
+        event.ignore()
 
     def openAnotherWindow(self):
         self.anotherWindow = None
@@ -183,6 +196,38 @@ class MainAplication(QMainWindow):
             ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
             self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
         event.accept()
+
+    def wheelEvent(self, event):
+        # Calculate the new zoom level based on the scroll direction
+        if event.angleDelta().y() > 0:
+            # Zoom in
+            self.currentScale *= 1.1
+        else:
+            # Zoom out
+            self.currentScale *= 0.9
+
+        # Update the image display
+        self.zoom(self.currentScale)
+
+    def zoom(self, factor):
+        if os.path.exists('./images/0.png'):
+            image_path = './images/0.png'
+        elif len(self.image_dict) > 0:
+            image_path = self.image_dict[self.image_number]
+        else:
+            return
+
+        # Load the image as a QImage object
+        image = QImage(image_path)
+
+        # Resize the image
+        width = int(image.width() * factor)
+        height = int(image.height() * factor)
+        pixmap = QPixmap.fromImage(image.scaled(
+            width, height, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+
+        # Set the pixmap in the label
+        self.main_layout.photo.setPixmap(pixmap)
 
     def open_dialog(self):
         fname = QFileDialog.getOpenFileName(
@@ -409,8 +454,6 @@ class MainAplication(QMainWindow):
             self.run_fuzzy_with_weights_and_thresholds()
 
     def fuzzyficate(self):
-        # TODO to the future there will be a function that will fuzzyficate the input data from database and results will be stored in self.fuzzyficated_M0
-
         records_dict = {"Vek": None,
                         "Pohlavie": None,
                         "Vyska": None,
