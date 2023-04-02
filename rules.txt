@@ -1,7 +1,7 @@
 
 Podla toho zostavime Petriho siet:
 
-RULE 1: IF (age IS very_old) AND (chest_pain IS atypical_anginal) THEN health IS sick_4;
+RULE 1: IF (age IS very old) AND (chest_pain IS atypical_anginal) THEN health IS sick_4;
 RULE 2: IF (maximum_heart_rate IS high) AND (age IS old) THEN health IS sick_4;
 RULE 3: IF (sex IS male) AND (maximum_heart_rate IS medium) THEN health IS sick_3;
 RULE 4: IF (sex IS female) AND (maximum_heart_rate IS medium) THEN health IS sick_2;

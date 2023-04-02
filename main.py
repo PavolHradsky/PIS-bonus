@@ -145,8 +145,14 @@ class MainAplication(QMainWindow):
     def closeEvent(self, event):
         if self.dialog_window is not None and self.dialog_window.isVisible():
             self.dialog_window.close()
-        self.hide()
+
         self.dialog_window = DialogWindow()
+        self.close()
+        result, result1, result2 = connect()
+        self.dialog_window.database_output_table1 = result
+        self.dialog_window.database_output_table2 = result1
+        self.dialog_window.hashed = result2
+        self.dialog_window.parsing_database()
         # call parsing_database in self.dialog_window
 
         event.ignore()
@@ -493,7 +499,7 @@ class MainAplication(QMainWindow):
                             place)]
         if counter == 0:
             self.anotherWindow.fuzzification_result.setText(
-                "Fuzzyfikacia nebola mozna")
+                "Fuzzyfikacia zlyhala")
             self.anotherWindow.fuzzification_result.setAlignment(
                 QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
             # set color to fuzzification_result to red
@@ -501,7 +507,7 @@ class MainAplication(QMainWindow):
                 "color: red;")
         else:
             self.anotherWindow.fuzzification_result.setText(
-                "Fuzzyfikacia bola uspesna")
+                "Fuzzyfikacia uspesna")
             self.net.M0 = [place.tokens for place in self.net.getPlaces()]
             self.anotherWindow.fuzzification_result.setAlignment(
                 QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
@@ -2251,6 +2257,7 @@ class DialogWindow(QtWidgets.QDialog):
             if files != None:
                 for f in files:
                     os.remove(f)
+            self.close()
             self.main_application.database_output_table1 = self.patient_records
             self.main_application.main_layout.table.setColumnCount(
                 len(self.patient_records)-1)
