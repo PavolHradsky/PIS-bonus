@@ -11,21 +11,21 @@ class Age:
 
     def __init__(self):
         self.fuzzy_ranges = {
-            "young": [0, 25],
-            "middle_age": [25, 50],
+            "young": [0, 30],
+            "middle age": [30, 50],
             "old": [50, 75],
-            "very_old": [75, 100]
+            "very old": [75, 100]
         }
 
     def calc_fuzzy(self, age):
         # if age is string
         if isinstance(age, str):
             if age == 'young':
-                age = (0 + 25)/2
+                age = (0 + 30)/2
             elif age == 'middle age':
-                age = (25 + 50)/2
+                age = (30 + 50)/2
             elif age == 'old':
-                age = (50 + 75)/2
+                age = (50 + random.randint(50, 75))/2
             elif age == 'very old':
                 age = (75 + 100)/2
         plot_sigmoid_fuzzy_value(0, 100, age, 50, 10, "Vek")
@@ -38,16 +38,16 @@ class Sex:
 
     def __init__(self):
         self.fuzzy_ranges = {
-            "M": 0.3,
-            "F": 0.1
+            "M": 0.5,
+            "F": 0.3
         }
 
     def calc_fuzzy(self, sex):
 
         if sex == 'M':
-            return 0.3
+            return 0.5
         else:
-            return 0.1
+            return 0.3
 
 
 class Height:
@@ -67,17 +67,17 @@ class Height:
                 height = (155 + 175)/2
             elif height == 'tall':
                 height = (175 + 210)/2
-        plot_cup_gaussian_fuzzy_value(60, 210, height, 160, 25, "Vyska")
-        return 1 - obtain_gaussian_fuzzy_value(height, 160, 25)
+        plot_cup_gaussian_fuzzy_value(60, 210, height, 150, 25, "Vyska")
+        return 1 - obtain_gaussian_fuzzy_value(height, 150, 25)
 
 
 class Weight:
 
     def __init__(self):
         self.fuzzy_ranges = {
-            "light": [20, 20, 50, 50],
-            "medium": [50, 50, 80, 80],
-            "heavy": [80, 80, 120, 120]
+            "light": [20, 50],
+            "medium": [50, 80],
+            "heavy": [80, 120]
         }
 
     def calc_fuzzy(self, weight):
@@ -88,91 +88,93 @@ class Weight:
                 weight = (50 + 80)/2
             elif weight == 'heavy':
                 weight = (80 + 120)/2
-        plot_cup_gaussian_fuzzy_value(20, 120, weight, 60, 10, "Vaha")
-        return 1 - obtain_gaussian_fuzzy_value(weight, 60, 10)
+        plot_cup_gaussian_fuzzy_value(20, 120, weight, 60, 20, "Vaha")
+        return 1 - obtain_gaussian_fuzzy_value(weight, 60, 20)
 
 
 class ST_BloodPressure:
 
     def __init__(self):
         self.fuzzy_ranges = {
-            "low": [0, 0, 89, 99],
-            "medium": [100, 100, 119, 129],
-            "high": [130, 130, 149, 149],
-            "very_heigh": [150, 150, 170, 170]
+            "low": [0, 0, 70, 100],
+            "medium": [70, 70, 100, 120],
+            "high": [100, 100, 120, 140],
+            "very high": [120, 120, 170, 170]
         }
 
     def calc_fuzzy(self, bp):
         if isinstance(bp, str):
             if bp == 'low':
-                bp = (0 + 89)/2
+                bp = (70 + 100)/2
             elif bp == 'medium':
-                bp = (100 + 119)/2
+                bp = (100 + 120)/2
             elif bp == 'high':
-                bp = (130 + 149)/2
+                bp = (120 + random.randint(120, 140))/2
             elif bp == 'very heigh':
-                bp = (150 + 170)/2
+                bp = (140 + 170)/2
         plot_sigmoid_fuzzy_value(
-            0, 180, bp, 125, 10, "Systolic Blood Pressure")
-        return obtain_sigmoid_fuzzy_value(bp, 125, 10)
+            0, 170, bp, 120, 10, "Systolic Blood Pressure")
+        return obtain_sigmoid_fuzzy_value(bp, 120, 10)
 
 
 class DT_BloodPressure:
 
     def __init__(self):
         self.fuzzy_ranges = {
-            "low": [0, 0, 59, 69],
-            "medium": [70, 70, 79, 89],
-            "high": [90, 90, 99, 99],
-            "very_high": [100, 100, 109, 109],
+            "low": [0, 0, 60, 80],
+            "medium": [60, 60, 80, 90],
+            "high": [80, 80, 90, 120]
         }
 
     def calc_fuzzy(self, bp):
         if isinstance(bp, str):
             if bp == 'low':
-                bp = (0 + 59)/2
+                bp = (0 + 60)/2
             elif bp == 'medium':
-                bp = (70 + 79)/2
+                bp = (60 + 80)/2
             elif bp == 'high':
-                bp = (90 + 99)/2
+                bp = (80 + random.randint(80, 90))/2
             elif bp == 'very high':
-                bp = (100 + 109)/2
+                bp = (90 + 120)/2
         plot_sigmoid_fuzzy_value(
-            0, 120, bp, 80, 10, "Diastolic Blood Pressure")
-        return obtain_sigmoid_fuzzy_value(bp, 80, 10)
+            0, 120, bp, 78, 10, "Diastolic Blood Pressure")
+        return obtain_sigmoid_fuzzy_value(bp, 78, 10)
 
 
 class Cholesterol:
 
     def __init__(self):
         self.fuzzy_ranges = {
-            "low": [0, 0, 150, 200],
-            "medium_high": [150, 150, 200, 250],
-            "very_high": [200, 200, 500, 600],
-            "extremely_high": [500, 500, 600, 600]
+            "low": [0, 0, 40, 130],
+            "medium high": [40, 40, 130, 160],
+            "high": [130, 130, 160, 190],
+            "very high": [160, 160, 190, 200],
+            "extremely high": [190, 190, 300, 300]
         }
 
     def calc_fuzzy(self, cholesterol):
         if isinstance(cholesterol, str):
             if cholesterol == 'low':
-                cholesterol = (0 + 150)/2
+                cholesterol = (40 + 130)/2
             elif cholesterol == 'medium high':
-                cholesterol = (150 + 200)/2
+                cholesterol = (130 + 160)/2
+            elif cholesterol == 'high':
+                cholesterol = (160 + 190)/2
             elif cholesterol == 'very high':
-                cholesterol = (200 + 500)/2
+                cholesterol = (190 + 200)/2
             elif cholesterol == 'extremely high':
-                cholesterol = (500 + 600)/2
-        plot_sigmoid_fuzzy_value(0, 600, cholesterol, 170, 50, "Cholesterol")
-        return obtain_sigmoid_fuzzy_value(cholesterol, 170, 50)
+                cholesterol = (200 + 300)/2
+        plot_sigmoid_fuzzy_value(0, 300, cholesterol, 160, 40, "Cholesterol")
+        return obtain_sigmoid_fuzzy_value(cholesterol, 160, 40)
 
 
 class Sugar:
 
     def __init__(self):
         self.fuzzy_ranges = {
-            "low": [0, 0, 100, 125],
-            "medium": [100, 100, 125, 200],
-            "high": [125, 125, 200, 200]
+            "low": [0, 0, 100, 120],
+            "medium": [100, 100, 120, 150],
+            "high": [120, 120, 150, 240]
         }
 
     def calc_fuzzy(self, sugar):
@@ -180,75 +182,81 @@ class Sugar:
             if sugar == 'low':
                 sugar = (0 + 100)/2
             elif sugar == 'medium':
-                sugar = (100 + 125)/2
+                sugar = (100 + 120)/2
             elif sugar == 'high':
-                sugar = (125 + 200)/2
+                sugar = (120 + 150)/2
         plot_trapezoid_fuzzy_value(
-            0, 200, sugar, 0, 160, 200, 201, "Hladina cukru")
-        return obtain_trapezoid_fuzzy_value(sugar, [0, 160, 200, 200])
+            0, 240, sugar, 0, 220, 240, 241, "Hladina cukru")
+        return obtain_trapezoid_fuzzy_value(sugar, [0, 220, 240, 240])
 
 
 class HeartRate:
 
     def __init__(self):
         self.fuzzy_ranges = {
-            "small": [0, 0, 110, 140],
-            "medium": [110, 110, 140, 200],
-            "big": [140, 140, 200, 200]
+            "low": [0, 0, 60, 100],
+            "medium": [60, 60, 100, 140],
+            "high": [100, 100, 140, 200]
         }
 
     def calc_fuzzy(self, hr):
         if isinstance(hr, str):
-            if hr == 'small':
-                hr = (0 + 100)/2
+            if hr == 'low':
+                hr = (0 + 60)/2
             elif hr == 'medium':
-                hr = (110 + 140)/2
-            elif hr == 'big':
-                hr = (140 + 200)/2
+                hr = (60 + random.randint(60, 140))/2
+            elif hr == 'high':
+                hr = (100 + random.randint(150, 200))/2
         plot_trapezoid_fuzzy_value(
-            0, 200, hr, 0, 110, 200, 201, "Tepova frekvencia")
-        return obtain_trapezoid_fuzzy_value(hr, [0, 110, 200, 200])
+            0, 200, hr, 0, 165, 200, 201, "Tepova frekvencia")
+        return obtain_trapezoid_fuzzy_value(hr, [0, 165, 200, 200])
 
 
 class EKG:
 
     def __init__(self):
         self.fuzzy_ranges = {
-            "normal": [-0.5, -0.5, 0.2, 0.2],
-            "abnormal": [0.2, 0.2, 1, 1],
-            "hypertrophy": [1, 1, 2, 2]
+            "normal": [-0.5, -0.5, 0.4, 0.4],
+            "abnormal": [0.4, 0.4, 1, 1],
+            "hypertrophy": [1, 1, 2, 2.01]
         }
 
     def calc_fuzzy(self, ekg):
         if isinstance(ekg, str):
             if ekg == 'normal':
-                ekg = random.uniform(-0.5, 0.2)
+                ekg = random.uniform(-0.5, 0.4)
             elif ekg == 'abnormal':
-                ekg = random.uniform(0.2, 1)
+                ekg = random.uniform(0.4, 1)
             elif ekg == 'hypertrophy':
                 ekg = random.uniform(1, 2)
         plot_trapezoid_fuzzy_value(
-            -0.5, 2, ekg, -0.5, 1, 2, 2.01, "EKG")
-        return obtain_trapezoid_fuzzy_value(ekg, [-0.5, 1, 2, 2.01])
+            -0.5, 2, ekg, -0.5, 1.5, 2, 2.01, "EKG")
+        return obtain_trapezoid_fuzzy_value(ekg, [-0.5, 1.5, 2, 2.01])
 
 
 class ChestPain:
 
     def __init__(self):
         self.fuzzy_ranges = {
-            "no": [0, 0, 0.5, 0.5],
-            "yes": [0.5, 0.5, 1, 1]
+            "typical": [0, 0, 0.25, 0.25],
+            "atypical": [0.25, 0.25, 0.45, 0.45],
+            "non-anginal": [0.45, 0.45, 0.65, 0.65],
+            "asymptomatic": [0.65, 0.65, 1, 1]
         }
 
     def calc_fuzzy(self, chest_pain):
         if isinstance(chest_pain, str):
-            if chest_pain == 'no':
-                chest_pain = random.uniform(0.01, 0.5)
-            elif chest_pain == 'yes':
-                chest_pain = random.uniform(0.5, 1)
+            if chest_pain == 'typical':
+                chest_pain = random.uniform(0, 0.25)
+            elif chest_pain == 'atypical':
+                chest_pain = random.uniform(0.26, 0.45)
+            elif chest_pain == 'non-anginal':
+                chest_pain = random.uniform(0.46, 0.65)
+            elif chest_pain == 'asymptomatic':
+                chest_pain = random.uniform(0.66, 1)
         plot_trapezoid_fuzzy_value(
-            0, 1, chest_pain, 0, 1, 1, 1.01, "Bolest v hrudi")
-        return obtain_trapezoid_fuzzy_value(chest_pain, [0, 1, 1, 1.01])
+            0, 2, chest_pain, 0, 1, 2, 2.01, "Bolest v hrudnej kosti")
+        return obtain_trapezoid_fuzzy_value(chest_pain, [0, 1, 2, 2.01])
 
 
 def get_final_result(data):
@@ -296,17 +304,17 @@ def get_final_result(data):
     else:
         dt_bp = dt_bp_class.calc_fuzzy(int(data['Diastolický krvný tlak']))
 
-    if data['Hladina cukru'] == 'low' or data['Hladina cukru'] == 'medim' or data['Hladina cukru'] == 'high':
+    if data['Hladina cukru'] == 'low' or data['Hladina cukru'] == 'medium' or data['Hladina cukru'] == 'high':
         sugar = sugar_class.calc_fuzzy(data['Hladina cukru'])
     else:
         sugar = sugar_class.calc_fuzzy(int(data['Hladina cukru']))
 
-    if data['Cholesterol'] == 'low' or data['Cholesterol'] == 'medium high' or data['Cholesterol'] == 'very high' or data['Cholesterol'] == 'extremely high':
+    if data['Cholesterol'] == 'low' or data['Cholesterol'] == 'medium high' or data['Cholesterol'] == 'high' or data['Cholesterol'] == 'very high' or data['Cholesterol'] == 'extremely high':
         cholesterol = cholesterol_class.calc_fuzzy(data['Cholesterol'])
     else:
         cholesterol = cholesterol_class.calc_fuzzy(int(data['Cholesterol']))
 
-    if data['Tep'] == 'small' or data['Tep'] == 'medium' or data['Tep'] == 'big':
+    if data['Tep'] == 'low' or data['Tep'] == 'medium' or data['Tep'] == 'high':
         heart_rate = heart_rate_class.calc_fuzzy(data['Tep'])
     else:
         heart_rate = heart_rate_class.calc_fuzzy(int(data['Tep']))
@@ -316,7 +324,7 @@ def get_final_result(data):
     else:
         ekg = ekg_class.calc_fuzzy(float(data['EKG']))
 
-    if data['Bolesť v hrudi'] == 'no' or data['Bolesť v hrudi'] == 'yes':
+    if data['Bolesť v hrudi'] == 'typical' or data['Bolesť v hrudi'] == 'atypical' or data['Bolesť v hrudi'] == 'non-anginal' or data['Bolesť v hrudi'] == 'asymptomatic':
         chest_pain = chest_pain_class.calc_fuzzy(data['Bolesť v hrudi'])
     else:
         print("chyba v chest pain")

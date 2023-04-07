@@ -22,9 +22,11 @@ from PySide6.QtCore import QFile, QTimer, QTime
 import os
 import glob
 from PySide6.QtGui import QPixmap, QImage
-import FuzzyficateFunctions
 import matplotlib
 matplotlib.use('tkagg')
+
+dict_values_patient = {}
+dict_values_problem = {}
 
 
 def loading_data(name_file, fuzzy_flag, weights_flag, threshold_flag, flag):
@@ -148,13 +150,12 @@ class MainAplication(QMainWindow):
 
         self.dialog_window = DialogWindow()
         self.close()
-        result, result1, result2 = connect()
+        result, result1, result2 = connect(
+            0, dict_values_patient, dict_values_problem)
         self.dialog_window.database_output_table1 = result
         self.dialog_window.database_output_table2 = result1
         self.dialog_window.hashed = result2
         self.dialog_window.parsing_database()
-        # call parsing_database in self.dialog_window
-
         event.ignore()
 
     def openAnotherWindow(self):
@@ -211,7 +212,6 @@ class MainAplication(QMainWindow):
         else:
             # Zoom out
             self.currentScale *= 0.9
-
         # Update the image display
         self.zoom(self.currentScale)
 
@@ -330,7 +330,7 @@ class MainAplication(QMainWindow):
             self.dict_places = {}
             self.dict_transitions = {}
             self.draw_net_initial()
-            self.setting_first_image()
+            self.setting_image(1)
             self.dict_weights = {}
             self.dict_tresholds = {}
             self.dict_marks = {}
@@ -472,7 +472,15 @@ class MainAplication(QMainWindow):
                         "EKG": None,
                         "Bolesť v hrudi": None
                         }
-
+        if len(self.database_output_table1) == 0 or len(self.database_output_table2) == 0:
+            self.anotherWindow.fuzzification_result.setText(
+                "Chybajuce data!")
+            self.anotherWindow.fuzzification_result.setAlignment(
+                QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+            # set color to fuzzification_result to red
+            self.anotherWindow.fuzzification_result.setStyleSheet(
+                "color: red;")
+            return
         for i, record in enumerate(self.database_output_table1[3:]):
             records_dict[list(records_dict.keys())[i]] = record
 
@@ -1422,17 +1430,13 @@ class MainAplication(QMainWindow):
                                  sourceIdInNetList] = arc.getMultiplicity()
         return inputMatrix, outputMatrix
 
-    def setting_first_image(self):
-        path = './images/0.png'
-        prem = QImage(path)
-        pixmap = QPixmap.fromImage(prem)
-        self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
-        ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-        self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
-
-    def settting_image(self):
-        self.image_number = 1
-        prem = QImage(self.image_dict[self.image_number])
+    def setting_image(self, first):
+        if first:
+            path = './images/0.png'
+            prem = QImage(path)
+        else:
+            self.image_number = 1
+            prem = QImage(self.image_dict[self.image_number])
         pixmap = QPixmap.fromImage(prem)
         self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
         ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
@@ -1591,7 +1595,7 @@ class MainAplication(QMainWindow):
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
 
-        self.settting_image()
+        self.setting_image(0)
 
     def fill_dict_pre_fuzzy_net(self, M):
         self.transitions_to_change = {}
@@ -1660,26 +1664,26 @@ class MainAplication(QMainWindow):
         self.transitions_to_change[self.image_number] = "END"
 
     def defuzzyfication_decision(self, result):
-        if 0.0 <= result <= 0.20:
+        if 0.0 <= result <= 0.25:
             self.main_layout.defuzzyfication_label.setText(
                 str(result) + " - Very low")
             self.main_layout.defuzzyfication_label.setStyleSheet(
                 "color: green;")
-        elif 0.20 < result <= 0.40:
+        elif 0.25 < result <= 0.45:
             self.main_layout.defuzzyfication_label.setText(
                 str(result) + " - Low")
             self.main_layout.defuzzyfication_label.setStyleSheet(
                 "color: yellow;")
-        elif 0.40 < result <= 0.60:
+        elif 0.45 < result <= 0.65:
             self.main_layout.defuzzyfication_label.setText(
                 str(result) + " - High")
             self.main_layout.defuzzyfication_label.setStyleSheet(
                 "color: orange;")
-        elif 0.60 < result <= 0.80:
+        elif 0.65 < result <= 0.85:
             self.main_layout.defuzzyfication_label.setText(
                 str(result) + " - Very high")
             self.main_layout.defuzzyfication_label.setStyleSheet("color: red;")
-        elif 0.80 < result <= 1.0:
+        elif 0.85 < result <= 1.0:
             self.main_layout.defuzzyfication_label.setText(
                 str(result) + " - Critical")
             self.main_layout.defuzzyfication_label.setStyleSheet("color: red;")
@@ -1772,7 +1776,7 @@ class MainAplication(QMainWindow):
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
         self.defuzzyfication_decision(Wk[len(Wk)-1])
-        self.settting_image()
+        self.setting_image(0)
 
     def fill_dict_pre_fuzzy_with_weights(self, M):
         self.transitions_to_change = {}
@@ -1925,7 +1929,7 @@ class MainAplication(QMainWindow):
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
         self.defuzzyfication_decision(Wk[len(Wk)-1])
-        self.settting_image()
+        self.setting_image(0)
 
     def fill_dict_pre_fuzzy_with_weights_and_thresholds(self, M):
         self.transitions_to_change = {}
@@ -2089,7 +2093,7 @@ class MainAplication(QMainWindow):
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
         self.defuzzyfication_decision(Wk[len(Wk)-1])
-        self.settting_image()
+        self.setting_image(0)
 
     def error_message_box(self):
         dialog = QMessageBox(text="Siet je neohranicena")
@@ -2329,10 +2333,44 @@ class DialogWindow(QtWidgets.QDialog):
 
 
 if __name__ == '__main__':
-    result, result1, result2 = connect()
+    print("Pridat pacienta? (y/n)")
+    answer = input()
+    if answer == "y":
+        print("Meno pacienta:")
+        dict_values_patient["name"] = input()
+        print("Priezvisko pacienta:")
+        dict_values_patient["surname"] = input()
+        print("Vek pacienta:")
+        dict_values_patient["age"] = input()
+        print("Pohlavie pacienta:")
+        dict_values_patient["sex"] = input()
+        print("Vyska pacienta:")
+        dict_values_patient["height"] = input()
+        print("Vaha pacienta:")
+        dict_values_patient["weight"] = input()
+
+        print("Pridat problem pacienta? (y/n)")
+        answer = input()
+        if answer == "y":
+            print("Hodnota systolickeho tlaku")
+            dict_values_problem["systolic_blood_pressure"] = input()
+            print("Hodnota diastolickeho tlaku")
+            dict_values_problem["diastolic_blood_pressure"] = input()
+            print("Hodnota cukru v krvi")
+            dict_values_problem["blood_sugar"] = input()
+            print("Hodnota cholesterolu")
+            dict_values_problem["cholesterol"] = input()
+            print("Hodnota tepu")
+            dict_values_problem["heart_rate"] = input()
+            print("Hodnota EKG")
+            dict_values_problem["EKG"] = input()
+            print("Bolest hrudnika")
+            dict_values_problem["chest_pain"] = input()
+        result, result1, result2 = connect(
+            1, dict_values_patient, dict_values_problem)
+    else:
+        result, result1, result2 = connect(0, None, None)
     app = QApplication(sys.argv)
-    # window = MainAplication()
-    # window.show()
     dialog = DialogWindow()
     dialog.database_output_table1 = result
     dialog.database_output_table2 = result1
