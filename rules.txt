@@ -46,7 +46,7 @@ RULE 42: IF (age IS old) THEN health IS sick_3;
 RULE 43: IF (age IS very_old) THEN health IS sick_4;
 
 
-Podla toho zostavime Petriho siet:
+Podla toho zostavime fuzzy Petriho siet: (source Github)
 
 RULE 1: IF (age IS very old) AND (chest_pain IS atypical) THEN health IS Critical;
 
@@ -121,14 +121,15 @@ RULE 52: IF (weight IS light) THEN health IS High; OK
 RULE 53: IF (weight IS medium) THEN health IS Very Low; OK
 RULE 54: IF (weight IS heavy) THEN health IS Critical; OK
 
+Podla toho zostavime logicku Petriho siet: (source lekar)
+
 Premenne: LBBB, QRS, NYHA-II-III, GFR, sTK, symptomaticka hypotenzia, Uzivany gliflozin, Max davka, K+, TEP, CHOCHP, AV blok II / III, Kreatinin, Nebivolol, Uziva ivabradin,  Fibrilacia predsieni , vek, SF ,Symptomaticka bradykardia, 
 Uziva vericiguat, Uziva digoxin, Hodnota digoxinu v krvi, Pomaly rytmus,  eGRF , SBP, HR, Zvysenie NTproBNP 
 
-if LBBB IS true AND QRS is >=150 AND NYHA-II-III is true THEN "Doporučene zavedenie CRT"
-if LBBB is true AND QRS is [130,..,149] AND NYHA-II-III is true THEN "Malo by byt zvazene zavedenie CRT"
-if LBBB is false AND QRS >= 150 AND NYHA-II-III is true THEN "Malo by byt zvazene zavedenie CRT"
-if LBBB is false AND QRS is [130,..,149] AND NYHA-II-III is true THEN "Môže byt zvazene zavedenie CRT"
-if NYHA-II-III is true THEN "Zvazte zavedenie ICD"
+if LBBB is true AND QRS is >=150 THEN "Doporučene zavedenie CRT"
+if LBBB is true AND QRS is [130,..,149] THEN "Malo by byt zvazene zavedenie CRT"
+if LBBB is false AND QRS >= 150 THEN "Malo by byt zvazene zavedenie CRT"
+if LBBB is false AND QRS is [130,..,149] THEN "Môže byt zvazene zavedenie CRT"
 
 if GFR < 20 THEN "Nemozno pridat gliflozin"
 if sTK < 90 THEN "Nemozno pridat gliflozin"
@@ -136,16 +137,16 @@ if symptomaticka hypotenzia is true THEN "Nemozno pridat gliflozin"
 if GFR is [20..25] THEN "Pridajte empagliflozin"
 if GFR > 25 THEN "Pridajte dapagliflozin alebo empagliflozin"
 
-if GFR < 20 AND Uzivany gliflozin is "dapa", "empa" THEN "Vysadiť gliflozin"
+if GFR < 20 AND Uzivany gliflozin is "dapa" | "empa" THEN "Vysadiť gliflozin"
 if GFR is [20..25] AND Uzivany gliflozin is "empa" THEN "Pokračujte v aktuálnej terapii"
 if GFR is [20..25] AND Uzivany gliflozin is "dapa" THEN "Ak sa očakáva ďalšie zhoršenie fukncie obličiek, odporucanie vysadit, inak prejst na empa."
-if GFR > 25 AND Uzivany gliflozin is "dapa", "empa" THEN "Pokračujte v aktuálnej terapii."
+if GFR > 25 AND Uzivany gliflozin is "dapa" | "empa" THEN "Pokračujte v aktuálnej terapii."
 If Max davka is true THEN "Pokračujte v terapii."
 
-if Max davka is false AND K+ <5 THEN "Pridajte bežnú dávku MRA."
+if Max davka is false AND K+ < 5 THEN "Pridajte bežnú dávku MRA."
 if K+ is [5..5,5] THEN "Udržiavajte aktuálnu dávku."
 if Max davka is false AND K+ is [5,5...6] THEN "Pridajte polovičnú dávku MRA, ak to nie je možné odporúčanie vysadiť MRA."
-if Max davka is false AND GFR <30 THEN "Pridajte polovičnú dávku MRA, ak to nie je možné odporúčanie vysadiť MRA."
+if Max davka is false AND GFR < 30 THEN "Pridajte polovičnú dávku MRA, ak to nie je možné odporúčanie vysadiť MRA."
 if K+ > 6 THEN "Vysaďte MRA."
 if GFR < 20 THEN "Vysaďte MRA."
 if Max davka is true THEN "Pokračujte v terapii."
@@ -170,7 +171,7 @@ if AV blok II / III is true THEN "Nepridať BB."
 if Kreatinin > 250 THEN "Pridať BB okrem nebivolol."
 
 if Tep < 50 THEN "Vysadiť alebo redukovať BB."
-if AV blok II /III is true THEN "Vysadiť alebo redukovať BB."
+if AV blok II / III is true THEN "Vysadiť alebo redukovať BB."
 if "symptomaticka hypotenzia" is true THEN "Vysadiť alebo redukovať BB."
 if Nebivolol is true AND Kreatinin > 250 THEN "Nahradiť nebivolol iným BB."
 if Max davka is false THEN "Navýšiť dávku BB.
@@ -183,15 +184,15 @@ if sTK < 90 THEN "Nemožnosť pridať ACEi."
 if symptomaticka hypotenzia is true THEN "Vysadiť alebo znížiť dávku ACEi."
 if K+ > 5,5 THEN "Vysadiť alebo znížiť dávku ACEi."
 if GFR < 20 THEN "Vysadiť alebo znížiť dávku ACEi."
-IF Max davka is true THEN "Pokračujte v liečbe."
+if Max davka is true THEN "Pokračujte v liečbe."
 if Max davka is false THEN "Navýšiť dávku ACEi."
 
 if Uziva ivabradin is false AND GFR < 15 THEN "Nezačať s terapiou."
-If Uziva ivabradin is false AND Fibrilacia predsieni is true THEN "Nezačať s terapiou."
-If Uziva ivabradin is false AND vek > 75 THEN "Začať s nižšou dávkou."
-If Uziva ivabradin is false THEN "Začať s terapiou."
-If Uziva ivabradin is true AND SF < 50 THEN "Vysadiť alebo redukovať ivabradin."
-If Uziva ivabradin is true AND Symptomaticka bradykardia is true THEN "Vysadiť alebo redukovať ivabradin."
+if Uziva ivabradin is false AND Fibrilacia predsieni is true THEN "Nezačať s terapiou."
+if Uziva ivabradin is false AND vek > 75 THEN "Začať s nižšou dávkou."
+if Uziva ivabradin is false THEN "Začať s terapiou."
+if Uziva ivabradin is true AND SF < 50 THEN "Vysadiť alebo redukovať ivabradin."
+if Uziva ivabradin is true AND Symptomaticka bradykardia is true THEN "Vysadiť alebo redukovať ivabradin."
 
 if Uziva vericiguat is false AND sTK < 100 THEN "Nezačať s terapiou."
 if Uziva vericiguat is false AND GFR < 15 THEN "Nezačať s terapiou."
@@ -201,14 +202,14 @@ if Uziva vericiguat is true AND GFR < 15 THEN "Vysadiť alebo redukovať vericig
 if Uziva vericiguat is true AND Symptomaticka hypotenzia is true THEN "Vysadiť alebo redukovať vericiguat."
 
 if Uziva digoxin is false AND Pomaly rytmus is true THEN "Nezačať s terapiou."
-if Uziva digoxin is false AND AV vlok is II, III THEN "Nezačať s terapiou."
+if Uziva digoxin is false AND AV blok is II / III THEN "Nezačať s terapiou."
 if Uziva digoxin is true AND Pomaly rytmus is true THEN "Vysadiť alebo redukovať digoxin."
-if Uziva digoxin is true AND AV Vlok is II, III THEN "Vysadiť alebo redukovať digoxin."
+if Uziva digoxin is true AND  AV blok is II / III THEN "Vysadiť alebo redukovať digoxin."
 if Uziva digoxin is true AND Hodnota digoxinu v krvi > 1.05  THEN "Vysadiť alebo redukovať digoxin."
 if Hodnota digoxinu v krvi is [0,64..1,05] THEN "Pokračovať v aktuálnej terapii."
 if Hodnota digoxinu v krvi < 0.64 THEN "Pridať digoxin."
 
-if eGRF < 30 THEN "Ak je mozne znizit diuretika, inak Sznizit/prerusit ACEi/ARB/ARNI alebo MRA."
+if eGRF < 30 THEN "Ak je mozne znizit diuretika, inak znizit/prerusit ACEi/ARB/ARNI alebo MRA."
 if K+ > 5 THEN "Znizit/prerusit ACEi/ARB/ARNI alebo MRA."
 if SBP < 95 THEN "Znizit/prerusit ACEi/ARB/ARNI alebo MRA."
 

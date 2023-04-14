@@ -116,3 +116,32 @@ def plot_trapezoid_fuzzy_value(range_start, range_end, measured_value, a, b, c, 
     plt.axhline(y=trapezoid_fuzzy_value(measured_value, a, b, c, d), color='k')
     plt.savefig('images_fuzzyfication/'+label+'.png')
     plt.clf()
+
+
+def triangular_fuzzy_value(x, left, center, right):
+    if x <= left or x >= right:
+        return 0.0
+    elif x >= center:
+        return (right - x) / (right - center)
+    else:
+        return (x - left) / (center - left)
+
+
+def obtain_triangular_fuzzy_value(measured_value, plot):
+    triangular_value = triangular_fuzzy_value(
+        measured_value, plot[0], plot[1], plot[2])
+    return triangular_value
+
+
+def plot_triangular_fuzzy_value(range_start, range_end, measured_value, a, b, c, label):
+    x = np.linspace(range_start, range_end, 1000)
+    y = [triangular_fuzzy_value(xi, a, b, c) for xi in x]
+    plt.plot(x, y, label=f'a: {a}, b: {b}, c: {c}')
+    plt.legend()
+    plt.xlabel('Measured Value')
+    plt.ylabel('Fuzzy Value')
+    plt.title(label)
+    plt.axvline(x=measured_value, color='k')
+    plt.axhline(y=triangular_fuzzy_value(measured_value, a, b, c), color='k')
+    plt.savefig('images_fuzzyfication/'+label+'.png')
+    plt.clf()

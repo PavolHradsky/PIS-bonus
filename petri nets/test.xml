@@ -16,7 +16,7 @@
 		<id>p1</id>
 		<x>580</x>
 		<y>140</y>
-		<label>Diastolický krvný tlak</label>
+		<label>Uziva vericiguat</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -24,7 +24,7 @@
 		<id>p2</id>
 		<x>580</x>
 		<y>300</y>
-		<label>Bolesť v hrudi</label>
+		<label>GFR</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

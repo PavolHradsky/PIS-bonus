@@ -151,7 +151,7 @@ class MainAplication(QMainWindow):
         self.dialog_window = DialogWindow()
         self.close()
         result, result1, result2 = connect(
-            0, dict_values_patient, dict_values_problem)
+            0, 0, dict_values_patient, dict_values_problem)
         self.dialog_window.database_output_table1 = result
         self.dialog_window.database_output_table2 = result1
         self.dialog_window.hashed = result2
@@ -170,12 +170,10 @@ class MainAplication(QMainWindow):
         self.anotherWindow.setGeometry(200, 200, 800, 600)
         self.anotherWindow.setWindowTitle("Nastavenie váh a prahov pravidiel")
         self.anotherWindow.table.setStyleSheet("background-color: black;")
-        if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
-            self.anotherWindow.fuzzyficate_run.setEnabled(False)
-        else:
-            self.anotherWindow.fuzzyficate_run.setEnabled(True)
-            self.anotherWindow.fuzzyficate_run.clicked.connect(
-                self.fuzzyficate)
+
+        self.anotherWindow.fuzzyficate_run.setEnabled(True)
+        self.anotherWindow.fuzzyficate_run.clicked.connect(
+            self.fuzzyficate)
         self.anotherWindow.show()
         self.ui.close()
 
@@ -460,38 +458,160 @@ class MainAplication(QMainWindow):
             self.run_fuzzy_with_weights_and_thresholds()
 
     def fuzzyficate(self):
-        records_dict = {"Vek": None,
-                        "Pohlavie": None,
-                        "Vyska": None,
-                        "Vaha": None,
-                        "Systolický krvný tlak": None,
-                        "Diastolický krvný tlak": None,
-                        "Hladina cukru": None,
-                        "Cholesterol": None,
-                        "Tep": None,
-                        "EKG": None,
-                        "Bolesť v hrudi": None
-                        }
-        if len(self.database_output_table1) == 0 or len(self.database_output_table2) == 0:
-            self.anotherWindow.fuzzification_result.setText(
-                "Chybajuce data!")
-            self.anotherWindow.fuzzification_result.setAlignment(
-                QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
-            # set color to fuzzification_result to red
-            self.anotherWindow.fuzzification_result.setStyleSheet(
-                "color: red;")
-            return
-        for i, record in enumerate(self.database_output_table1[3:]):
-            records_dict[list(records_dict.keys())[i]] = record
+        counter = 0
+        if self.fuzzy_flag or self.weights_flag or self.tresholds_flag:
 
-        for i, record in enumerate(self.database_output_table2[0][2:]):
-            records_dict[list(records_dict.keys())[i+4]] = record
+            for _, value in self.dict_marks.items():
+                if value.text() == '':
+                    counter += 1
+            if counter == len(self.dict_marks):
 
-        output = Fuzzyfication.get_final_result(records_dict)
-        # iterate through records dict and update the values from output array
-        for i, key in enumerate(records_dict.keys()):
-            records_dict[key] = output[i]
-        print(records_dict)
+                records_dict = {"Vek": None,
+                                "Pohlavie": None,
+                                "Vyska": None,
+                                "Vaha": None,
+                                "Systolický krvný tlak": None,
+                                "Diastolický krvný tlak": None,
+                                "Hladina cukru": None,
+                                "Cholesterol": None,
+                                "Tep": None,
+                                "EKG": None,
+                                "Bolesť v hrudi": None
+                                }
+
+                if len(self.database_output_table1) == 0 or len(self.database_output_table2) == 0:
+                    self.anotherWindow.fuzzification_result.setText(
+                        "Chybajuce data! Zadaj")
+                    self.anotherWindow.fuzzification_result.setAlignment(
+                        QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+                    # set color to fuzzification_result to red
+                    self.anotherWindow.fuzzification_result.setStyleSheet(
+                        "color: red;")
+                    return
+                for i, record in enumerate(self.database_output_table1[3:]):
+                    records_dict[list(records_dict.keys())[i]] = record
+
+                for i, record in enumerate(self.database_output_table2[0][2:]):
+                    records_dict[list(records_dict.keys())[i+4]] = record
+            else:
+                print(self.database_output_table1)
+                print(self.database_output_table2)
+                records_dict = {"Vek": None,
+                                "Pohlavie": None,
+                                "Vyska": None,
+                                "Vaha": None,
+                                "Systolický krvný tlak": None,
+                                "Diastolický krvný tlak": None,
+                                "Hladina cukru": None,
+                                "Cholesterol": None,
+                                "Tep": None,
+                                "EKG": None,
+                                "Bolesť v hrudi": None
+                                }
+
+                for i, record in enumerate(self.database_output_table1[3:]):
+                    records_dict[list(records_dict.keys())[i]] = record
+
+                for i, record in enumerate(self.database_output_table2[0][2:]):
+                    records_dict[list(records_dict.keys())[i+4]] = record
+
+                print("Actual treatement: ", records_dict)
+
+                for key, value in self.dict_marks.items():
+                    if value.text() != '':
+                        records_dict[key.label] = value.text()
+                        for i, record in enumerate(self.database_output_table1[3:]):
+                            if records_dict[list(records_dict.keys())[i]] != record:
+                                array = list(self.database_output_table1)
+                                array[3+i] = value.text()
+                                self.database_output_table1 = tuple(array)
+
+                        for i, record in enumerate(self.database_output_table2[0][2:]):
+                            if records_dict[list(records_dict.keys())[i+4]] != record:
+                                array = list(self.database_output_table2[0])
+                                array[2+i] = value.text()
+                                self.database_output_table2[0] = tuple(array)
+            dict_values_patient['id'] = self.database_output_table1[0]
+            dict_values_patient['name'] = self.database_output_table1[1]
+            dict_values_patient['surname'] = self.database_output_table1[2]
+            dict_values_patient['age'] = self.database_output_table1[3]
+            dict_values_patient['sex'] = self.database_output_table1[4]
+            dict_values_patient['height'] = self.database_output_table1[5]
+            dict_values_patient['weight'] = self.database_output_table1[6]
+
+            dict_values_problem['id'] = self.database_output_table2[0][0]
+            dict_values_problem['pacient_id'] = self.database_output_table2[0][1]
+            dict_values_problem['systolic_blood_pressure'] = self.database_output_table2[0][2]
+            dict_values_problem['diastolic_blood_pressure'] = self.database_output_table2[0][3]
+            dict_values_problem['blood_sugar'] = self.database_output_table2[0][4]
+            dict_values_problem['cholesterol'] = self.database_output_table2[0][5]
+            dict_values_problem['heart_rate'] = self.database_output_table2[0][6]
+            dict_values_problem['ekg'] = self.database_output_table2[0][7]
+            dict_values_problem['chest_pain'] = self.database_output_table2[0][8]
+
+            print(dict_values_patient)
+            print(dict_values_problem)
+            connect(0, 1, dict_values_patient,
+                    dict_values_problem)
+            # iterate through places labels in the net and update the values from records dict if the place label is the same as the key then leave the value from dict if not then set the value to None
+            places = [place.label for place in self.net.getPlaces()]
+            for key, record in records_dict.items():
+                for i, place in enumerate(places):
+                    if place == key:
+                        records_dict[key] = record
+                        break
+                    else:
+                        records_dict[key] = None
+
+            Fuzzyfication.get_final_result_fuzzy(records_dict)
+            print("Fuzzyficated values:", records_dict)
+
+        if self.logical_flag:
+            records_dict = {"Uziva ivabradin": None,
+                            "Uziva vericiguat": None,
+                            "sTK": None,
+                            "GFR": None,
+                            "fibrilacia predsieni": None,
+                            "symptomaticka bradykardia": None,
+                            "vek": None,
+                            "sf": None,
+                            "LBBB": None,
+                            "QRS": None,
+                            "symptomaticka hypotenzia": None,
+                            "Uziva gliflozin": None,
+                            "Max davka": None,
+                            "K+": None,
+                            "TEP": None,
+                            "CHOCHP": None,
+                            "AV blok": None,
+                            "Kreatinin": None,
+                            "Nebivolol": None,
+                            "Uziva digoxin": None,
+                            "eGRF": None,
+                            "SBP": None,
+                            "HR": None,
+                            "Zvysenie NTproBNP": None,
+                            "NYHA-II-III": None
+                            }
+
+            print(records_dict)
+            for key, value in self.dict_marks.items():
+                if value.text() != '':
+                    records_dict[key.label] = value.text()
+            print(records_dict)
+            # iterate through places labels in the net and update the values from records dict if the place label is the same as the key then leave the value from dict if not then set the value to None
+            places = [place.label for place in self.net.getPlaces()]
+            for key, record in records_dict.items():
+                for i, place in enumerate(places):
+                    if place == key:
+                        records_dict[key] = record
+                        break
+                    else:
+                        records_dict[key] = None
+
+            print(records_dict)
+            Fuzzyfication.get_final_result_logical(records_dict)
+            print(records_dict)
 
         self.fuzzyficated_M0 = [0 for _ in range(len(self.dict_places))]
         # iterate through places labels in the net and update the values from records dict
@@ -555,7 +675,7 @@ class MainAplication(QMainWindow):
             placeLabel.setStyleSheet("color: green;")
             entry = QtWidgets.QLineEdit()
             entry.setMaximumWidth(50)
-            entry.setValidator(QtGui.QRegularExpressionValidator(validator))
+            # entry.setValidator(QtGui.QRegularExpressionValidator(validator))
             entry.setStyleSheet("color: white;")
             self.list_edit_widgets.append(entry)
             # self.list_edit_widgets.append(placeLabel)
@@ -1487,7 +1607,7 @@ class MainAplication(QMainWindow):
             Wk = []
             for i in range(len(Wo)):
                 Wk.append(int(max(Wo[i], almost_result[i])))
-           #Wk = [int((outputMatrix @ Uo)[i] or Wo[i]) for i in range(len(Wo))]
+           # Wk = [int((outputMatrix @ Uo)[i] or Wo[i]) for i in range(len(Wo))]
             changed_places = []
             for num in range(len(Wo)):
                 if Wk[num] != Wo[num]:
@@ -1563,7 +1683,7 @@ class MainAplication(QMainWindow):
             Wk = []
             for i in range(len(Wo)):
                 Wk.append(int(max(Wo[i], almost_result[i])))
-            #Wk = [int(Wo[i] or (outputMatrix @ Uo)[i]) for i in range(len(Wo))]
+            # Wk = [int(Wo[i] or (outputMatrix @ Uo)[i]) for i in range(len(Wo))]
             changed_places = []
             for num in range(len(Wo)):
                 if Wk[num] != Wo[num]:
@@ -1664,29 +1784,76 @@ class MainAplication(QMainWindow):
         self.transitions_to_change[self.image_number] = "END"
 
     def defuzzyfication_decision(self, result):
-        if 0.0 <= result <= 0.25:
-            self.main_layout.defuzzyfication_label.setText(
-                str(result) + " - Very low")
-            self.main_layout.defuzzyfication_label.setStyleSheet(
-                "color: green;")
-        elif 0.25 < result <= 0.45:
-            self.main_layout.defuzzyfication_label.setText(
-                str(result) + " - Low")
-            self.main_layout.defuzzyfication_label.setStyleSheet(
-                "color: yellow;")
-        elif 0.45 < result <= 0.65:
-            self.main_layout.defuzzyfication_label.setText(
-                str(result) + " - High")
-            self.main_layout.defuzzyfication_label.setStyleSheet(
-                "color: orange;")
-        elif 0.65 < result <= 0.85:
-            self.main_layout.defuzzyfication_label.setText(
-                str(result) + " - Very high")
-            self.main_layout.defuzzyfication_label.setStyleSheet("color: red;")
-        elif 0.85 < result <= 1.0:
-            self.main_layout.defuzzyfication_label.setText(
-                str(result) + " - Critical")
-            self.main_layout.defuzzyfication_label.setStyleSheet("color: red;")
+        if self.logical_flag:
+            for place in self.net.getPlaces():
+                if place.label == "Uziva vericiguat":
+                    if place.tokens == 0.5:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(result) + " - Začať s terapiou")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: orange;")
+                    if int(result) == 0:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(result) + " - Nezačať s terapiou")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: green;")
+                    if result != 0 and place.tokens != 0.5:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(result) + " - Vysadiť alebo redukovať vericiguat")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: red;")
+                    break
+
+                if place.label == "Uziva ivabradin":
+                    if place.tokens == 0.5:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(result) + " - Začať s terapiou")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: orange;")
+                    if int(result) == 0:
+                        if place.label == "vek":
+                            self.main_layout.defuzzyfication_label.setText(
+                                str(result) + " - Začať s nižšou dávkou")
+                            self.main_layout.defuzzyfication_label.setStyleSheet(
+                                "color: green;")
+                        else:
+                            self.main_layout.defuzzyfication_label.setText(
+                                str(result) + " - Nezačať s terapiou")
+                            self.main_layout.defuzzyfication_label.setStyleSheet(
+                                "color: green;")
+
+                    if result != 0 and place.tokens != 0.5:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(result) + " - Vysadiť alebo redukovať ivabradin")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: red;")
+                    break
+        if self.fuzzy_flag or self.weights_flag or self.tresholds_flag:
+            if 0.0 <= result <= 0.25:
+                self.main_layout.defuzzyfication_label.setText(
+                    str(result) + " - Very low")
+                self.main_layout.defuzzyfication_label.setStyleSheet(
+                    "color: green;")
+            elif 0.25 < result <= 0.45:
+                self.main_layout.defuzzyfication_label.setText(
+                    str(result) + " - Low")
+                self.main_layout.defuzzyfication_label.setStyleSheet(
+                    "color: yellow;")
+            elif 0.45 < result <= 0.65:
+                self.main_layout.defuzzyfication_label.setText(
+                    str(result) + " - High")
+                self.main_layout.defuzzyfication_label.setStyleSheet(
+                    "color: orange;")
+            elif 0.65 < result <= 0.85:
+                self.main_layout.defuzzyfication_label.setText(
+                    str(result) + " - Very high")
+                self.main_layout.defuzzyfication_label.setStyleSheet(
+                    "color: red;")
+            elif 0.85 < result <= 1.0:
+                self.main_layout.defuzzyfication_label.setText(
+                    str(result) + " - Critical")
+                self.main_layout.defuzzyfication_label.setStyleSheet(
+                    "color: red;")
 
         self.main_layout.defuzzyfication_label.adjustSize()
 
@@ -2367,9 +2534,9 @@ if __name__ == '__main__':
             print("Bolest hrudnika")
             dict_values_problem["chest_pain"] = input()
         result, result1, result2 = connect(
-            1, dict_values_patient, dict_values_problem)
+            1, 0, dict_values_patient, dict_values_problem)
     else:
-        result, result1, result2 = connect(0, None, None)
+        result, result1, result2 = connect(0, 0, None, None)
     app = QApplication(sys.argv)
     dialog = DialogWindow()
     dialog.database_output_table1 = result

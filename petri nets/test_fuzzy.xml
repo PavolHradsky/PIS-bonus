@@ -1,4 +1,3 @@
-<?xml version='1.0' encoding='UTF-8'?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>new_model</id>
 	<initials>NEW</initials>
@@ -17,7 +16,7 @@
 		<id>p1</id>
 		<x>580</x>
 		<y>140</y>
-		<label>Uziva vericiguat</label>
+		<label>Vek</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -25,7 +24,7 @@
 		<id>p2</id>
 		<x>580</x>
 		<y>300</y>
-		<label>GFR</label>
+		<label>Vaha</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

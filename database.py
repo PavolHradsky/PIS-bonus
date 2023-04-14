@@ -2,7 +2,7 @@ import psycopg2
 import bcrypt
 
 
-def connect(add, dict_values_patient, dict_values_problems):
+def connect(add, update, dict_values_patient, dict_values_problems):
     """ Connect to the PostgreSQL database server """
     conn = psycopg2.connect(
         host="localhost",
@@ -76,6 +76,22 @@ def connect(add, dict_values_patient, dict_values_problems):
                     chest_pain=dict_values_problems['chest_pain']
                 )
                 cur.execute(insert_liecba)
+        if update:
+            # % loop through the dictionary and update multiple columns
+            for key, value in dict_values_patient.items():
+                update_patient = """UPDATE pacient SET {key}='{value}' WHERE id={id}""".format(
+                    key=key,
+                    value=value,
+                    id=dict_values_patient['id']
+                )
+                cur.execute(update_patient)
+            for key, value in dict_values_problems.items():
+                update_liecba = """UPDATE liecba SET {key}='{value}' WHERE id={id}""".format(
+                    key=key,
+                    value=value,
+                    id=dict_values_problems['id']
+                )
+                cur.execute(update_liecba)
 
         # insert_patient = """INSERT INTO pacient (name, surname, age, sex, height, weight)
         #          VALUES ('Adam', 'Sivy', '35', 'M', '180', '80')"""
@@ -101,8 +117,8 @@ def connect(add, dict_values_patient, dict_values_problems):
         salt_str = salt.decode('utf-8')
         hashed_with_salt = f"{hashed_str}+++{salt_str}"
         """
-        #sql3 = """INSERT INTO hesla (password) VALUES (%s)"""
-        #cur.execute(sql3, (hashed_with_salt,))
+        # sql3 = """INSERT INTO hesla (password) VALUES (%s)"""
+        # cur.execute(sql3, (hashed_with_salt,))
         sql_select = """SELECT * FROM pacient"""
         sql_select2 = """SELECT * FROM liecba"""
         sql_select3 = """SELECT * FROM hesla"""
