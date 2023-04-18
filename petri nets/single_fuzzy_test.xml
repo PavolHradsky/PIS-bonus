@@ -15,15 +15,7 @@
 	<place>
 		<id>p1</id>
 		<x>580</x>
-		<y>140</y>
-		<label>Systolicky krvny tlak</label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>p2</id>
-		<x>580</x>
-		<y>300</y>
+		<y>220</y>
 		<label>Hladina cukru</label>
 		<tokens>0</tokens>
 		<static>false</static>
@@ -40,13 +32,6 @@
 		<id>a1</id>
 		<type>regular</type>
 		<sourceId>p1</sourceId>
-		<destinationId>t1</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a2</id>
-		<type>regular</type>
-		<sourceId>p2</sourceId>
 		<destinationId>t1</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>

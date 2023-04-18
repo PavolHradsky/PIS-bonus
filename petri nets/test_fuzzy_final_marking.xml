@@ -12,21 +12,21 @@
 		<x>780</x>
 		<y>220</y>
 		<label>treatement</label>
-	</transition>
+	<weight>0.2</weight></transition>
 	<place>
 		<id>p1</id>
 		<x>580</x>
 		<y>140</y>
-		<label>Vek</label>
-		<tokens>0.03</tokens>
+		<label>Systolicky krvny tlak</label>
+		<tokens>0.27</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p2</id>
 		<x>580</x>
 		<y>300</y>
-		<label>Vaha</label>
-		<tokens>0.0</tokens>
+		<label>Hladina cukru</label>
+		<tokens>0.5</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -34,7 +34,7 @@
 		<x>980</x>
 		<y>220</y>
 		<label>result</label>
-		<tokens>0.0</tokens>
+		<tokens>0.2</tokens>
 		<static>false</static>
 	</place>
 	<arc>

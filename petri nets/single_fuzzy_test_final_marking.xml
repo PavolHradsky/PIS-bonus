@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>new_model</id>
 	<initials>NEW</initials>
@@ -15,17 +16,9 @@
 	<place>
 		<id>p1</id>
 		<x>580</x>
-		<y>140</y>
-		<label>Systolicky krvny tlak</label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>p2</id>
-		<x>580</x>
-		<y>300</y>
+		<y>220</y>
 		<label>Hladina cukru</label>
-		<tokens>0</tokens>
+		<tokens>0.61</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -33,20 +26,13 @@
 		<x>980</x>
 		<y>220</y>
 		<label>result</label>
-		<tokens>0</tokens>
+		<tokens>0.61</tokens>
 		<static>false</static>
 	</place>
 	<arc>
 		<id>a1</id>
 		<type>regular</type>
 		<sourceId>p1</sourceId>
-		<destinationId>t1</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a2</id>
-		<type>regular</type>
-		<sourceId>p2</sourceId>
 		<destinationId>t1</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>

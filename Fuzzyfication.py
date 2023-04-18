@@ -112,7 +112,7 @@ class ST_BloodPressure:
                 bp = (100 + 120)/2
             elif bp == 'high':
                 bp = (120 + random.randint(120, 140))/2
-            elif bp == 'very heigh':
+            elif bp == 'very high':
                 bp = (140 + 170)/2
         plot_sigmoid_fuzzy_value(
             0, 170, bp, 120, 10, "Systolic Blood Pressure")
@@ -257,24 +257,19 @@ class ChestPain:
             elif chest_pain == 'asymptomatic':
                 chest_pain = random.uniform(0.66, 1)
         plot_trapezoid_fuzzy_value(
-            0, 2, chest_pain, 0, 1, 2, 2.01, "Bolest v hrudnej kosti")
+            0, 2, chest_pain, 0, 1, 2, 2.01, "Bolest v hrudi")
         return obtain_trapezoid_fuzzy_value(chest_pain, [0, 1, 2, 2.01])
 
 
 class VericiguatTherapy:
 
     def __init__(self):
-        self.fuzzy_ranges = {
-            "false": [0, 0, 0.5, 0.5],
-            "true": [0.5, 0.5, 1, 1],
-        }
+        pass
 
     def calc_fuzzy(self, uziva_vericiguat, stk=None, gfr=None, symptomaticka_hypotenzia=None):
 
-        if stk is not None and (isinstance(stk, int) or isinstance(stk, float)):
-            stk = min(100, max(0, stk))
-        if gfr is not None and (isinstance(gfr, int) or isinstance(gfr, float)):
-            gfr = min(100, max(0, gfr))
+        if uziva_vericiguat == '0' or uziva_vericiguat == '1':
+            uziva_vericiguat = int(uziva_vericiguat)
 
         if uziva_vericiguat == "true":
             uziva_vericiguat = 1
@@ -282,158 +277,91 @@ class VericiguatTherapy:
             uziva_vericiguat = 0
 
         if symptomaticka_hypotenzia == "true":
-            symptomaticka_hypotenzia = 1.0
+            symptomaticka_hypotenzia = 1
         elif symptomaticka_hypotenzia == "false":
-            symptomaticka_hypotenzia = 0.0
-
-        if stk is not None:
-            plot_trapezoid_fuzzy_value(
-                0, 100, stk, 0, 10, 20, 100, "sTK")
-        if gfr is not None:
-            plot_trapezoid_fuzzy_value(
-                0, 100, gfr, 0, 15, 25, 100, "GFR")
-        if symptomaticka_hypotenzia is not None:
-            plot_triangular_fuzzy_value(
-                0, 1.0, symptomaticka_hypotenzia, 0, 1, 1, "Symptomaticka hypotenzia")
+            symptomaticka_hypotenzia = 0
 
         if uziva_vericiguat == 0 and stk is not None and stk < 100:
             print("uziva_vericiguat == 0 and stk is not None and stk < 100")
-            return uziva_vericiguat, round(obtain_trapezoid_fuzzy_value(stk, [0, 10, 20, 100]), 2)
+            return uziva_vericiguat, 0
         elif uziva_vericiguat == 0 and gfr is not None and gfr < 15:
             print("uziva_vericiguat == 0 and gfr is not None and gfr < 15")
-
-            return uziva_vericiguat, round(obtain_trapezoid_fuzzy_value(gfr, [0, 15, 20, 100]), 2)
+            return uziva_vericiguat, 1
         elif uziva_vericiguat == 1 and stk is not None and stk < 90:
             print("uziva_vericiguat == 1 and stk is not None and stk < 90")
-            return uziva_vericiguat, round(obtain_trapezoid_fuzzy_value(stk, [0, 10, 20, 100]), 2)
+            return uziva_vericiguat, 1
         elif uziva_vericiguat == 1 and gfr is not None and gfr < 15:
             print("uziva_vericiguat == 1 and gfr is not None and gfr < 15")
-            return uziva_vericiguat, round(obtain_trapezoid_fuzzy_value(gfr, [0, 15, 20, 100]), 2)
+            return uziva_vericiguat, 1
         elif uziva_vericiguat == 1 and symptomaticka_hypotenzia == 1:
             print("uziva_vericiguat == 1 and symptomaticka_hypotenzia == 1")
-            return uziva_vericiguat, round(obtain_triangular_fuzzy_value(symptomaticka_hypotenzia, [0, 1.01, 1.01]), 2)
+            return uziva_vericiguat, 1
         elif uziva_vericiguat == 0 and stk is None and gfr is None and symptomaticka_hypotenzia is None:
-            print("uziva_vericiguat == 0")
-            uziva_vericiguat = 0.5
-            return uziva_vericiguat
+            return 0
         else:
-            print("Nespravna hodnota")
-            return -1
+            print("neexistujuce pravidlo")
 
 
 class IvabradineTherapy:
 
     def __init__(self):
-        self.fuzzy_ranges = {
-            "false": [0, 0, 0.5, 0.5],
-            "true": [0.5, 0.5, 1, 1],
-        }
+        pass
 
     def calc_fuzzy(self, uziva_ivabradin, fibrilacia_predsieni=None, sf=None, vek=None, symptomaticka_bradykardia=None, gfr=None):
 
-        if vek is not None and (isinstance(vek, int) or isinstance(vek, float)):
-            vek = min(120, max(0, vek))
-        if sf is not None and (isinstance(sf, int) or isinstance(sf, float)):
-            sf = min(100, max(0, sf))
-        if gfr is not None and (isinstance(gfr, int) or isinstance(gfr, float)):
-            gfr = min(100, max(0, gfr))
+        if uziva_ivabradin == '0' or uziva_ivabradin == '1':
+            uziva_ivabradin = int(uziva_ivabradin)
 
         if uziva_ivabradin == "true":
-            uziva_ivabradin = 1.0
+            uziva_ivabradin = 1
         elif uziva_ivabradin == "false":
-            uziva_ivabradin = 0.0
+            uziva_ivabradin = 0
 
         if fibrilacia_predsieni == "true":
-            fibrilacia_predsieni = 1.0
+            fibrilacia_predsieni = 1
         elif fibrilacia_predsieni == "false":
-            fibrilacia_predsieni = 0.0
+            fibrilacia_predsieni = 0
 
         if symptomaticka_bradykardia == "true":
-            symptomaticka_bradykardia = 1.0
+            symptomaticka_bradykardia = 1
         elif symptomaticka_bradykardia == "false":
-            symptomaticka_bradykardia = 0.0
-
-        if vek is not None:
-            plot_trapezoid_fuzzy_value(
-                0, 120, vek, 0, 60, 75, 120, "Vek")
-        if sf is not None:
-            plot_trapezoid_fuzzy_value(
-                0, 100, sf, 0, 25, 35, 100, "SF")
-        if gfr is not None:
-            plot_trapezoid_fuzzy_value(
-                0, 100, gfr, 0, 15, 20, 100, "GFR")
-        if symptomaticka_bradykardia is not None:
-            plot_triangular_fuzzy_value(
-                0, 1.0, symptomaticka_bradykardia, 0, 1, 1, "Symptomaticka bradykardia")
-        if fibrilacia_predsieni is not None:
-            plot_triangular_fuzzy_value(
-                0, 1.0, fibrilacia_predsieni, 0, 1, 1, "Fibrilacia predsieni")
+            symptomaticka_bradykardia = 0
 
         if uziva_ivabradin == 0 and gfr is not None and gfr < 15:
             print("uziva_ivabradin == 0 and gfr is not None and gfr < 15")
-            return uziva_ivabradin, round(obtain_trapezoid_fuzzy_value(gfr, [0, 15, 20, 100]), 2)
+            return uziva_ivabradin, 0
         elif uziva_ivabradin == 0 and fibrilacia_predsieni is not None and fibrilacia_predsieni == 1:
             print("uziva_ivabradin == 0 and fibrilacia_predsieni == 1")
-            return uziva_ivabradin, round(obtain_triangular_fuzzy_value(fibrilacia_predsieni, [0, 1.01, 1.01]), 2)
+            return uziva_ivabradin, 0
         elif uziva_ivabradin == 0 and vek is not None and vek > 75:
             print("uziva_ivabradin == 0 and vek is not None and vek > 75")
-            return uziva_ivabradin, round(obtain_trapezoid_fuzzy_value(vek, [0, 60, 75, 120]), 2)
+            return uziva_ivabradin, 1
         elif uziva_ivabradin == 0 and gfr is None and fibrilacia_predsieni is None and vek is None and sf is None and symptomaticka_bradykardia is None:
             print("uziva_ivabradin == 0")
-            uziva_ivabradin = 0.5
             return uziva_ivabradin
         elif uziva_ivabradin == 1 and sf is not None and sf < 50:
             print("uziva_ivabradin == 1 and sf is not None and sf < 50")
-            return uziva_ivabradin, round(obtain_trapezoid_fuzzy_value(sf, [0, 25, 35, 100]), 2)
+            return uziva_ivabradin, 1
         elif uziva_ivabradin == 1 and symptomaticka_bradykardia == 1:
             print("uziva_ivabradin == 1 and symptomaticka_bradykardia == 1")
-            return uziva_ivabradin, round(obtain_triangular_fuzzy_value(symptomaticka_bradykardia, [0, 1.01, 1.01]), 2)
+            return uziva_ivabradin, 1
         else:
             print("neexistujuce pravidlo")
-            return None, None
-
-
-"""
-print(IvabradineTherapy().calc_fuzzy("false", gfr=10))
-print(IvabradineTherapy().calc_fuzzy("true", None, None, None, "true", None))
-print(IvabradineTherapy().calc_fuzzy("true", None, None, None, "false", None))
-print(IvabradineTherapy().calc_fuzzy("false", None, None, None, None, 10))
-print(IvabradineTherapy().calc_fuzzy("false", None, None, None, None, 20))
-print(IvabradineTherapy().calc_fuzzy("false", "true", None, None, None, None))
-print(IvabradineTherapy().calc_fuzzy("false", "false", None, None, None, None))
-print(IvabradineTherapy().calc_fuzzy("false", None, 50, None, None, None))
-print(IvabradineTherapy().calc_fuzzy("true", None, 40, None, None, None))
-print(IvabradineTherapy().calc_fuzzy("false", None, None, 80, None, None))
-print(IvabradineTherapy().calc_fuzzy("false", None, None, 70, None, None))
-"""
-
-"""
-if Uziva digoxin is false AND Pomaly rytmus is true THEN "Nezačať s terapiou."
-if Uziva digoxin is false AND AV vlok is II, III THEN "Nezačať s terapiou."
-if Uziva digoxin is true AND Pomaly rytmus is true THEN "Vysadiť alebo redukovať digoxin."
-if Uziva digoxin is true AND AV Vlok is II, III THEN "Vysadiť alebo redukovať digoxin."
-if Uziva digoxin is true AND Hodnota digoxinu v krvi > 1.05  THEN "Vysadiť alebo redukovať digoxin."
-if Hodnota digoxinu v krvi is [0,64..1,05] THEN "Pokračovať v aktuálnej terapii."
-if Hodnota digoxinu v krvi < 0.64 THEN "Pridať digoxin."
-"""
 
 
 class DigoxinTherapy:
     def __init__(self):
-        self.fuzzy_ranges = {
-            "false": [0, 0, 0.5, 0.5],
-            "true": [0.5, 0.5, 1, 1],
-        }
+        pass
 
     def calc_fuzzy(self, uziva_digoxin, pomaly_rytmus=None, av_blok=None, hodnota_digoxinu=None):
-
-        if hodnota_digoxinu is not None and (isinstance(hodnota_digoxinu, int) or isinstance(hodnota_digoxinu, float)):
-            hodnota_digoxinu = float(hodnota_digoxinu)
 
         if av_blok is not None and av_blok == "II" or av_blok == "III":
             av_blok = 1
         else:
             av_blok = 0
+
+        if uziva_digoxin == '0' or uziva_digoxin == '1':
+            uziva_digoxin = int(uziva_digoxin)
 
         if uziva_digoxin == "true":
             uziva_digoxin = 1
@@ -447,78 +375,21 @@ class DigoxinTherapy:
 
         if uziva_digoxin == 0 and pomaly_rytmus is not None and pomaly_rytmus == 1:
             print("uziva_digoxin == 0 and pomaly_rytmus == 1")
-            return uziva_digoxin, round(obtain_triangular_fuzzy_value(pomaly_rytmus, [0, 1.01, 1.01]), 2)
+            return uziva_digoxin, pomaly_rytmus
         elif uziva_digoxin == 0 and av_blok is not None and av_blok == 1:
             print("uziva_digoxin == 0 and av_blok == 1")
-            return uziva_digoxin, round(obtain_triangular_fuzzy_value(av_blok, [0, 1.01, 1.01]), 2)
+            return uziva_digoxin, av_blok
         elif uziva_digoxin == 1 and pomaly_rytmus is not None and pomaly_rytmus == 1:
             print("uziva_digoxin == 1 and pomaly_rytmus == 1")
-            return uziva_digoxin, round(obtain_triangular_fuzzy_value(pomaly_rytmus, [0, 1.01, 1.01]), 2)
+            return uziva_digoxin, pomaly_rytmus
         elif uziva_digoxin == 1 and av_blok is not None and av_blok == 1:
             print("uziva_digoxin == 1 and av_blok == 1")
-            return uziva_digoxin, round(obtain_triangular_fuzzy_value(av_blok, [0, 1.01, 1.01]), 2)
+            return uziva_digoxin,  av_blok
         elif uziva_digoxin == 1 and hodnota_digoxinu is not None and hodnota_digoxinu > 1.05:
             print("uziva_digoxin == 1 and hodnota_digoxinu > 1.05")
-            return uziva_digoxin, round(obtain_triangular_fuzzy_value(hodnota_digoxinu, [0, 1.01, 1.01]), 2)
-        elif uziva_digoxin == 1 and hodnota_digoxinu is not None and hodnota_digoxinu < 0.64:
-            print("uziva_digoxin == 1 and hodnota_digoxinu < 0.64")
-            return uziva_digoxin, round(obtain_triangular_fuzzy_value(hodnota_digoxinu, [0, 1.01, 1.01]), 2)
-        elif uziva_digoxin == 1 and hodnota_digoxinu is not None and hodnota_digoxinu >= 0.64 and hodnota_digoxinu <= 1.05:
-            print(
-                "uziva_digoxin == 1 and hodnota_digoxinu >= 0.64 and hodnota_digoxinu <= 1.05")
-            return uziva_digoxin, round(obtain_triangular_fuzzy_value(hodnota_digoxinu, [0, 1.01, 1.01]), 2)
+            return uziva_digoxin,  1
         else:
             print("neexistuje pravidlo")
-            return -1
-
-
-"""
-print(DigoxinTherapy().calc_fuzzy("true", "true", "II", 1.07))
-print(DigoxinTherapy().calc_fuzzy("true", "false", "IV", 0.0))
-"""
-"""
-
-if LBBB is true AND QRS is >=150 THEN "Doporučene zavedenie CRT"
-if LBBB is true AND QRS is [130,..,149] THEN "Malo by byt zvazene zavedenie CRT"
-if LBBB is false AND QRS >= 150 THEN "Malo by byt zvazene zavedenie CRT"
-if LBBB is false AND QRS is [130,..,149] THEN "Môže byt zvazene zavedenie CRT"
-
-
-"""
-
-
-class LbbbTherapy:
-    def __init__(self):
-        self.fuzzy_ranges = {
-            "false": [0, 0, 0.5, 0.5],
-            "true": [0.5, 0.5, 1, 1],
-        }
-
-    def calc_fuzzy(self, lbbb, qrs):
-        if lbbb == "true":
-            lbbb = 1
-        elif lbbb == "false":
-            lbbb = 0
-
-        if qrs is not None and (isinstance(qrs, int) or isinstance(qrs, float)):
-            qrs = float(qrs)
-
-        if lbbb == 1 and qrs >= 150:
-            return lbbb, round(obtain_triangular_fuzzy_value(qrs, [0, 200.1, 300.0]), 2)
-        elif lbbb == 1 and qrs >= 130 and qrs <= 149:
-            return lbbb, round(obtain_triangular_fuzzy_value(qrs, [0, 130.0, 150.1]), 2)
-        elif lbbb == 0 and qrs >= 150:
-            return lbbb, round(obtain_triangular_fuzzy_value(qrs, [0, 150.1, 400.0]), 2)
-        elif lbbb == 0 and qrs >= 130 and qrs <= 149:
-            return lbbb, round(obtain_triangular_fuzzy_value(qrs, [0, 130.0, 149.0]), 2)
-        else:
-            return -1
-
-
-print(LbbbTherapy().calc_fuzzy("true", 150))
-print(LbbbTherapy().calc_fuzzy("true", 149))
-print(LbbbTherapy().calc_fuzzy("false", 165))
-print(LbbbTherapy().calc_fuzzy("false", 130))
 
 
 def get_final_result_fuzzy(data):
@@ -535,17 +406,17 @@ def get_final_result_fuzzy(data):
     ekg_class = EKG()
     chest_pain_class = ChestPain()
 
-    age_value = data['Vek']
-    sex_value = data['Pohlavie']
-    height_value = data['Vyska']
-    weight_value = data['Vaha']
-    st_bp_value = data['Systolický krvný tlak']
-    dt_bp_value = data['Diastolický krvný tlak']
-    sugar_value = data['Hladina cukru']
-    cholesterol_value = data['Cholesterol']
-    heart_rate_value = data['Tep']
-    ekg_value = data['EKG']
-    chest_pain_value = data['Bolesť v hrudi']
+    age_value = data['Vek'] if 'Vek' in data else None
+    sex_value = data['Pohlavie'] if 'Pohlavie' in data else None
+    height_value = data['Vyska'] if 'Vyska' in data else None
+    weight_value = data['Vaha'] if 'Vaha' in data else None
+    st_bp_value = data['Systolicky krvny tlak'] if 'Systolicky krvny tlak' in data else None
+    dt_bp_value = data['Diastolicky krvny tlak'] if 'Diastolicky krvny tlak' in data else None
+    sugar_value = data['Hladina cukru'] if 'Hladina cukru' in data else None
+    cholesterol_value = data['Cholesterol'] if 'Cholesterol' in data else None
+    heart_rate_value = data['Tep'] if 'Tep' in data else None
+    ekg_value = data['EKG'] if 'EKG' in data else None
+    chest_pain_value = data['Bolest v hrudi'] if 'Bolest v hrudi' in data else None
     age, sex, height, weight, st_bp, dt_bp, sugar, cholesterol, heart_rate, ekg, chest_pain = None, None, None, None, None, None, None, None, None, None, None
 
     # check if data has string value instad of number
@@ -574,13 +445,13 @@ def get_final_result_fuzzy(data):
             weight = round(weight_class.calc_fuzzy(float(weight_value)), 2)
 
     if st_bp_value is not None:
-        if isinstance(st_bp_value, str) and (st_bp_value == 'low' or st_bp_value == 'medium' or st_bp_value == 'high'):
+        if isinstance(st_bp_value, str) and (st_bp_value == 'low' or st_bp_value == 'medium' or st_bp_value == 'high' or st_bp_value == 'very high'):
             st_bp = round(st_bp_class.calc_fuzzy(st_bp_value), 2)
         else:
             st_bp = round(st_bp_class.calc_fuzzy(int(st_bp_value)), 2)
 
     if dt_bp_value is not None:
-        if isinstance(dt_bp_value, str) and (dt_bp_value == 'low' or dt_bp_value == 'medium' or dt_bp_value == 'high'):
+        if isinstance(dt_bp_value, str) and (dt_bp_value == 'low' or dt_bp_value == 'medium' or dt_bp_value == 'high' or dt_bp_value == 'very high'):
             dt_bp = round(dt_bp_class.calc_fuzzy(dt_bp_value), 2)
         else:
             dt_bp = round(dt_bp_class.calc_fuzzy(int(dt_bp_value)), 2)
@@ -622,33 +493,403 @@ def get_final_result_fuzzy(data):
 
     # if all of these  age, sex, height, weight, st_bp, dt_bp, sugar, cholesterol, heart_rate, ekg, chest_pain are None then return None
     if age is None and sex is None and height is None and weight is None and st_bp is None and dt_bp is None and sugar is None and cholesterol is None and heart_rate is None and ekg is None and chest_pain is None:
-        print("V petri sieti sa nenachadza ziadna z hodnot")
+        print("V petri sieti sa nenachadza ziadna nami riesenych premennych")
         return None
     else:
         data['Vek'] = age
         data['Pohlavie'] = sex
         data['Vyska'] = height
         data['Vaha'] = weight
-        data['Systolický krvný tlak'] = st_bp
-        data['Diastolický krvný tlak'] = dt_bp
+        data['Systolicky krvny tlak'] = st_bp
+        data['Diastolicky krvny tlak'] = dt_bp
         data['Hladina cukru'] = sugar
         data['Cholesterol'] = cholesterol
         data['Tep'] = heart_rate
         data['EKG'] = ekg
-        data['Bolesť v hrudi'] = chest_pain
+        data['Bolest v hrudi'] = chest_pain
 
 
-def get_final_result_logical(data):
+class LbbbTherapy:
+    def __init__(self):
+        pass
 
-    # check if data['uziva vericiguat'] key exists
+    def calc_fuzzy(self, lbbb, qrs, nyha):
+        if lbbb == "true":
+            lbbb = 1
+        elif lbbb == "false":
+            lbbb = 0
+        else:
+            print("Nespravny format hodnoty lbbb")
 
-    if 'Uziva vericiguat' in data:
-        if data['Uziva vericiguat'] == 'false' or data['Uziva vericiguat'] == 'true':
+        if nyha is not None and (isinstance(nyha, str)):
+            if nyha == "true":
+                nyha = 1
+            elif nyha == "false":
+                nyha = 0
+        else:
+            print("Nespravny format hodnoty nyha")
+
+        if qrs is not None and (isinstance(qrs, int) or isinstance(qrs, float)):
+            if qrs >= 150:
+                qrs = 1
+            elif qrs >= 130 and qrs <= 149:
+                qrs = 0
+        else:
+            print("Nespravny format hodnoty qrs")
+
+        if lbbb == 1 and qrs == 1 and nyha == 1:
+            return lbbb, qrs, nyha
+        elif lbbb == 1 and qrs == 0 and nyha == 1:
+            return lbbb, qrs, nyha
+        elif lbbb == 0 and qrs == 1 and nyha == 1:
+            return lbbb, qrs, nyha
+        elif lbbb == 0 and qrs == 0 and nyha == 1:
+            return lbbb, qrs, nyha
+        else:
+            print("Nezname pravidlo")
+            return None
+
+
+def get_final_result_logical(data, net):
+    keys_array = [key for key in data.keys()]
+    print(keys_array)
+    if 'LBBB' in keys_array:
+        if data['LBBB'] == 'false' or data['LBBB'] == 'true':
+            LBBB = data['LBBB']
+            qrs = int(data['QRS']) if 'QRS' in keys_array else None
+            nyha = data['NYHA-II-III'] if 'NYHA-II-III' in keys_array else None
+            if qrs is not None and nyha is not None:
+                value = LbbbTherapy().calc_fuzzy(LBBB, qrs, nyha)
+                data['QRS'] = value[1]
+                data['LBBB'] = value[0]
+                data['NYHA-II-III'] = value[2]
+            else:
+                print("Nezname pravidlo")
+        else:
+            print("Nespravny format hodnoty LBBB")
+
+    if 'NYHA-II-III' in keys_array:
+        if (data['NYHA-II-III'] == 'false' or data['NYHA-II-III'] == 'true') and 'LBBB' not in keys_array and 'QRS' not in keys_array:
+            data['NYHA-II-III'] = 1 if data['NYHA-II-III'] == 'true' else 0
+        else:
+            print("Nezname pravidlo")
+
+    if 'Uzivany gliflozin' in keys_array:
+        if (data['Uzivany gliflozin'] == 'false' or data['Uzivany gliflozin'] == 0) and 'GFR' in keys_array:
+            gfr = int(data['GFR'])
+            if data['Uzivany gliflozin'] == 'false':
+                data['Uzivany gliflozin'] = 0
+            if gfr < 20:
+                data['GFR'] = 0
+            elif gfr >= 20 and gfr <= 25:
+                data['GFR'] = 1
+            elif gfr > 25:
+                data['GFR'] = 1
+            else:
+                print("Nespravny format hodnoty gfr")
+        if (data['Uzivany gliflozin'] == 'false' or data['Uzivany gliflozin'] == '0') and 'sTK' in keys_array:
+            data['Uzivany gliflozin'] = 0
+            stk = int(data['sTK'])
+            if stk < 90:
+                data['sTK'] = 0
+            else:
+                print("Nespravny format hodnoty sTK")
+
+        if (data['Uzivany gliflozin'] == 'false' or data['Uzivany gliflozin'] == '0') and 'symptomaticka hypotenzia' in keys_array:
+            if data['Uzivany gliflozin'] == 'false':
+                data['Uzivany gliflozin'] = 0
+            if data['symptomaticka hypotenzia'] == 'true':
+                data['symptomaticka hypotenzia'] = 0
+            elif data['symptomaticka hypotenzia'] == 'false':
+                data['symptomaticka hypotenzia'] = 1
+            else:
+                print("Nespravny format hodnoty symptomaticka hypotenzia")
+
+        if (data['Uzivany gliflozin'] == 'dapa' or data['Uzivany gliflozin'] == 'empa') and 'GFR' in keys_array:
+            gfr = int(data['gfr'])
+            if gfr and (data['Uzivany gliflozin'] == 'dapa' or data['Uzivany gliflozin'] == 'empa'):
+                data['Uzivany gliflozin'] = 0
+                data['GFR'] = 0
+            elif gfr >= 20 and gfr <= 25 and data['Uzivany gliflozin'] == 'empa':
+                data['Uzivany gliflozin'] = 1
+                data['GFR'] = 1
+            elif gfr >= 20 and gfr <= 25 and data['Uzivany gliflozin'] == 'dapa':
+                data['Uzivany gliflozin'] = 0
+                data['GFR'] = 1
+            elif gfr > 25 and (data['Uzivany gliflozin'] == 'dapa' or data['Uzivany gliflozin'] == 'empa'):
+                data['Uzivany gliflozin'] = 1
+                data['GFR'] = 1
+            else:
+                print("Nespravny format hodnoty GFR")
+
+        if (data['Uzivany gliflozin'] == 'true' or data['Uzivany gliflozin'] == '1') and 'Max davka' in keys_array:
+            if data['Max davka'] == 'true':
+                data['Max davka'] = 1
+        else:
+            print("Nezname pravidlo")
+
+    if 'BB' in keys_array:
+        if (data['BB'] == 'false' or data['BB'] == '0') and 'TEP' in keys_array:
+
+            if data['BB'] == 'false':
+                data['BB'] = 0
+            if int(data['TEP']) < 50:
+                data['TEP'] = 0
+            else:
+                print("Nespravny format hodnoty TEP")
+        if (data['BB'] == 'false' or data['BB'] == '0') and 'sTK' in keys_array:
+            if data['BB'] == 'false':
+                data['BB'] = 0
+            if int(data['sTK']) < 90:
+                data['sTK'] = 0
+            else:
+                print("Nespravny format hodnoty sTK")
+        if (data['BB'] == 'false' or data['BB'] == '0') and 'CHOCHP' in keys_array:
+            if data['BB'] == 'false':
+                data['BB'] = 0
+            if data['CHOCHP'] == 'true':
+                data['CHOCHP'] = 0
+            elif data['CHOCHP'] == 'false':
+                data['CHOCHP'] = 1
+            else:
+                print("Nespravny format hodnoty CHOCHP")
+        if (data['BB'] == 'false' or data['BB'] == '0') and 'AV blok' in keys_array:
+            if data['BB'] == 'false':
+                data['BB'] = 0
+            if data['AV blok'] == 'true':
+                data['AV blok'] = 0
+            elif data['AV blok'] == 'false':
+                data['AV blok'] = 1
+            else:
+                print("Nespravny format hodnoty AV blok")
+        if (data['BB'] == 'false' or data['BB'] == '0') and 'Kreatinin' in keys_array:
+            if data['BB'] == 'false':
+                data['BB'] = 0
+            if int(data['Kreatinin']) > 250:
+                data['Kreatinin'] = 1
+            else:
+                print("Nespravny format hodnoty Kreatinin")
+
+        if (data['BB'] == 'true' or data['BB'] == '1') and 'TEP' in keys_array:
+            if data['BB'] == 'true':
+                data['BB'] = 1
+            if int(data['TEP']) < 50:
+                data['TEP'] = 0
+            else:
+                print("Nespravny format hodnoty TEP")
+        if (data['BB'] == 'true' or data['BB'] == '1') and "symptomaticka hypotenzia" in keys_array:
+            if data['BB'] == 'true':
+                data['BB'] = 1
+            if data["symptomaticka hypotenzia"] == 'true':
+                data["symptomaticka hypotenzia"] = 0
+            elif data["symptomaticka hypotenzia"] == 'false':
+                data["symptomaticka hypotenzia"] = 1
+            else:
+                print("Nespravny format hodnoty symptomaticka hypotenzia")
+
+        if (data['BB'] == 'true' or data['BB'] == '1') and 'Kreatinin' in keys_array and 'Nebivolol' in keys_array:
+            if data['BB'] == 'true':
+                data['BB'] = 1
+            if data["Nebivolol"] == 'true' and int(data['Kreatinin']) > 250:
+                data["Nebivolol"] = 1
+                data['Kreatinin'] = 1
+            else:
+                print("Nespravny format hodnoty Nebivolol")
+        if (data['BB'] == 'true' or data['BB'] == '1') and 'AV blok' in keys_array:
+            if data['BB'] == 'true':
+                data['BB'] = 1
+            if data['AV blok'] == 'true':
+                data['AV blok'] = 0
+            else:
+                print("Nespravny format hodnoty AV blok")
+        if (data['BB'] == 'true' or data['BB'] == '1') and 'Max davka' in keys_array:
+            if data['BB'] == 'true':
+                data['BB'] = 1
+            if data['Max davka'] == "true":
+                data['Max davka'] = 0
+            elif data['Max davka'] == "false":
+                data['Max davka'] = 1
+            else:
+                print("Nespravny format hodnoty Max davka")
+
+    if 'ARNI' in keys_array:
+        if (data['ARNI'] == 'false' or data['ARNI'] == '0') and 'GFR' in keys_array:
+            if data['ARNI'] == 'false':
+                data['ARNI'] = 0
+            if int(data['GFR']) < 30:
+                data['GFR'] = 0
+            if int(data['GFR']) > 30 and int(data['GFR']) < 60:
+                data['GFR'] = 1
+            else:
+                print("Nespravny format hodnoty GFR")
+        if (data['ARNI'] == 'false' or data['ARNI'] == '0') and 'sTK' in keys_array:
+            if data['ARNI'] == 'false':
+                data['ARNI'] = 0
+            if int(data['sTK']) < 90:
+                data['sTK'] = 0
+            if int(data['sTK']) > 90 and int(data['sTK']) < 110:
+                data['sTK'] = 1
+            else:
+                print("Nespravny format hodnoty sTK")
+        if (data['ARNI'] == 'false' or data['ARNI'] == '0') and 'K+' in keys_array:
+            if data['ARNI'] == 'false':
+                data['ARNI'] = 0
+            if int(data['K+']) > 5:
+                data['K+'] = 0
+            else:
+                print("Nespravny format hodnoty K+")
+        if (data['ARNI'] == 'false' or data['ARNI'] == '0') and "symptomaticka hypotenzia" in keys_array:
+            if data['ARNI'] == 'false':
+                data['ARNI'] = 0
+            if data["symptomaticka hypotenzia"] == 'true':
+                data["symptomaticka hypotenzia"] = 0
+            elif data["symptomaticka hypotenzia"] == 'false':
+                data["symptomaticka hypotenzia"] = 1
+            else:
+                print("Nespravny format hodnoty symptomaticka hypotenzia")
+        if (data['ARNI'] == 'true' or data['ARNI'] == '1') and 'GFR' in keys_array:
+            if data['ARNI'] == 'true':
+                data['ARNI'] = 1
+            if int(data['GFR']) < 30:
+                data['GFR'] = 1
+            else:
+                print("Nespravny format hodnoty gfr")
+        if (data['ARNI'] == 'true' or data['ARNI'] == '1') and "symptomaticka hypotenzia" in keys_array:
+            if data['ARNI'] == 'true':
+                data['ARNI'] = 1
+            if data["symptomaticka hypotenzia"] == 'true':
+                data["symptomaticka hypotenzia"] = 1
+            else:
+                print("Nespravny format hodnoty symptomaticka hypotenzia")
+        if (data['ARNI'] == 'true' or data['ARNI'] == '1') and 'K+' in keys_array:
+            if data['ARNI'] == 'true':
+                data['ARNI'] = 1
+            if float(data['K+']) > 5.5:
+                data['K+'] = 1
+            else:
+                print("Nespravny format hodnoty K+")
+        if (data['ARNI'] == 'true' or data['ARNI'] == '1') and 'Max davka' in keys_array:
+            if data['ARNI'] == 'true':
+                data['ARNI'] = 1
+            if data['Max davka'] == "true":
+                data['Max davka'] = 0
+            elif data['Max davka'] == "false":
+                data['Max davka'] = 1
+            else:
+                print("Nespravny format hodnoty Max davka")
+        else:
+            print("Neexitujuce pravidlo pre ARNI")
+
+    if 'ACEI' in keys_array:
+        if (data['ACEI'] == 'false' or data['ACEI'] == '0') and 'K+' in keys_array:
+            if data['ACEI'] == 'false':
+                data['ACEI'] = 0
+            if int(data['K+']) > 5:
+                data['K+'] = 0
+            else:
+                print("Nespravny format hodnoty K+")
+        elif (data['ACEI'] == 'false' or data['ACEI'] == '0') and 'sTK' in keys_array:
+            if data['ACEI'] == 'false':
+                data['ACEI'] = 0
+            if int(data['sTK']) < 90:
+                data['sTK'] = 0
+            else:
+                print("Nespravny format hodnoty sTK")
+        elif (data['ACEI'] == 'false' or data['ACEI'] == '0') and 'GFR' in keys_array:
+            if data['ACEI'] == 'false':
+                data['ACEI'] = 0
+            if int(data['GFR']) < 30:
+                data['GFR'] = 0
+            else:
+                print("Nespravny format hodnoty gfr")
+
+        elif (data['ACEI'] == 'true' or data['ACEI'] == '1') and 'K+' in keys_array:
+            if data['ACEI'] == 'true':
+                data['ACEI'] = 1
+            if float(data['K+']) > 5.5:
+                data['K+'] = 1
+            else:
+                print("Nespravny format hodnoty K+")
+        elif (data['ACEI'] == 'true' or data['ACEI'] == '1') and "symptomaticka hypotenzia" in keys_array:
+            if data['ACEI'] == 'true':
+                data['ACEI'] = 1
+            if data["symptomaticka hypotenzia"] == 'true':
+                data["symptomaticka hypotenzia"] = 1
+            else:
+                print("Nespravny format hodnoty symptomaticka hypotenzia")
+        elif (data['ACEI'] == 'true' or data['ACEI'] == '1') and 'GFR' in keys_array:
+            if data['ACEI'] == 'true':
+                data['ACEI'] = 1
+            if float(data['GFR']) < 20:
+                data['GFR'] = 1
+            else:
+                print("Nespravny format hodnoty GFR")
+        elif (data['ACEI'] == 'true' or data['ACEI'] == '1') and 'Max davka' in keys_array:
+            if data['ACEI'] == 'true':
+                data['ACEI'] = 1
+            if data['Max davka'] == "true":
+                data['Max davka'] = 0
+            elif data['Max davka'] == "false":
+                data['Max davka'] = 1
+            else:
+                print("Nespravny format hodnoty Max davka")
+        else:
+            print("Neexitujuce pravidlo pre ACEI")
+
+    if "MRA" in [place.label for place in net.getPlaces()]:
+
+        if 'Max davka' in keys_array and "K+" in keys_array:
+            k_value = float(data['K+'].replace(",", "."))
+            if data['Max davka'] == "false":
+                data['Max davka'] = 1
+            else:
+                print("Nespravny format hodnoty Max davka")
+            if k_value < 5:
+                data['K+'] = 1
+            else:
+                print("Nespravny format hodnoty K+")
+        if 'K+' in keys_array and "Max davka" not in keys_array:
+            k_value = float(data['K+'].replace(",", "."))
+            if k_value > 5 and k_value < 5.5:
+                data['K+'] = 0
+            if k_value > 6:
+                data['K+'] = 1
+            else:
+                print("Nespravny format hodnoty K+")
+        if 'K+' in keys_array and "Max davka" in keys_array and "GFR" not in keys_array:
+            k_value = float(data['K+'].replace(",", "."))
+            if data['Max davka'] == "false":
+                data['Max davka'] = 1
+            if k_value > 5.5 and k_value < 6:
+                data['K+'] = 1
+            else:
+                print("Nespravny format hodnoty K+")
+        if 'K+' not in keys_array and "Max davka" in keys_array and "GFR" in keys_array:
+            if float(data['GFR']) < 30:
+                data['GFR'] = 1
+            if data['Max davka'] == "false":
+                data['Max davka'] = 1
+            else:
+                print("Nespravny format hodnoty GFR")
+        if 'GFR' in keys_array and "Max davka" not in keys_array and "K+" not in keys_array:
+            if float(data['GFR']) < 20:
+                data['GFR'] = 1
+            else:
+                print("Nespravny format hodnoty GFR")
+        if 'GFR' not in keys_array and "Max davka" in keys_array and "K+" not in keys_array:
+            if data['Max davka'] == "true":
+                data['Max davka'] = 0
+        else:
+            print("Neexitujuce pravidlo pre MRA")
+
+    if 'Uziva vericiguat' in keys_array:
+
+        if data['Uziva vericiguat'] == 'false' or data['Uziva vericiguat'] == 'true' or data['Uziva vericiguat'] == '0' or data['Uziva vericiguat'] == '1':
 
             vericiguat = data['Uziva vericiguat']
-            sTK = float(data['sTK']) if data['sTK'] is not None else None
-            GFR = float(data['GFR']) if data['GFR'] is not None else None
-            symptomaticka_hypotenzia = data['symptomaticka hypotenzia']
+            sTK = float(data['sTK']) if 'sTK' in keys_array else None
+            GFR = float(data['GFR']) if 'GFR' in keys_array else None
+            symptomaticka_hypotenzia = data['symptomaticka hypotenzia'] if 'symptomaticka hypotenzia' in keys_array else None
             if sTK is not None:
                 value = VericiguatTherapy().calc_fuzzy(
                     vericiguat, sTK, GFR, symptomaticka_hypotenzia)
@@ -668,19 +909,19 @@ def get_final_result_logical(data):
 
             if vericiguat is not None and sTK is None and GFR is None and symptomaticka_hypotenzia is None:
                 data['Uziva vericiguat'] = VericiguatTherapy().calc_fuzzy(
-                    vericiguat, None, None, None)[0]
+                    vericiguat, None, None, None)
 
         else:
             print("Uziva vericiguat musi byt true alebo false")
-    if 'Uziva ivabradin' in data:
-        if data['Uziva ivabradin'] == 'false' or data['Uziva ivabradin'] == 'true':
 
+    if 'Uziva ivabradin' in keys_array:
+        if data['Uziva ivabradin'] == 'false' or data['Uziva ivabradin'] == 'true' or data['Uziva ivabradin'] == '0' or data['Uziva ivabradin'] == '1':
             ivabradin = data['Uziva ivabradin']
-            fibrilacia_predsieni = data['fibrilacia predsieni']
-            sf = float(data['sf']) if data['sf'] is not None else None
-            vek = int(data['vek']) if data['vek'] is not None else None
-            gfr = float(data['GFR']) if data['GFR'] is not None else None
-            symptomaticka_bradykardia = data['symptomaticka bradykardia']
+            fibrilacia_predsieni = data['fibrilacia predsieni'] if 'fibrilacia predsieni' in keys_array else None
+            sf = float(data['sf']) if 'sf' in keys_array else None
+            vek = int(data['vek']) if 'vek' in keys_array else None
+            gfr = float(data['GFR']) if 'GFR' in keys_array else None
+            symptomaticka_bradykardia = data['symptomaticka bradykardia'] if 'symptomaticka bradykardia' in keys_array else None
             if fibrilacia_predsieni is not None:
                 value = IvabradineTherapy().calc_fuzzy(ivabradin, fibrilacia_predsieni,
                                                        sf, vek, symptomaticka_bradykardia, gfr)
@@ -708,52 +949,81 @@ def get_final_result_logical(data):
                 data['Uziva ivabradin'] = value[0]
             if ivabradin is not None and fibrilacia_predsieni is None and sf is None and vek is None and gfr is None and symptomaticka_bradykardia is None:
                 data['Uziva ivabradin'] = IvabradineTherapy().calc_fuzzy(
-                    ivabradin, None, None, None, None, None)[0]
+                    ivabradin, None, None, None, None, None)
         else:
             print("Uziva ivabradin musi byt true alebo false")
 
-    if 'Uziva digoxin' in data:
-        if data['Uziva digoxin'] == 'false' or data['Uziva digoxin'] == 'true':
+    if 'Uziva digoxin' in keys_array and 'hodnota digoxinu' not in keys_array:
+        if data['Uziva digoxin'] == 'false' or data['Uziva digoxin'] == 'true' or data['Uziva digoxin'] == '0' or data['Uziva digoxin'] == '1':
             digoxin = data['Uziva digoxin']
-            fibrilacia_predsieni = data['fibrilacia predsieni']
-            pomaly_rytmus = data['pomaly rytmus']
-            av = data['AV blok']
-            di_val = data['hodnota digoxinu']
+            pomaly_rytmus = data['pomaly rytmus'] if 'pomaly rytmus' in keys_array else None
+            av = data['AV blok'] if 'AV blok' in keys_array else None
+            di_val = float(data['hodnota digoxinu'].replace(
+                ',', '.')) if 'hodnota digoxinu' in keys_array else None
 
-            if fibrilacia_predsieni is not None:
-                value = DigoxinTherapy().calc_fuzzy(digoxin, fibrilacia_predsieni,
-                                                    pomaly_rytmus, av, di_val)
-                data['fibrilacia predsieni'] = value[1]
-                data['Uziva digoxin'] = value[0]
             if pomaly_rytmus is not None:
-                value = DigoxinTherapy().calc_fuzzy(digoxin, fibrilacia_predsieni,
+                value = DigoxinTherapy().calc_fuzzy(digoxin,
                                                     pomaly_rytmus, av, di_val)
                 data['pomaly rytmus'] = value[1]
                 data['Uziva digoxin'] = value[0]
             if av is not None:
-                value = DigoxinTherapy().calc_fuzzy(digoxin, fibrilacia_predsieni,
+                value = DigoxinTherapy().calc_fuzzy(digoxin,
                                                     pomaly_rytmus, av, di_val)
                 data['AV blok'] = value[1]
                 data['Uziva digoxin'] = value[0]
             if di_val is not None:
-                value = DigoxinTherapy().calc_fuzzy(digoxin, fibrilacia_predsieni,
+                value = DigoxinTherapy().calc_fuzzy(digoxin,
                                                     pomaly_rytmus, av, di_val)
                 data['hodnota digoxinu'] = value[1]
                 data['Uziva digoxin'] = value[0]
-            if digoxin is not None and fibrilacia_predsieni is None and pomaly_rytmus is None and av is None and di_val is None:
-                data['Uziva digoxin'] = DigoxinTherapy().calc_fuzzy(
-                    digoxin, None, None, None, None)[0]
+
         else:
             print("Uziva digoxin musi byt true alebo false")
-    if 'LBBB' in data:
-        if data['LBBB'] == 'false' or data['LBBB'] == 'true':
-            lbbb = data['LBBB']
-            qrs = float(data['QRS']) if data['QRS'] is not None else None
-            if qrs is not None:
-                value = LbbbTherapy().calc_fuzzy(lbbb, qrs)
-                data['QRS'] = value[1]
-                data['LBBB'] = value[0]
-            if lbbb is not None and qrs is None:
-                data['LBBB'] = LbbbTherapy().calc_fuzzy(lbbb, None)[0]
+
+    if 'hodnota digoxinu' in keys_array and 'Uziva digoxin' not in keys_array:
+        hodnota_digoxinu = float(data['hodnota digoxinu'].replace(
+            ',', '.')) if 'hodnota digoxinu' in keys_array else None
+        if hodnota_digoxinu < 0.64:
+            print("uziva_digoxin == 1 and hodnota_digoxinu < 0.64")
+            data['hodnota digoxinu'] = 1
+        elif hodnota_digoxinu >= 0.64 and hodnota_digoxinu <= 1.05:
+            print(
+                "uziva_digoxin == 1 and hodnota_digoxinu >= 0.64 and hodnota_digoxinu <= 1.05")
+            data['hodnota digoxinu'] = 0
+
+    if 'eGRF' in keys_array and len(keys_array) == 1:
+        eGRF = int(data['eGRF'])
+        if eGRF < 30:
+            data['eGRF'] = 1
         else:
-            print("LBBB musi byt true alebo false")
+            print("Nezname pravidlo pre eGRF")
+
+    if 'K+' in keys_array and ("MRA" not in [place.label for place in net.getPlaces()] and "ACEI" not in [place.label for place in net.getPlaces()] and "ARNI" not in [place.label for place in net.getPlaces()]):
+        K = int(data['K+'])
+        if K > 5:
+            data['K+'] = 0
+        else:
+            print("Nezname pravidlo pre K+")
+
+    if 'SBP' in keys_array and len(keys_array) == 1:
+        SBP = int(data['SBP'])
+        if SBP < 95:
+            data['SBP'] = 0
+        elif SBP > 95:
+            data['SBP'] = 1
+        else:
+            print("Nezname pravidlo pre SBP")
+
+    if 'HR' in keys_array and len(keys_array) == 1:
+        HR = int(data['HR'])
+        if HR < 55:
+            data['HR'] = 0
+        else:
+            print("Nezname pravidlo pre HR")
+
+    if 'Zvysenie NTproBNP' in keys_array and len(keys_array) == 1:
+        Zvysenie_NTproBNP = int(data['Zvysenie NTproBNP'])
+        if Zvysenie_NTproBNP > 10:
+            data['Zvysenie NTproBNP'] = 1
+        else:
+            print("Nezname pravidlo pre Zvysenie NTproBNP")

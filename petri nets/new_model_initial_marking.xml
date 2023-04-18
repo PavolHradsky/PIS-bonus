@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>new_model</id>
 	<initials>NEW</initials>
@@ -8,30 +9,44 @@
 	<transitionRole>false</transitionRole>
 	<transition>
 		<id>t1</id>
-		<x>780</x>
+		<x>540</x>
 		<y>220</y>
-		<label>treatement</label>
+		<label>liecba</label>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>540</x>
+		<y>60</y>
+		<label />
 	</transition>
 	<place>
 		<id>p1</id>
-		<x>580</x>
+		<x>380</x>
 		<y>140</y>
-		<label>Systolicky krvny tlak</label>
+		<label>Uziva ivabradin</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p2</id>
-		<x>580</x>
+		<x>380</x>
 		<y>300</y>
-		<label>Hladina cukru</label>
+		<label>GFR</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p3</id>
-		<x>980</x>
+		<x>700</x>
 		<y>220</y>
+		<label>result</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p4</id>
+		<x>700</x>
+		<y>60</y>
 		<label>result</label>
 		<tokens>0</tokens>
 		<static>false</static>
@@ -55,6 +70,20 @@
 		<type>regular</type>
 		<sourceId>t1</sourceId>
 		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p4</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 </document>

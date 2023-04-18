@@ -143,6 +143,8 @@ class MainAplication(QMainWindow):
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)  # add this line
         self.dialog_window = None  # initialize dialog window as None
         self.main_layout.closeEvent = self.closeEvent  # add this line
+        self.records_dict = {}
+        self.records_dict_prev = {}
 
     def closeEvent(self, event):
         if self.dialog_window is not None and self.dialog_window.isVisible():
@@ -341,6 +343,9 @@ class MainAplication(QMainWindow):
                 self.weights_flag = 0
                 self.tresholds_flag = 0
                 self.set_marking_initial(self.logical_validator)
+                self.anotherWindow.navod.setText(
+                    "Ciselne namerane hodnoty / textove ohodnotenie -> napisat do vstupov -> Fuzzifikacia button -> SAVE")
+                self.anotherWindow.navod.setStyleSheet("color: green;")
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť":
                 self.fuzzy_flag = 1
@@ -348,6 +353,9 @@ class MainAplication(QMainWindow):
                 self.weights_flag = 0
                 self.tresholds_flag = 0
                 self.set_marking_initial(self.fuzzy_validator)
+                self.anotherWindow.navod.setText(
+                    "Fuzzy hodnoty (0-1) -> napisat do vstupov -> OK -> SAVE alebo Fuzzifikacia button (udaje z databazy) -> SAVE alebo Ciselne namerane hodnoty / textove ohodnotenie -> napisat do vstupov -> Fuzzifikacia button -> SAVE")
+                self.anotherWindow.navod.setStyleSheet("color: green;")
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami pravidiel":
                 self.weights_flag = 1
@@ -355,12 +363,18 @@ class MainAplication(QMainWindow):
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
                 self.set_marking_initial(self.fuzzy_validator)
+                self.anotherWindow.navod.setText(
+                    "Fuzzy hodnoty (0-1) -> napisat do vstupov -> OK -> SAVE alebo Ciselne namerane hodnoty / textove ohodnotenie -> napisat do vstupov -> Fuzzifikacia button -> hodnoty (0-1) do vah prechodov -> SAVE alebo Fuzzifikacia button (udaje z databazy) -> hodnoty (0-1) do vah prechodov -> SAVE")
+                self.anotherWindow.navod.setStyleSheet("color: green;")
                 self.anotherWindow.enter.clicked.connect(self.run_final)
             elif self.main_layout.comboBox.currentText() == "Fuzzy Petriho sieť s váhami a prahmi pravidiel":
                 self.tresholds_flag = 1
                 self.weights_flag = 1
                 self.fuzzy_flag = 1
                 self.logical_flag = 0
+                self.anotherWindow.navod.setText(
+                    "Fuzzy hodnoty (0-1) -> napisat do vstupov -> OK -> SAVE alebo Ciselne namerane hodnoty / textove ohodnotenie -> napisat do vstupov -> Fuzzifikacia button -> hodnoty (0-1) do vah, prahov prechodov -> SAVE alebo Fuzzifikacia button (udaje z databazy) -> hodnoty (0-1) do vah, prahov prechodov -> SAVE")
+                self.anotherWindow.navod.setStyleSheet("color: green;")
                 self.set_marking_initial(self.fuzzy_validator)
                 self.anotherWindow.enter.clicked.connect(self.run_final)
         else:
@@ -466,18 +480,18 @@ class MainAplication(QMainWindow):
                     counter += 1
             if counter == len(self.dict_marks):
 
-                records_dict = {"Vek": None,
-                                "Pohlavie": None,
-                                "Vyska": None,
-                                "Vaha": None,
-                                "Systolický krvný tlak": None,
-                                "Diastolický krvný tlak": None,
-                                "Hladina cukru": None,
-                                "Cholesterol": None,
-                                "Tep": None,
-                                "EKG": None,
-                                "Bolesť v hrudi": None
-                                }
+                self.records_dict = {"Vek": None,
+                                     "Pohlavie": None,
+                                     "Vyska": None,
+                                     "Vaha": None,
+                                     "Systolicky krvny tlak": None,
+                                     "Diastolicky krvny tlak": None,
+                                     "Hladina cukru": None,
+                                     "Cholesterol": None,
+                                     "Tep": None,
+                                     "EKG": None,
+                                     "Bolest v hrudi": None
+                                     }
 
                 if len(self.database_output_table1) == 0 or len(self.database_output_table2) == 0:
                     self.anotherWindow.fuzzification_result.setText(
@@ -489,45 +503,49 @@ class MainAplication(QMainWindow):
                         "color: red;")
                     return
                 for i, record in enumerate(self.database_output_table1[3:]):
-                    records_dict[list(records_dict.keys())[i]] = record
+                    self.records_dict[list(self.records_dict.keys())[
+                        i]] = record
 
                 for i, record in enumerate(self.database_output_table2[0][2:]):
-                    records_dict[list(records_dict.keys())[i+4]] = record
+                    self.records_dict[list(self.records_dict.keys())[
+                        i+4]] = record
             else:
                 print(self.database_output_table1)
                 print(self.database_output_table2)
-                records_dict = {"Vek": None,
-                                "Pohlavie": None,
-                                "Vyska": None,
-                                "Vaha": None,
-                                "Systolický krvný tlak": None,
-                                "Diastolický krvný tlak": None,
-                                "Hladina cukru": None,
-                                "Cholesterol": None,
-                                "Tep": None,
-                                "EKG": None,
-                                "Bolesť v hrudi": None
-                                }
+                self.records_dict = {"Vek": None,
+                                     "Pohlavie": None,
+                                     "Vyska": None,
+                                     "Vaha": None,
+                                     "Systolicky krvny tlak": None,
+                                     "Diastolicky krvny tlak": None,
+                                     "Hladina cukru": None,
+                                     "Cholesterol": None,
+                                     "Tep": None,
+                                     "EKG": None,
+                                     "Bolest v hrudi": None
+                                     }
 
                 for i, record in enumerate(self.database_output_table1[3:]):
-                    records_dict[list(records_dict.keys())[i]] = record
+                    self.records_dict[list(self.records_dict.keys())[
+                        i]] = record
 
                 for i, record in enumerate(self.database_output_table2[0][2:]):
-                    records_dict[list(records_dict.keys())[i+4]] = record
+                    self.records_dict[list(self.records_dict.keys())[
+                        i+4]] = record
 
-                print("Actual treatement: ", records_dict)
+                print("Actual treatement: ", self.records_dict)
 
                 for key, value in self.dict_marks.items():
                     if value.text() != '':
-                        records_dict[key.label] = value.text()
+                        self.records_dict[key.label] = value.text()
                         for i, record in enumerate(self.database_output_table1[3:]):
-                            if records_dict[list(records_dict.keys())[i]] != record:
+                            if self.records_dict[list(self.records_dict.keys())[i]] != record:
                                 array = list(self.database_output_table1)
                                 array[3+i] = value.text()
                                 self.database_output_table1 = tuple(array)
 
                         for i, record in enumerate(self.database_output_table2[0][2:]):
-                            if records_dict[list(records_dict.keys())[i+4]] != record:
+                            if self.records_dict[list(self.records_dict.keys())[i+4]] != record:
                                 array = list(self.database_output_table2[0])
                                 array[2+i] = value.text()
                                 self.database_output_table2[0] = tuple(array)
@@ -555,69 +573,81 @@ class MainAplication(QMainWindow):
                     dict_values_problem)
             # iterate through places labels in the net and update the values from records dict if the place label is the same as the key then leave the value from dict if not then set the value to None
             places = [place.label for place in self.net.getPlaces()]
-            for key, record in records_dict.items():
+            for key, record in self.records_dict.items():
                 for i, place in enumerate(places):
                     if place == key:
-                        records_dict[key] = record
+                        self.records_dict[key] = record
                         break
                     else:
-                        records_dict[key] = None
+                        self.records_dict[key] = None
 
-            Fuzzyfication.get_final_result_fuzzy(records_dict)
-            print("Fuzzyficated values:", records_dict)
+            self.records_dict_prev = self.records_dict
+            print("Records dict:", self.records_dict)
+            Fuzzyfication.get_final_result_fuzzy(self.records_dict)
+            print("Fuzzyficated values:", self.records_dict)
 
         if self.logical_flag:
-            records_dict = {"Uziva ivabradin": None,
-                            "Uziva vericiguat": None,
-                            "sTK": None,
-                            "GFR": None,
-                            "fibrilacia predsieni": None,
-                            "symptomaticka bradykardia": None,
-                            "vek": None,
-                            "sf": None,
-                            "LBBB": None,
-                            "QRS": None,
-                            "symptomaticka hypotenzia": None,
-                            "Uziva gliflozin": None,
-                            "Max davka": None,
-                            "K+": None,
-                            "TEP": None,
-                            "CHOCHP": None,
-                            "AV blok": None,
-                            "Kreatinin": None,
-                            "Nebivolol": None,
-                            "Uziva digoxin": None,
-                            "eGRF": None,
-                            "SBP": None,
-                            "HR": None,
-                            "Zvysenie NTproBNP": None,
-                            "NYHA-II-III": None
-                            }
+            self.records_dict = {"Uziva ivabradin": None,
+                                 "Uziva vericiguat": None,
+                                 "sTK": None,
+                                 "GFR": None,
+                                 "fibrilacia predsieni": None,
+                                 "symptomaticka bradykardia": None,
+                                 "vek": None,
+                                 "sf": None,
+                                 "LBBB": None,
+                                 "QRS": None,
+                                 "symptomaticka hypotenzia": None,
+                                 "Uzivany gliflozin": None,
+                                 "Max davka": None,
+                                 "K+": None,
+                                 "TEP": None,
+                                 "CHOCHP": None,
+                                 "AV blok": None,
+                                 "Kreatinin": None,
+                                 "Nebivolol": None,
+                                 "Uziva digoxin": None,
+                                 "hodnota digoxinu": None,
+                                 "pomaly rytmus": None,
+                                 "eGRF": None,
+                                 "SBP": None,
+                                 "HR": None,
+                                 "Zvysenie NTproBNP": None,
+                                 "NYHA-II-III": None,
+                                 'BB': None,
+                                 'ARNI': None,
+                                 'ACEI': None,
+                                 "MRA": None
+                                 }
 
-            print(records_dict)
+            print(self.records_dict)
             for key, value in self.dict_marks.items():
                 if value.text() != '':
-                    records_dict[key.label] = value.text()
-            print(records_dict)
+                    self.records_dict[key.label] = value.text()
+            print(self.records_dict)
             # iterate through places labels in the net and update the values from records dict if the place label is the same as the key then leave the value from dict if not then set the value to None
             places = [place.label for place in self.net.getPlaces()]
-            for key, record in records_dict.items():
+            for key, record in self.records_dict.items():
                 for i, place in enumerate(places):
                     if place == key:
-                        records_dict[key] = record
+                        self.records_dict[key] = record
                         break
                     else:
-                        records_dict[key] = None
+                        self.records_dict[key] = None
 
-            print(records_dict)
-            Fuzzyfication.get_final_result_logical(records_dict)
-            print(records_dict)
+            # ♦ remove keys with values where value is None (create new dict)
+            self.records_dict = {key: value for key,
+                                 value in self.records_dict.items() if value is not None}
+            self.records_dict_prev = self.records_dict
+            print(self.records_dict)
+            Fuzzyfication.get_final_result_logical(self.records_dict, self.net)
+            print(self.records_dict)
 
         self.fuzzyficated_M0 = [0 for _ in range(len(self.dict_places))]
         # iterate through places labels in the net and update the values from records dict
         counter = 0
         places = [place.label for place in self.net.getPlaces()]
-        for key, record in records_dict.items():
+        for key, record in self.records_dict.items():
             for i, place in enumerate(places):
                 if place == key:
                     counter += 1
@@ -1714,7 +1744,12 @@ class MainAplication(QMainWindow):
                 print("Wk: ", Wk)
                 self.net.Wk_final = Wk
             self.net.Wk_final = Wo
-
+        Wo[len(Wo)-1] = round(sum(Wk[:-1]) / (len(Wk)-1), 2)
+        self.actual_marking_dict[self.image_number] = "( "+', '.join([str(elem)
+                                                                      for i, elem in enumerate(Wo)])+" )"
+        self.net.Wk_final = Wo
+        Wk = Wo
+        self.defuzzyfication_decision(round(sum(Wk[:-1]) / len(Wk), 2))
         self.setting_image(0)
 
     def fill_dict_pre_fuzzy_net(self, M):
@@ -1786,48 +1821,386 @@ class MainAplication(QMainWindow):
     def defuzzyfication_decision(self, result):
         if self.logical_flag:
             for place in self.net.getPlaces():
-                if place.label == "Uziva vericiguat":
-                    if place.tokens == 0.5:
+                if place.label == 'NYHA-II-III' and 'LBBB' not in self.records_dict:
+                    if place.tokens == 1:
                         self.main_layout.defuzzyfication_label.setText(
-                            str(result) + " - Začať s terapiou")
+                            str(result/2) + " - Zvazit zavedenie ICD")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: yellow;")
+                    else:
+                        self.main_layout.defuzzyfication_label.setText(
+                            "Nezname pravidlo")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: red;")
+
+                if place.label == 'LBBB':
+                    if place.tokens == 1:
+                        for key, value in self.records_dict.items():
+                            if key == "QRS":
+                                if value == 1:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(result) + " - " + "Doporučene CRT")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: red;")
+                                if value == 0:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(0.75) + " - " + "Malo by byt zvazene CRT")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: orange;")
+
+                    if place.tokens == 0:
+                        for key, value in self.records_dict.items():
+                            if key == "QRS":
+                                if value == 1:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(0.75) + " - " + "Malo by byt zvazene CRT")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: orange;")
+                                if value == 0:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(0.5) + " - " + "Moze byt zvazene CRT")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: yellow;")
+
+                if place.label == "Uzivany gliflozin":
+                    if place.tokens == 0 and "empa" not in self.records_dict_prev.values() or "dapa" not in self.records_dict_prev.values():
+                        for key, value in self.records_dict.items():
+                            if key == "GFR":
+                                if value == 0:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(result) + " - " + "Nemozno pridat gliflozin")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: green;")
+                                if value == 1:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(result) + " - " + "Pridajte empagliflozin")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: red;")
+                            if key == "sTK":
+                                if value == 0:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(result) + " - " + "Nemozno pridat gliflozin")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: green;")
+                            if key == "symptomaticka hypotenzia":
+                                if value == 0:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(result) + " - " + "Nemozno pridat gliflozin")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: green;")
+
+                    if place.tokens == 1 and ("empa" in self.records_dict_prev.values() or "dapa" in self.records_dict_prev.values()):
+                        for key, value in self.records_dict.items():
+                            if key == "GFR":
+                                if value == 1:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(0.7) + " - " + "Pokračujte v terapii.")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: red;")
+
+                    if place.tokens == 0 and ("empa" in self.records_dict_prev.values() or "dapa" in self.records_dict_prev.values()):
+                        for key, value in self.records_dict.items():
+                            if key == "GFR":
+                                if value == 0:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(0.5) + " - " + "Vysadiť gliflozin")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: yellow;")
+
+                    if place.tokens == 0 and ("dapa" in self.records_dict_prev.values() and "empa" not in self.records_dict_prev.values()):
+                        for key, value in self.records_dict.items():
+                            if key == "GFR":
+                                if value == 1:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(0.5) + " - " + "Prejst na empa")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: yellow;")
+
+                    if place.tokens == 1 and ("empa" in self.records_dict_prev.values() and "dapa" not in self.records_dict_prev.values()):
+                        for key, value in self.records_dict.items():
+                            if key == "GFR":
+                                if value == 1:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(0.7) + " - " + "Pokračujte v terapii.")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: red;")
+
+                    if place.tokens == 1 and "Max davka" in self.records_dict:
+                        for key, value in self.records_dict.items():
+                            if key == "Max davka":
+                                if value == 1:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(0.7) + " - " + "Pokračujte v terapii.")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: red;")
+
+                if place.label == "eGRF":
+                    if place.tokens == 1:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(0.5) + " - " + "Sznizit ACEi/ARB/ARNI, MRA")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: yellow;")
+
+                if place.label == "K+" and ("MRA" not in [place.label for place in self.net.getPlaces()] and "ACEI" not in [place.label for place in self.net.getPlaces()] and "ARNI" not in [place.label for place in self.net.getPlaces()]):
+                    for key, value in self.records_dict.items():
+                        if key == "K+":
+                            if value == 0:
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(0.5) + " - " + "Sznizit ACEi/ARB/ARNI, MRA")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: yellow;")
+
+                if place.label == "SBP":
+                    if place.tokens == 0:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(0.5) + " - " + "Snizit ACEi/ARB/ARNI, MRA")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: yellow;")
+                    if place.tokens == 1:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(0.7) + " - " + "Pokracovat alebo zvysit BB")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: red;")
+
+                if place.label == "HR":
+                    if place.tokens == 0:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(0.5) + " - " + " Znizit alebo vysadit BB")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: yellow;")
+
+                if place.label == "Zvysenie NTproBNP":
+                    if place.tokens == 1:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(0.5) + " - " + "Zvysit diuretika a znizit alebo vysadit BB")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: yellow;")
+
+                if place.label == "Uziva vericiguat":
+                    if place.tokens == 1:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(result) + " - Vysadiť, redukovať vericiguat")
                         self.main_layout.defuzzyfication_label.setStyleSheet(
                             "color: orange;")
-                    if int(result) == 0:
+                    if place.tokens == 0:
                         self.main_layout.defuzzyfication_label.setText(
                             str(result) + " - Nezačať s terapiou")
                         self.main_layout.defuzzyfication_label.setStyleSheet(
                             "color: green;")
-                    if result != 0 and place.tokens != 0.5:
+
+                    if place.tokens == 0 and "sTK" not in self.records_dict and "GFR" not in self.records_dict and "symptomaticka hypotenzia" not in self.records_dict:
                         self.main_layout.defuzzyfication_label.setText(
-                            str(result) + " - Vysadiť alebo redukovať vericiguat")
+                            str(0.5) + " - Začať s terapiou")
                         self.main_layout.defuzzyfication_label.setStyleSheet(
                             "color: red;")
-                    break
 
                 if place.label == "Uziva ivabradin":
-                    if place.tokens == 0.5:
-                        self.main_layout.defuzzyfication_label.setText(
-                            str(result) + " - Začať s terapiou")
-                        self.main_layout.defuzzyfication_label.setStyleSheet(
-                            "color: orange;")
-                    if int(result) == 0:
-                        if place.label == "vek":
+                    if place.tokens == 0:
+                        if 'GFR' not in self.records_dict_prev and 'SF' not in self.records_dict_prev and 'symptomaticka bradykardia' not in self.records_dict_prev and 'vek' not in self.records_dict_prev and 'fibrilacia predsieni' not in self.records_dict_prev:
                             self.main_layout.defuzzyfication_label.setText(
-                                str(result) + " - Začať s nižšou dávkou")
+                                str(1) + " - Začať s terapiou")
                             self.main_layout.defuzzyfication_label.setStyleSheet(
-                                "color: green;")
+                                "color: red;")
+                        elif "vek" in self.records_dict:
+                            self.main_layout.defuzzyfication_label.setText(
+                                str(0.5) + " - Začať s nižšou dávkou")
+                            self.main_layout.defuzzyfication_label.setStyleSheet(
+                                "color: yellow;")
                         else:
                             self.main_layout.defuzzyfication_label.setText(
                                 str(result) + " - Nezačať s terapiou")
                             self.main_layout.defuzzyfication_label.setStyleSheet(
                                 "color: green;")
-
-                    if result != 0 and place.tokens != 0.5:
+                    if place.tokens == 1:
                         self.main_layout.defuzzyfication_label.setText(
                             str(result) + " - Vysadiť alebo redukovať ivabradin")
                         self.main_layout.defuzzyfication_label.setStyleSheet(
                             "color: red;")
-                    break
+
+                if place.label == "Uziva digoxin":
+                    if place.tokens == 0:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(result) + " - Nezačať s terapiou")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: green;")
+                    if place.tokens == 1:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(result) + " - Vysadiť alebo redukovať digoxin")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: red;")
+
+                if place.label == "hodnota digoxinu":
+                    if place.tokens == 0:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(result) + " - Pokracovat")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: green;")
+                    if place.tokens == 1:
+                        self.main_layout.defuzzyfication_label.setText(
+                            str(result) + " - Zvýšiť dávku")
+                        self.main_layout.defuzzyfication_label.setStyleSheet(
+                            "color: red;")
+
+                if place.label == "ACEI":
+                    if place.tokens == 0:
+                        for key, value in self.records_dict.items():
+                            if key == "K+":
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(result) + " - Nemožnosť pridať ACEi")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: green;")
+                            if key == "GFR":
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(result) + " - Nemožnosť pridať ACEi")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: green;")
+                            if key == "sTK":
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(result) + " - Nemožnosť pridať ACEi")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: green;")
+
+                    if place.tokens == 1:
+                        for key, value in self.records_dict.items():
+                            if key == "K+" or key == "symptomaticka hypotenzia" or key == "GFR":
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(result) + " - Vysadiť alebo znížiť ACEi")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: red;")
+                            if key == "Max davka" and result == 0:
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(result) + " - Pokračujte v liečbe.")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: green;")
+                            if key == "Max davka" and result == 1:
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(result) + " - Zvýšiť dávku.")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: red;")
+
+                if place.label == "BB":
+                    if place.tokens == 0:
+                        for key, value in self.records_dict.items():
+                            if key == "TEP" or key == "sTK" or key == "CHOCHP" or key == "AV blok":
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(result) + " - Nepridať BB")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: green;")
+                            if key == "Kreatinin":
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(result) + " - Pridať BB okrem nebivolol.")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: red;")
+
+                    if place.tokens == 1:
+                        for key, value in self.records_dict.items():
+                            if key == "TEP" or key == "AV blok" or key == "symptomaticka hypotenzia":
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(0.5) + " - Vysadiť alebo znížiť BB")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: yellow;")
+                            if key == "Nebivolol" or key == "Kreatinin":
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(0.7) + " - Nahradiť nebivolol")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: orange;")
+                            if key == "Max davka" and self.records_dict[key] == 1:
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(result) + " - Zvýšiť dávku.")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: red;")
+                            if key == "Max davka" and self.records_dict[key] == 0:
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(result) + " - Pokračujte v liečbe.")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: green;")
+
+                if place.label == "MRA":
+
+                    for key, value in self.records_dict.items():
+
+                        if "K+" in self.records_dict and "Max davka" not in self.records_dict:
+                            if value == 0:
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(result) + " - Udržiavajte aktuálnu dávku")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: green;")
+                            if value == 1:
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(result) + " - Vysaďte MRA")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: red;")
+                        elif key == "Max davka" and "GFR" in self.records_dict:
+                            if value == 1:
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(0.75) + " - Zvýšiť dávku")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: orange;")
+                        elif key == "Max davka" and "K+" in self.records_dict:
+                            if value == 1:
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(0.75) + " - Zvýšiť dávku")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: orange;")
+                        elif key == "Max davka" and "K+" not in self.records_dict and "GFR" not in self.records_dict:
+                            if value == 0:
+                                self.main_layout.defuzzyfication_label.setText(
+                                    str(0.5) + " - Pokračujte v terapii.")
+                                self.main_layout.defuzzyfication_label.setStyleSheet(
+                                    "color: yellow;")
+
+                if place.label == "ARNI":
+                    if place.tokens == 0:
+                        for key, value in self.records_dict.items():
+                            if key == "GFR" or key == "sTK" or key == "symptomaticka hypotenzia" or key == "K+":
+                                if key == "GFR" and result == 1:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(result) + " - Začať s ARNI")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: red;")
+                                elif key == "GFR" and result == 0:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(result) + " - Nezačať s ARNI")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: green;")
+                                elif key == "sTK" and result == 1:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(result) + " - Začať s ARNI")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: red;")
+                                elif key == "sTK" and result == 0:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(result) + " - Nezačať s ARNI")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: green;")
+                                else:
+                                    self.main_layout.defuzzyfication_label.setText(
+                                        str(result) + " - ponechať ACEi")
+                                    self.main_layout.defuzzyfication_label.setStyleSheet(
+                                        "color: green;")
+
+                    if place.tokens == 1:
+                        if "Max davka" in self.records_dict and self.records_dict["Max davka"] == 0:
+                            self.main_layout.defuzzyfication_label.setText(
+                                str(0.25) + " - Pokračovať v liečbe")
+                            self.main_layout.defuzzyfication_label.setStyleSheet(
+                                "color: yellow;")
+                        elif "Max davka" in self.records_dict and self.records_dict["Max davka"] == 1:
+                            self.main_layout.defuzzyfication_label.setText(
+                                str(0.5) + " - Navýšiť dávku ARNI")
+                            self.main_layout.defuzzyfication_label.setStyleSheet(
+                                "color: orange;")
+                        elif "Max davka" not in self.records_dict:
+                            self.main_layout.defuzzyfication_label.setText(
+                                str(0.75) + " - Vysadiť ARNI")
+                            self.main_layout.defuzzyfication_label.setStyleSheet(
+                                "color: orange;")
+                        else:
+                            self.main_layout.defuzzyfication_label.setText(
+                                str(result) + " - Pokračovať v liečbe")
+                            self.main_layout.defuzzyfication_label.setStyleSheet(
+                                "color: green;")
+
         if self.fuzzy_flag or self.weights_flag or self.tresholds_flag:
             if 0.0 <= result <= 0.25:
                 self.main_layout.defuzzyfication_label.setText(
@@ -1856,6 +2229,8 @@ class MainAplication(QMainWindow):
                     "color: red;")
 
         self.main_layout.defuzzyfication_label.adjustSize()
+        self.records_dict = {}
+        self.records_dict_prev = {}
 
     def fuzzy_petri_net(self, M):
         array_steps = []
@@ -2300,7 +2675,6 @@ class MainAplication(QMainWindow):
             self.error_message_box()
 
     def run_fuzzy(self):
-        self.image_number = 1
         self.image_dict = {}
         self.step_dict = {}
         files = glob.glob('./images/*')
@@ -2507,31 +2881,32 @@ if __name__ == '__main__':
         dict_values_patient["name"] = input()
         print("Priezvisko pacienta:")
         dict_values_patient["surname"] = input()
-        print("Vek pacienta:")
+        print("Vek pacienta (young, middle age, old, very old):")
         dict_values_patient["age"] = input()
-        print("Pohlavie pacienta:")
+        print("Pohlavie pacienta (M/F):")
         dict_values_patient["sex"] = input()
-        print("Vyska pacienta:")
+        print("Vyska pacienta (short, medium, tall):")
         dict_values_patient["height"] = input()
-        print("Vaha pacienta:")
+        print("Vaha pacienta (light, medium, heavy):")
         dict_values_patient["weight"] = input()
 
         print("Pridat problem pacienta? (y/n)")
         answer = input()
         if answer == "y":
-            print("Hodnota systolickeho tlaku")
+            print("Hodnota systolickeho tlaku (low, medium, high, very high)")
             dict_values_problem["systolic_blood_pressure"] = input()
-            print("Hodnota diastolickeho tlaku")
+            print("Hodnota diastolickeho tlaku (low, medium, high, very high))")
             dict_values_problem["diastolic_blood_pressure"] = input()
-            print("Hodnota cukru v krvi")
+            print("Hodnota cukru v krvi (low, medium, high)")
             dict_values_problem["blood_sugar"] = input()
-            print("Hodnota cholesterolu")
+            print(
+                "Hodnota cholesterolu (low, medium high, high, very high, extremely high)")
             dict_values_problem["cholesterol"] = input()
-            print("Hodnota tepu")
+            print("Hodnota tepu (low, medum, high)")
             dict_values_problem["heart_rate"] = input()
-            print("Hodnota EKG")
+            print("Hodnota EKG (normal, abnormal, hypertrophy)")
             dict_values_problem["EKG"] = input()
-            print("Bolest hrudnika")
+            print("Bolest v hrudni (typical, atypical, non-anginal, asymptomatic)")
             dict_values_problem["chest_pain"] = input()
         result, result1, result2 = connect(
             1, 0, dict_values_patient, dict_values_problem)

@@ -1,219 +1,183 @@
+Podľa tohoto zostavíme fuzzy Petriho sieť: (source Github)
 
-Podla toho zostavime Petriho siet:
+Premenné:
+ 
+"Vek", "Pohlavie", "Vyska", "Vaha", "Systolicky krvny tlak", 
+"Diastolicky krvny tlak", 
+"Hladina cukru", "Cholesterol", "Tep", "EKG", "Bolest v hrudi"
 
-RULE 1: IF (age IS very old) AND (chest_pain IS atypical_anginal) THEN health IS sick_4;
-RULE 2: IF (maximum_heart_rate IS high) AND (age IS old) THEN health IS sick_4;
-RULE 3: IF (sex IS male) AND (maximum_heart_rate IS medium) THEN health IS sick_3;
-RULE 4: IF (sex IS female) AND (maximum_heart_rate IS medium) THEN health IS sick_2;
-RULE 5: IF (chest_pain IS non_aginal_pain) AND (blood_pressure IS high) THEN health IS sick_3;
-RULE 6: IF (chest_pain IS typical_anginal) AND (maximum_heart_rate IS medium) THEN health IS sick_2;
-RULE 7: IF (blood_sugar IS true) AND (age IS mild) THEN health IS sick_3;
-RULE 8: IF (blood_sugar IS false) AND (blood_pressure IS very_high) THEN health IS sick_2;
-RULE 9: IF (chest_pain IS asymptomatic) OR (age IS very_old) THEN health IS sick_1;
-RULE 10: IF (blood_pressure IS high) OR (maximum_heart_rate IS low) THEN health IS sick_1;
-RULE 11: IF (chest_pain IS typical_anginal) THEN health IS healthy;
-RULE 12: IF (chest_pain IS atypical_anginal) THEN health IS sick_1;
-RULE 13: IF (chest_pain IS non_aginal_pain) THEN health IS sick_2;
-RULE 14: IF (chest_pain IS asymptomatic) THEN health IS sick_3;
-RULE 15: IF (chest_pain IS asymptomatic) THEN health IS sick_4;
-RULE 16: IF (sex IS female) THEN health IS sick_1;
-RULE 17: IF (sex IS male) THEN health IS sick_2;
-RULE 18: IF (blood_pressure IS low) THEN health IS healthy;
-RULE 19: IF (blood_pressure IS medium) THEN health IS sick_1;
-RULE 20: IF (blood_pressure IS high) THEN health IS sick_2;
-RULE 21: IF (blood_pressure IS high) THEN health IS sick_3;
-RULE 22: IF (blood_pressure IS very_high) THEN health IS sick_4;
-RULE 23: IF (cholesterol IS low) THEN health IS	healthy;
-RULE 24: IF (cholesterol IS medium) THEN health IS sick_1;
-RULE 25: IF (cholesterol IS high) THEN health IS sick_2;
-RULE 26: IF (cholesterol IS high) THEN health IS sick_3;
-RULE 27: IF (cholesterol IS very_high) THEN health IS sick_4;
-RULE 28: IF (blood_sugar IS true) THEN health IS sick_2;
-RULE 29: IF (ECG IS normal) THEN health IS healthy;
-RULE 30: IF (ECG IS normal) THEN health IS sick_1;
-RULE 31: IF (ECG IS abnormal) THEN health IS sick_2;
-RULE 32: IF (ECG IS hypertrophy) THEN health IS sick_3;
-RULE 33: IF (ECG IS hypertrophy) THEN health IS sick_4;
-RULE 34: IF (maximum_heart_rate IS low) THEN health IS healthy;
-RULE 35: IF (maximum_heart_rate IS medium) THEN health IS sick_1;
-RULE 36: IF (maximum_heart_rate IS medium) THEN health IS sick_2;
-RULE 37: IF(maximum_heart_rate IS high) THEN health IS sick_3;
-RULE 38: IF(maximum_heart_rate IS high) THEN health IS sick_4;
-RULE 39: IF (age IS young) THEN health IS healthy;
-RULE 40: IF (age IS mild) THEN health IS sick_1;
-RULE 41: IF (age IS old) THEN health IS sick_2;
-RULE 42: IF (age IS old) THEN health IS sick_3;
-RULE 43: IF (age IS very_old) THEN health IS sick_4;
+Pravidlá:
+
+RULE 1: IF (Vek IS very old) AND (Bolest v hrudi IS atypical) THEN health IS Low; OK
+
+RULE 2: IF (Tep IS high) AND (Vek IS old) THEN health IS High; OK
+
+RULE 3: IF (Pohlavie IS M) AND (Tep IS medium) THEN health IS High; OK
+RULE 4: IF (Pohlavie IS F) AND (Tep IS medium) THEN health IS Low; OK
+
+RULE 5: IF (Bolest v hrudi IS non-anginal) AND (Diastolicky krvny tlak IS high) THEN health IS High; OK
+RULE 5: IF (Bolest v hrudi IS non-anginal) AND (Systolicky krvny tlak IS high) THEN health IS High; OK
+RULE 6: IF (Bolest v hrudi IS typical) AND (Tep IS medium) THEN health IS Very low; OK
+
+RULE 7: IF (Hladina cukru IS high) AND (Vek IS middle age) THEN health IS Low; OK
+RULE 8: IF (Hladina cukru IS low|medium) AND (Diastolicky krvny tlak IS very high) THEN health IS Very low / High; OK
+RULE 8: IF (Hladina cukru IS low|medium) AND (Systolicky krvny tlak IS very high) THEN health IS low / High; OK
+
+RULE 9: IF (Bolest v hrudi IS typical) THEN health IS healthy; OK
+RULE 10: IF (Bolest v hrudi IS atypical) THEN health IS Low; OK
+RULE 11: IF (Bolest v hrudi IS non-anginal) THEN health IS High; OK
+RULE 12: IF (Bolest v hrudi IS asymptomatic) THEN health IS Very high; OK
+RULE 13: IF (Bolest v hrudi IS asymptomatic) THEN health IS Critical; OK
+
+RULE 14: IF (Pohlavie IS F) THEN health IS Low;  OK
+RULE 15: IF (Pohlavie IS M) THEN health IS High; OK
+
+RULE 16: IF (Diastolicky krvny tlak IS low) THEN health IS healthy; OK
+RULE 17: IF (Diastolicky krvny tlak IS medium) THEN health IS Low; OK
+RULE 18: IF (Diastolicky krvny tlak IS high) THEN health IS High; OK
+RULE 19: IF (Diastolicky krvny tlak IS high) THEN health IS Very high; OK
+RULE 20: IF (Diastolicky krvny tlak IS very high) THEN health IS Critical; OK
+
+RULE 21: IF (Systolicky krvny tlak IS low) THEN health IS healthy; OK
+RULE 22: IF (Systolicky krvny tlak IS medium) THEN health IS Low; OK
+RULE 23: IF (Systolicky krvny tlak IS high) THEN health IS High; OK
+RULE 24: IF (Systolicky krvny tlak IS high) THEN health IS Very high; OK
+RULE 25: IF (Systolicky krvny tlak IS very high) THEN health IS Critical; OK
+
+RULE 26: IF (Cholesterol IS low) THEN health IS	healthy;  OK
+RULE 27: IF (Cholesterol IS medium high) THEN health IS Low; OK
+RULE 28: IF (Cholesterol IS high) THEN health IS High; OK
+RULE 29: IF (Cholesterol IS very high) THEN health IS Very high; OK
+RULE 30: IF (Cholesterol IS extremely high) THEN health IS Critical; OK
+
+RULE 31: IF (Hladina cukru IS high) THEN health IS High; OK
+
+RULE 32: IF (EKG IS normal) THEN health IS healthy; OK
+RULE 33: IF (EKG IS normal) THEN health IS Low; OK
+RULE 34: IF (EKG IS abnormal) THEN health IS High; OK
+RULE 35: IF (EKG IS hypertrophy) THEN health IS Very high; OK
+RULE 36: IF (EKG IS hypertrophy) THEN health IS Critical; OK
+
+RULE 37: IF (Tep IS low) THEN health IS healthy; OK
+RULE 38: IF (Tep IS medium) THEN health IS Low; OK
+RULE 39: IF (Tep IS medium) THEN health IS High; OK
+RULE 40: IF (Tep IS high) THEN health IS Very high; OK
+RULE 41: IF (Tep IS high) THEN health IS Critical; OK
+
+RULE 42: IF (Vek IS young) THEN health IS healthy; OK
+RULE 43: IF (Vek IS middle age) THEN health IS Low; OK
+RULE 44: IF (Vek IS old) THEN health IS High; OK
+RULE 45: IF (Vek IS old) THEN health IS Very high; OK
+RULE 46: IF (Vek IS very old) THEN health IS Critical; OK
+
+RULE 47: IF (Vyska IS short) THEN health IS Very high; OK
+RULE 48: IF (Vyska IS medium) THEN health IS Very Low; OK
+RULE 49: IF (Vyska IS tall) THEN health IS Very high; OK
+
+RULE 50: IF (Vaha IS light) THEN health IS High; OK
+RULE 51: IF (Vaha IS medium) THEN health IS Very Low; OK
+RULE 52: IF (Vaha IS heavy) THEN health IS Critical; OK
 
 
-Podla toho zostavime fuzzy Petriho siet: (source Github)
+Podľa tohoto zostavíme logickú Petriho sieť: (source reálny lekár)
 
-RULE 1: IF (age IS very old) AND (chest_pain IS atypical) THEN health IS Critical;
+Premenné:
 
-RULE 2: IF (heart_rate IS high) AND (age IS old) THEN health IS Critical;
+"Uziva ivabradin", "Uziva vericiguat", "sTK", "GFR", "fibrilacia predsieni", "symptomaticka bradykardia", "vek", "sf", "LBBB", "QRS", "symptomaticka hypotenzia", "Uzivany gliflozin",
+"Max davka", "K+", "TEP", "CHOCHP", "AV blok", "Kreatinin", "Nebivolol", "Uziva digoxin", "hodnota digoxinu", "pomaly rytmus", "eGRF", "SBP", "HR", "Zvysenie NTproBNP",
+"NYHA-II-III", 'BB', 'ARNI', 'ACEI', "MRA"
 
-RULE 3: IF (sex IS M) AND (heart_rate IS medium) THEN health IS Very high;
-RULE 4: IF (sex IS F) AND (heart_rate IS medium) THEN health IS High;
+Pravidlá:
 
-RULE 5: IF (chest_pain IS non-aginal) AND (diastolic_blood_pressure IS high) THEN health IS Very high;
-RULE 5: IF (chest_pain IS non-aginal) AND (systolic_blood_pressure IS high) THEN health IS Very high;
-RULE 6: IF (chest_pain IS typical_anginal) AND (heart_rate IS medium) THEN health IS High;
+IF LBBB IS true AND QRS IS >=150 AND NYHA-II-III IS true THEN "Doporučene zavedenie CRT" OK
+IF LBBB IS true AND QRS IS [130,..,149] AND NYHA-II-III IS true THEN "Malo by byt zvazene zavedenie CRT" OK
+IF LBBB IS false AND QRS >= 150 AND NYHA-II-III IS true THEN "Malo by byt zvazene zavedenie CRT" OK
+IF LBBB IS false AND QRS IS [130,..,149] AND NYHA-II-III IS true THEN "Môže byt zvazene zavedenie CRT" OK
 
-RULE 7: IF (blood_sugar IS high) AND (age IS middle age) THEN health IS Very high;
-RULE 8: IF (blood_sugar IS low|medium) AND (diastolic_blood_pressure IS very high) THEN health IS High;
-RULE 8: IF (blood_sugar IS low|medium) AND (systolic_blood_pressure IS very high) THEN health IS High;
+IF NYHA-II-III IS true THEN "Zvazte zavedenie ICD" OK
 
-RULE 9: IF (chest_pain IS asymptomatic) OR (age IS very old) THEN health IS Low;
-RULE 10: IF (blood_pressure IS high) OR (heart_rate IS small) THEN health IS Low;
+IF GFR < 20 THEN "Nemozno pridat gliflozin" (Uzivany gliflozin IS false | 0) 0 OK
+IF sTK < 90 THEN "Nemozno pridat gliflozin" (Uzivany gliflozin IS false | 0) 0 OK
+IF symptomaticka hypotenzia IS true THEN "Nemozno pridat gliflozin" (Uzivany gliflozin IS false | 0) 0 OK
+IF GFR IS [20..25] THEN "Pridajte empagliflozin" (Uzivany gliflozin IS false | 0) 1 OK
+IF GFR > 25 THEN "Pridajte dapagliflozin alebo empagliflozin" (Uzivany gliflozin IS false | 0) 1  OK
 
-RULE 11: IF (chest_pain IS typical) THEN health IS healthy; OK
-RULE 12: IF (chest_pain IS atypical) THEN health IS Low; OK
-RULE 13: IF (chest_pain IS non-anginal) THEN health IS High; OK
-RULE 14: IF (chest_pain IS asymptomatic) THEN health IS Very high; OK
-RULE 15: IF (chest_pain IS asymptomatic) THEN health IS Critical; OK
+IF GFR < 20 AND Uzivany gliflozin IS "dapa", "empa" THEN "Vysadiť gliflozin" 0 OK
+IF GFR IS [20..25] AND Uzivany gliflozin IS "empa" THEN "Pokračujte v aktuálnej terapii" 1 OK
+IF GFR IS [20..25] AND Uzivany gliflozin IS "dapa" THEN "Ak sa očakáva ďalšie zhoršenie fukncie obličiek, odporucanie vysadit, inak prejst na empa."
+IF GFR > 25 AND Uzivany gliflozin IS "dapa", "empa" THEN "Pokračujte v aktuálnej terapii." 1 OK
+IF Max davka IS true THEN "Pokračujte v terapii." OK
 
-RULE 16: IF (sex IS F) THEN health IS Low;  OK
-RULE 17: IF (sex IS M) THEN health IS High; OK
+IF Max davka IS false AND K+ < 5 THEN "Pridajte bežnú dávku MRA." 1 OK
+IF K+ IS [5..5,5] THEN "Udržiavajte aktuálnu dávku." 0 OK -
+IF Max davka IS false AND K+ IS [5,5...6] THEN "Pridajte polovičnú dávku MRA, ak to nie je možné odporúčanie vysadiť MRA." 1 OK
+IF Max davka IS false AND GFR <30 THEN "Pridajte polovičnú dávku MRA, ak to nie je možné odporúčanie vysadiť MRA." 1 OK
+IF K+ > 6 THEN "Vysaďte MRA." 1 OK -
+IF GFR < 20 THEN "Vysaďte MRA." 1 OK
+IF Max davka IS true THEN "Pokračujte v terapii." 0 OK
 
-RULE 18: IF (diastolic_blood_pressure IS low) THEN health IS healthy; OK
-RULE 19: IF (diastolic_blood_pressure IS medium) THEN health IS Low; OK
-RULE 20: IF (diastolic_blood_pressure IS high) THEN health IS High; OK
-RULE 21: IF (diastolic_blood_pressure IS high) THEN health IS Very high; OK
-RULE 22: IF (diastolic_blood_pressure IS very high) THEN health IS Critical; OK
+IF GFR < 30 THEN "Nie je možné prejst na ARNI, odporúčanie ponechať ACEi." 0 OK
+IF sTK < 90 THEN "Nie je možné prejst na ARNI, odporúčanie ponechať ACEi." 0 OK
+IF symptomaticka hypotenzia IS true THEN "Nie je možné prejst na ARNI, odporúčanie ponechať ACEi." 0 OK
+IF K+ > 5 THEN "Nie je možné prejst na ARNI, odporúčanie ponechať ACEi." OK
+IF GFR IS [30..60] THEN "Začať s ARNI s nižšou dávkou." 1 OK
+IF sTK IS [100..110] THEN "Začať s ARNI s nižšou dávkou. " 1 OK
 
-RULE 23: IF (systolic_blood_pressure IS low) THEN health IS healthy; OK
-RULE 24: IF (systolic_blood_pressure IS medium) THEN health IS Low; OK
-RULE 25: IF (systolic_blood_pressure IS high) THEN health IS High; OK
-RULE 26: IF (systolic_blood_pressure IS high) THEN health IS Very high; OK
-RULE 27: IF (systolic_blood_pressure IS very high) THEN health IS Critical; OK
+IF symptomaticka hypotenzia IS true THEN "Vysadiť ARNI, ak je to možné prejsť na ACEi." 1 OK
+IF K+ > 5,5 THEN "Vysadiť ARNI, ak je to možné prejsť na ACEi." 1 OK
+IF GFR < 30 THEN "Vysadiť ARNI, ak je to možné prejsť na ACEi." 1 OK
+IF Max davka IS true THEN "Pokračujte v liečbe." 0 OK
+IF Max davka IS false THEN "Navýšiť dávku ARNI." 1 OK
 
-RULE 28: IF (cholesterol IS low) THEN health IS	healthy;  OK
-RULE 29: IF (cholesterol IS medium high) THEN health IS Low; OK
-RULE 30: IF (cholesterol IS high) THEN health IS High; OK
-RULE 31: IF (cholesterol IS very high) THEN health IS Very high; OK
-RULE 32: IF (cholesterol IS extremely high) THEN health IS Critical; OK
+IF TEP < 50 THEN "Nepridať BB." 0 OK   (BB IS false | 0)
+IF sTK < 90 THEN "Nepridať BB." 0 OK (BB IS false | 0)
+IF CHOCHP IS true THEN "Nepridať BB." 0 OK (BB IS false | 0)
+IF AV blok II / III IS true THEN "Nepridať BB." 0 OK (BB IS false | 0)
+IF Kreatinin > 250 THEN "Pridať BB okrem nebivolol." 1 OK (BB IS false | 0)
 
-RULE 33: IF (blood_sugar IS high) THEN health IS High; OK
+IF Tep < 50 THEN "Vysadiť alebo redukovať BB." 0 OK (BB IS true | 1)
+IF AV blok II / III IS true THEN "Vysadiť alebo redukovať BB." 0 OK (BB IS true | 1)
+IF symptomaticka hypotenzia IS true THEN "Vysadiť alebo redukovať BB." 0 OK (BB IS true | 1)
+IF Nebivolol IS true AND Kreatinin > 250 THEN "Nahradiť nebivolol iným BB." 1 OK (BB IS true | 1)
+IF Max davka IS false THEN "Navýšiť dávku BB. 1 OK (BB IS true | 1)
+IF Max davka IS true THEN "Pokračujte v terapii." 0 OK (BB IS true | 1)
 
-RULE 34: IF (ECG IS normal) THEN health IS healthy; OK
-RULE 35: IF (ECG IS normal) THEN health IS Low; OK
-RULE 36: IF (ECG IS abnormal) THEN health IS High; OK
-RULE 37: IF (ECG IS hypertrophy) THEN health IS Very high; OK
-RULE 38: IF (ECG IS hypertrophy) THEN health IS Critical; OK
+IF K+ > 5 THEN "Nemožnosť pridať ACEi." 0 OK
+IF GFR < 30 THEN "Nemožnosť pridať ACEi." 0 OK
+IF sTK < 90 THEN "Nemožnosť pridať ACEi." 0 OK
 
-RULE 39: IF (heart_rate IS low) THEN health IS healthy; OK
-RULE 40: IF (heart_rate IS medium) THEN health IS Low; OK
-RULE 41: IF (heart_rate IS medium) THEN health IS High; OK
-RULE 42: IF (heart_rate IS high) THEN health IS Very high; OK
-RULE 43: IF (heart_rate IS high) THEN health IS Critical; OK
+IF symptomaticka hypotenzia IS true THEN "Vysadiť alebo znížiť dávku ACEi." 1 OK
+IF K+ > 5,5 THEN "Vysadiť alebo znížiť dávku ACEi." 1 OK
+IF GFR < 20 THEN "Vysadiť alebo znížiť dávku ACEi." 1 OK 
+IF Max davka IS true THEN "Pokračujte v liečbe." 0 OK
+IF Max davka IS false THEN "Navýšiť dávku ACEi." 1 OK
 
-RULE 44: IF (age IS young) THEN health IS healthy; OK
-RULE 45: IF (age IS middle age) THEN health IS Low; OK
-RULE 46: IF (age IS old) THEN health IS High; OK
-RULE 47: IF (age IS old) THEN health IS Very high; OK
-RULE 48: IF (age IS very old) THEN health IS Critical; OK
+IF Uziva ivabradin IS false AND GFR < 15 THEN "Nezačať s terapiou." 0 OK
+IF Uziva ivabradin IS false AND fibrilacia predsieni IS true THEN "Nezačať s terapiou." 0 OK
+IF Uziva ivabradin IS false AND vek > 75 THEN "Začať s nižšou dávkou." 1 OK
+IF Uziva ivabradin IS false THEN "Začať s terapiou." 0 -> 1
+IF Uziva ivabradin IS true AND SF < 50 THEN "Vysadiť alebo redukovať ivabradin." 1 OK
+IF Uziva ivabradin IS true AND Symptomaticka bradykardia is true THEN "Vysadiť alebo redukovať ivabradin." 1 OK
 
-RULE 49: IF (height IS short) THEN height IS Very high; OK
-RULE 50: IF (height IS medium) THEN height IS Very Low; OK
-RULE 51: IF (height IS tall) THEN height IS Very high; OK
+IF Uziva vericiguat IS false AND sTK < 100 THEN "Nezačať s terapiou." 0 OK
+IF Uziva vericiguat IS false AND GFR < 15 THEN "Nezačať s terapiou." 0 OK
+IF Uziva vericiguat IS false THEN "Začať s terapiou, pokiaľ bol v predchádzajúcich 6 mesiacoch hospitalizovaný pre dekompenzáciu srdcového zlyhávania alebo vyžadoval v posledných 3 mesiacoch ambulantné podávanie diuretickej liečby." 0 OK
+IF Uziva vericiguat IS true AND sTK < 90 THEN "Vysadiť alebo redukovať vericiguat." 1 OK
+IF Uziva vericiguat IS true AND GFR < 15 THEN "Vysadiť alebo redukovať vericiguat." 1 OK
+IF Uziva vericiguat IS true AND Symptomaticka hypotenzia is true THEN "Vysadiť alebo redukovať vericiguat." 1 OK
 
-RULE 52: IF (weight IS light) THEN health IS High; OK
-RULE 53: IF (weight IS medium) THEN health IS Very Low; OK
-RULE 54: IF (weight IS heavy) THEN health IS Critical; OK
+IF Uziva digoxin IS false AND Pomaly rytmus IS true THEN "Nezačať s terapiou." 0 OK
+IF Uziva digoxin IS false AND AV blok IS II / III THEN "Nezačať s terapiou." 0  OK
+IF Uziva digoxin IS true AND Pomaly rytmus IS true THEN "Vysadiť alebo redukovať digoxin." 1 OK
+IF Uziva digoxin IS true AND AV blok IS II / III THEN "Vysadiť alebo redukovať digoxin." 1 OK
+IF Uziva digoxin IS true AND Hodnota digoxinu v krvi > 1.05  THEN "Vysadiť alebo redukovať digoxin." 1 OK 
+IF hodnota digoxinu v krvi IS [0,64..1,05] THEN "Pokračovať v aktuálnej terapii." 0 OK
+IF hodnota digoxinu v krvi < 0.64 THEN "Pridať digoxin." 1 OK	
 
-Podla toho zostavime logicku Petriho siet: (source lekar)
+IF eGRF < 30 THEN "Ak je mozne znizit diuretika, inak Sznizit/prerusit ACEi/ARB/ARNI alebo MRA."  1
+IF K+ > 5 THEN "Znizit/prerusit ACEi/ARB/ARNI alebo MRA." 0
+IF SBP < 95 THEN "Znizit/prerusit ACEi/ARB/ARNI alebo MRA." 0
 
-Premenne: LBBB, QRS, NYHA-II-III, GFR, sTK, symptomaticka hypotenzia, Uzivany gliflozin, Max davka, K+, TEP, CHOCHP, AV blok II / III, Kreatinin, Nebivolol, Uziva ivabradin,  Fibrilacia predsieni , vek, SF ,Symptomaticka bradykardia, 
-Uziva vericiguat, Uziva digoxin, Hodnota digoxinu v krvi, Pomaly rytmus,  eGRF , SBP, HR, Zvysenie NTproBNP 
-
-if LBBB is true AND QRS is >=150 THEN "Doporučene zavedenie CRT"
-if LBBB is true AND QRS is [130,..,149] THEN "Malo by byt zvazene zavedenie CRT"
-if LBBB is false AND QRS >= 150 THEN "Malo by byt zvazene zavedenie CRT"
-if LBBB is false AND QRS is [130,..,149] THEN "Môže byt zvazene zavedenie CRT"
-
-if GFR < 20 THEN "Nemozno pridat gliflozin"
-if sTK < 90 THEN "Nemozno pridat gliflozin"
-if symptomaticka hypotenzia is true THEN "Nemozno pridat gliflozin"
-if GFR is [20..25] THEN "Pridajte empagliflozin"
-if GFR > 25 THEN "Pridajte dapagliflozin alebo empagliflozin"
-
-if GFR < 20 AND Uzivany gliflozin is "dapa" | "empa" THEN "Vysadiť gliflozin"
-if GFR is [20..25] AND Uzivany gliflozin is "empa" THEN "Pokračujte v aktuálnej terapii"
-if GFR is [20..25] AND Uzivany gliflozin is "dapa" THEN "Ak sa očakáva ďalšie zhoršenie fukncie obličiek, odporucanie vysadit, inak prejst na empa."
-if GFR > 25 AND Uzivany gliflozin is "dapa" | "empa" THEN "Pokračujte v aktuálnej terapii."
-If Max davka is true THEN "Pokračujte v terapii."
-
-if Max davka is false AND K+ < 5 THEN "Pridajte bežnú dávku MRA."
-if K+ is [5..5,5] THEN "Udržiavajte aktuálnu dávku."
-if Max davka is false AND K+ is [5,5...6] THEN "Pridajte polovičnú dávku MRA, ak to nie je možné odporúčanie vysadiť MRA."
-if Max davka is false AND GFR < 30 THEN "Pridajte polovičnú dávku MRA, ak to nie je možné odporúčanie vysadiť MRA."
-if K+ > 6 THEN "Vysaďte MRA."
-if GFR < 20 THEN "Vysaďte MRA."
-if Max davka is true THEN "Pokračujte v terapii."
-
-if GFR < 30 THEN "Nie je možné prejst na ARNI, odporúčanie ponechať ACEi."
-if sTK < 90 THEN "Nie je možné prejst na ARNI, odporúčanie ponechať ACEi."
-if symptomaticka hypotenzia is true THEN "Nie je možné prejst na ARNI, odporúčanie ponechať ACEi."
-if K+ > 5 THEN "Nie je možné prejst na ARNI, odporúčanie ponechať ACEi."
-if GFR is [30..60] THEN "Začať s ARNI s nižšou dávkou."
-if sTK is [100..110] THEN "Začať s ARNI s nižšou dávkou. "
-
-if symptomaticka hypotenzia is true THEN "Vysadiť ARNI, ak je to možné prejsť na ACEi."
-if K+ > 5,5 THEN "Vysadiť ARNI, ak je to možné prejsť na ACEi."
-if GFR < 30 THEN "Vysadiť ARNI, ak je to možné prejsť na ACEi."
-if Max davka is true THEN "Pokračujte v liečbe."
-if Max davka is false THEN "Navýšiť dávku ARNI."
-
-if TEP < 50 THEN "Nepridať BB."
-is sTK < 90 THEN "Nepridať BB."
-if CHOCHP is true THEN "Nepridať BB."
-if AV blok II / III is true THEN "Nepridať BB."
-if Kreatinin > 250 THEN "Pridať BB okrem nebivolol."
-
-if Tep < 50 THEN "Vysadiť alebo redukovať BB."
-if AV blok II / III is true THEN "Vysadiť alebo redukovať BB."
-if "symptomaticka hypotenzia" is true THEN "Vysadiť alebo redukovať BB."
-if Nebivolol is true AND Kreatinin > 250 THEN "Nahradiť nebivolol iným BB."
-if Max davka is false THEN "Navýšiť dávku BB.
-if Max davka is true THEN "Pokračujte v terapii."
-
-if K+ > 5 THEN "Nemožnosť pridať ACEi."
-if GFR < 30 THEN "Nemožnosť pridať ACEi."
-if sTK < 90 THEN "Nemožnosť pridať ACEi."
-
-if symptomaticka hypotenzia is true THEN "Vysadiť alebo znížiť dávku ACEi."
-if K+ > 5,5 THEN "Vysadiť alebo znížiť dávku ACEi."
-if GFR < 20 THEN "Vysadiť alebo znížiť dávku ACEi."
-if Max davka is true THEN "Pokračujte v liečbe."
-if Max davka is false THEN "Navýšiť dávku ACEi."
-
-if Uziva ivabradin is false AND GFR < 15 THEN "Nezačať s terapiou."
-if Uziva ivabradin is false AND Fibrilacia predsieni is true THEN "Nezačať s terapiou."
-if Uziva ivabradin is false AND vek > 75 THEN "Začať s nižšou dávkou."
-if Uziva ivabradin is false THEN "Začať s terapiou."
-if Uziva ivabradin is true AND SF < 50 THEN "Vysadiť alebo redukovať ivabradin."
-if Uziva ivabradin is true AND Symptomaticka bradykardia is true THEN "Vysadiť alebo redukovať ivabradin."
-
-if Uziva vericiguat is false AND sTK < 100 THEN "Nezačať s terapiou."
-if Uziva vericiguat is false AND GFR < 15 THEN "Nezačať s terapiou."
-if Uziva vericiguat is false THEN "Začať s terapiou, pokiaľ bol v predchádzajúcich 6 mesiacoch hospitalizovaný pre dekompenzáciu srdcového zlyhávania alebo vyžadoval v posledných 3 mesiacoch ambulantné podávanie diuretickej liečby."
-if Uziva vericiguat is true AND sTK < 90 THEN "Vysadiť alebo redukovať vericiguat."
-if Uziva vericiguat is true AND GFR < 15 THEN "Vysadiť alebo redukovať vericiguat."
-if Uziva vericiguat is true AND Symptomaticka hypotenzia is true THEN "Vysadiť alebo redukovať vericiguat."
-
-if Uziva digoxin is false AND Pomaly rytmus is true THEN "Nezačať s terapiou."
-if Uziva digoxin is false AND AV blok is II / III THEN "Nezačať s terapiou."
-if Uziva digoxin is true AND Pomaly rytmus is true THEN "Vysadiť alebo redukovať digoxin."
-if Uziva digoxin is true AND  AV blok is II / III THEN "Vysadiť alebo redukovať digoxin."
-if Uziva digoxin is true AND Hodnota digoxinu v krvi > 1.05  THEN "Vysadiť alebo redukovať digoxin."
-if Hodnota digoxinu v krvi is [0,64..1,05] THEN "Pokračovať v aktuálnej terapii."
-if Hodnota digoxinu v krvi < 0.64 THEN "Pridať digoxin."
-
-if eGRF < 30 THEN "Ak je mozne znizit diuretika, inak znizit/prerusit ACEi/ARB/ARNI alebo MRA."
-if K+ > 5 THEN "Znizit/prerusit ACEi/ARB/ARNI alebo MRA."
-if SBP < 95 THEN "Znizit/prerusit ACEi/ARB/ARNI alebo MRA."
-
-if HR < 55 THEN "Znizit alebo vysadit BB."
-if Zvysenie NTproBNP > 10 %  THEN "Ak je to mozne zvysit diuretika a znizit alebo vysadit BB."
-if SBP > 95 THEN "Pokracovat alebo zvysit BB."
-
+IF HR < 55 THEN "Znizit alebo vysadit BB." 0
+IF Zvysenie NTproBNP > 10 % THEN "Ak je to mozne zvysit diuretika a znizit alebo vysadit BB." 1
+IF SBP > 95 THEN "Pokracovat alebo zvysit BB." 1 
