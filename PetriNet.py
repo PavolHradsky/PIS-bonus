@@ -88,3 +88,10 @@ class PetriNet:
         if m != m_next:
             return m_next
         return None
+
+    def getIncoming(self, transition: Transition) -> List[Place]:
+        incoming_places = []
+        for arc in self.W:
+            if arc.dest == transition:
+                incoming_places.append(arc.src)
+        return incoming_places

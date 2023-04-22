@@ -24,7 +24,7 @@
 		<id>p2</id>
 		<x>380</x>
 		<y>300</y>
-		<label>symptomaticka bradykardia</label>
+		<label>vek</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

@@ -31,7 +31,7 @@
 		<id>p2</id>
 		<x>700</x>
 		<y>220</y>
-		<label>K+</label>
+		<label>Max davka</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

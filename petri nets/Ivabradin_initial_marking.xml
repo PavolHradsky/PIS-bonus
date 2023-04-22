@@ -18,14 +18,14 @@
 		<x>380</x>
 		<y>140</y>
 		<label>Uziva ivabradin</label>
-		<tokens>1</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p2</id>
 		<x>380</x>
 		<y>300</y>
-		<label>symptomaticka bradykardia</label>
+		<label>vek</label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>

@@ -300,6 +300,7 @@ class VericiguatTherapy:
             return 0
         else:
             print("neexistujuce pravidlo")
+            return None
 
 
 class IvabradineTherapy:
@@ -347,6 +348,7 @@ class IvabradineTherapy:
             return uziva_ivabradin, 1
         else:
             print("neexistujuce pravidlo")
+            return None
 
 
 class DigoxinTherapy:
@@ -390,6 +392,7 @@ class DigoxinTherapy:
             return uziva_digoxin,  1
         else:
             print("neexistuje pravidlo")
+            return None
 
 
 def get_final_result_fuzzy(data):
@@ -419,7 +422,7 @@ def get_final_result_fuzzy(data):
     chest_pain_value = data['Bolest v hrudi'] if 'Bolest v hrudi' in data else None
     age, sex, height, weight, st_bp, dt_bp, sugar, cholesterol, heart_rate, ekg, chest_pain = None, None, None, None, None, None, None, None, None, None, None
 
-    # check if data has string value instad of number
+    # check if data has string value instead of number
     if age_value is not None:
         if isinstance(age_value, str) and (age_value == 'young' or age_value == 'middle age' or age_value == 'old' or age_value == 'very old'):
             age = round(age_class.calc_fuzzy(age_value), 2)
@@ -552,7 +555,6 @@ class LbbbTherapy:
 
 def get_final_result_logical(data, net):
     keys_array = [key for key in data.keys()]
-    print(keys_array)
     if 'LBBB' in keys_array:
         if data['LBBB'] == 'false' or data['LBBB'] == 'true':
             LBBB = data['LBBB']
@@ -560,23 +562,37 @@ def get_final_result_logical(data, net):
             nyha = data['NYHA-II-III'] if 'NYHA-II-III' in keys_array else None
             if qrs is not None and nyha is not None:
                 value = LbbbTherapy().calc_fuzzy(LBBB, qrs, nyha)
-                data['QRS'] = value[1]
-                data['LBBB'] = value[0]
-                data['NYHA-II-III'] = value[2]
+                if value is not None:
+                    data['LBBB'] = value[0]
+                    data['QRS'] = value[1]
+                    data['NYHA-II-III'] = value[2]
+                else:
+                    data['LBBB'] = None
+                    data['QRS'] = None
+                    data['NYHA-II-III'] = None
+                    return None
             else:
                 print("Nezname pravidlo")
+                for key, value in data.items():
+                    data[key] = None
+                return None
         else:
             print("Nespravny format hodnoty LBBB")
+            for key, value in data.items():
+                data[key] = None
+            return None
 
-    if 'NYHA-II-III' in keys_array:
+    if 'NYHA-II-III' in keys_array and len(keys_array) == 1:
         if (data['NYHA-II-III'] == 'false' or data['NYHA-II-III'] == 'true') and 'LBBB' not in keys_array and 'QRS' not in keys_array:
             data['NYHA-II-III'] = 1 if data['NYHA-II-III'] == 'true' else 0
         else:
-            print("Nezname pravidlo")
+            for key, value in data.items():
+                data[key] = None
+            return None
 
     if 'Uzivany gliflozin' in keys_array:
         if (data['Uzivany gliflozin'] == 'false' or data['Uzivany gliflozin'] == 0) and 'GFR' in keys_array:
-            gfr = int(data['GFR'])
+            gfr = int(data['GFR']) if 'GFR' in keys_array else None
             if data['Uzivany gliflozin'] == 'false':
                 data['Uzivany gliflozin'] = 0
             if gfr < 20:
@@ -587,15 +603,15 @@ def get_final_result_logical(data, net):
                 data['GFR'] = 1
             else:
                 print("Nespravny format hodnoty gfr")
-        if (data['Uzivany gliflozin'] == 'false' or data['Uzivany gliflozin'] == '0') and 'sTK' in keys_array:
+        elif (data['Uzivany gliflozin'] == 'false' or data['Uzivany gliflozin'] == '0') and 'sTK' in keys_array:
             data['Uzivany gliflozin'] = 0
-            stk = int(data['sTK'])
+            stk = int(data['sTK']) if 'sTK' in keys_array else None
             if stk < 90:
                 data['sTK'] = 0
             else:
                 print("Nespravny format hodnoty sTK")
 
-        if (data['Uzivany gliflozin'] == 'false' or data['Uzivany gliflozin'] == '0') and 'symptomaticka hypotenzia' in keys_array:
+        elif (data['Uzivany gliflozin'] == 'false' or data['Uzivany gliflozin'] == '0') and 'symptomaticka hypotenzia' in keys_array:
             if data['Uzivany gliflozin'] == 'false':
                 data['Uzivany gliflozin'] = 0
             if data['symptomaticka hypotenzia'] == 'true':
@@ -605,12 +621,13 @@ def get_final_result_logical(data, net):
             else:
                 print("Nespravny format hodnoty symptomaticka hypotenzia")
 
-        if (data['Uzivany gliflozin'] == 'dapa' or data['Uzivany gliflozin'] == 'empa') and 'GFR' in keys_array:
-            gfr = int(data['gfr'])
-            if gfr and (data['Uzivany gliflozin'] == 'dapa' or data['Uzivany gliflozin'] == 'empa'):
+        elif (data['Uzivany gliflozin'] == 'dapa' or data['Uzivany gliflozin'] == 'empa') and 'GFR' in keys_array:
+            gfr = int(data['GFR'])
+            if gfr < 20 and (data['Uzivany gliflozin'] == 'dapa' or data['Uzivany gliflozin'] == 'empa'):
                 data['Uzivany gliflozin'] = 0
                 data['GFR'] = 0
             elif gfr >= 20 and gfr <= 25 and data['Uzivany gliflozin'] == 'empa':
+                print(gfr)
                 data['Uzivany gliflozin'] = 1
                 data['GFR'] = 1
             elif gfr >= 20 and gfr <= 25 and data['Uzivany gliflozin'] == 'dapa':
@@ -621,11 +638,13 @@ def get_final_result_logical(data, net):
                 data['GFR'] = 1
             else:
                 print("Nespravny format hodnoty GFR")
-
-        if (data['Uzivany gliflozin'] == 'true' or data['Uzivany gliflozin'] == '1') and 'Max davka' in keys_array:
+        elif (data['Uzivany gliflozin'] == 'true' or data['Uzivany gliflozin'] == '1') and 'Max davka' in keys_array:
+            data['Uzivany gliflozin'] = 1
             if data['Max davka'] == 'true':
                 data['Max davka'] = 1
         else:
+            for key, value in data.items():
+                data[key] = None
             print("Nezname pravidlo")
 
     if 'BB' in keys_array:
@@ -787,6 +806,8 @@ def get_final_result_logical(data, net):
             if int(data['K+']) > 5:
                 data['K+'] = 0
             else:
+                data['ACEI'] = None
+                data['K+'] = None
                 print("Nespravny format hodnoty K+")
         elif (data['ACEI'] == 'false' or data['ACEI'] == '0') and 'sTK' in keys_array:
             if data['ACEI'] == 'false':
@@ -794,6 +815,8 @@ def get_final_result_logical(data, net):
             if int(data['sTK']) < 90:
                 data['sTK'] = 0
             else:
+                data['ACEI'] = None
+                data['sTK'] = None
                 print("Nespravny format hodnoty sTK")
         elif (data['ACEI'] == 'false' or data['ACEI'] == '0') and 'GFR' in keys_array:
             if data['ACEI'] == 'false':
@@ -801,7 +824,9 @@ def get_final_result_logical(data, net):
             if int(data['GFR']) < 30:
                 data['GFR'] = 0
             else:
-                print("Nespravny format hodnoty gfr")
+                data['ACEI'] = None
+                data['GFR'] = None
+                print("Nespravne pravidlo")
 
         elif (data['ACEI'] == 'true' or data['ACEI'] == '1') and 'K+' in keys_array:
             if data['ACEI'] == 'true':
@@ -809,21 +834,27 @@ def get_final_result_logical(data, net):
             if float(data['K+']) > 5.5:
                 data['K+'] = 1
             else:
-                print("Nespravny format hodnoty K+")
+                data['ACEI'] = None
+                data['K+'] = None
+                print("Nespravne pravidlo")
         elif (data['ACEI'] == 'true' or data['ACEI'] == '1') and "symptomaticka hypotenzia" in keys_array:
             if data['ACEI'] == 'true':
                 data['ACEI'] = 1
             if data["symptomaticka hypotenzia"] == 'true':
                 data["symptomaticka hypotenzia"] = 1
             else:
-                print("Nespravny format hodnoty symptomaticka hypotenzia")
+                data['ACEI'] = None
+                data["symptomaticka hypotenzia"] = None
+                print("Nespravne pravidlo")
         elif (data['ACEI'] == 'true' or data['ACEI'] == '1') and 'GFR' in keys_array:
             if data['ACEI'] == 'true':
                 data['ACEI'] = 1
             if float(data['GFR']) < 20:
                 data['GFR'] = 1
             else:
-                print("Nespravny format hodnoty GFR")
+                data['ACEI'] = None
+                data['GFR'] = None
+                print("Nespravne pravidlo")
         elif (data['ACEI'] == 'true' or data['ACEI'] == '1') and 'Max davka' in keys_array:
             if data['ACEI'] == 'true':
                 data['ACEI'] = 1
@@ -832,54 +863,72 @@ def get_final_result_logical(data, net):
             elif data['Max davka'] == "false":
                 data['Max davka'] = 1
             else:
-                print("Nespravny format hodnoty Max davka")
+                data['ACEI'] = None
+                data['Max davka'] = None
+                print("Nespravne pravidlo")
         else:
-            print("Neexitujuce pravidlo pre ACEI")
+            for key, value in data.items():
+                data[key] = None
+            print("Nezname pravidlo")
 
     if "MRA" in [place.label for place in net.getPlaces()]:
 
         if 'Max davka' in keys_array and "K+" in keys_array:
-            k_value = float(data['K+'].replace(",", "."))
+            k_value = float(str(data['K+']).replace(",", "."))
             if data['Max davka'] == "false":
                 data['Max davka'] = 1
             else:
+                data['Max davka'] = None
                 print("Nespravny format hodnoty Max davka")
             if k_value < 5:
                 data['K+'] = 1
-            else:
-                print("Nespravny format hodnoty K+")
-        if 'K+' in keys_array and "Max davka" not in keys_array:
-            k_value = float(data['K+'].replace(",", "."))
-            if k_value > 5 and k_value < 5.5:
-                data['K+'] = 0
-            if k_value > 6:
+            if k_value > 5.5 and k_value < 6:
                 data['K+'] = 1
             else:
+                data['K+'] = None
                 print("Nespravny format hodnoty K+")
-        if 'K+' in keys_array and "Max davka" in keys_array and "GFR" not in keys_array:
-            k_value = float(data['K+'].replace(",", "."))
+        elif 'K+' in keys_array and "Max davka" not in keys_array:
+            k_value = float(str(data['K+']).replace(",", "."))
+            if k_value > 5.0 and k_value < 5.5:
+                data['K+'] = 0
+            elif k_value > 6.0:
+                data['K+'] = 1
+            else:
+                data['K+'] = None
+                print("Nespravny format hodnoty K+")
+        elif 'K+' in keys_array and "Max davka" in keys_array and "GFR" not in keys_array:
+            k_value = float(str(data['K+']).replace(",", "."))
             if data['Max davka'] == "false":
                 data['Max davka'] = 1
             if k_value > 5.5 and k_value < 6:
                 data['K+'] = 1
             else:
+                data['K+'] = None
                 print("Nespravny format hodnoty K+")
-        if 'K+' not in keys_array and "Max davka" in keys_array and "GFR" in keys_array:
+        elif 'K+' not in keys_array and "Max davka" in keys_array and "GFR" in keys_array:
             if float(data['GFR']) < 30:
                 data['GFR'] = 1
             if data['Max davka'] == "false":
                 data['Max davka'] = 1
             else:
+                data['Max davka'] = None
+                data['GFR'] = None
                 print("Nespravny format hodnoty GFR")
-        if 'GFR' in keys_array and "Max davka" not in keys_array and "K+" not in keys_array:
+        elif 'GFR' in keys_array and "Max davka" not in keys_array and "K+" not in keys_array:
             if float(data['GFR']) < 20:
                 data['GFR'] = 1
             else:
+                data['GFR'] = None
                 print("Nespravny format hodnoty GFR")
-        if 'GFR' not in keys_array and "Max davka" in keys_array and "K+" not in keys_array:
+        elif 'GFR' not in keys_array and "Max davka" in keys_array and "K+" not in keys_array:
             if data['Max davka'] == "true":
                 data['Max davka'] = 0
+            else:
+                data['Max davka'] = None
+                print("Nespravny format hodnoty Max davka")
         else:
+            for key, value in data.items():
+                data[key] = None
             print("Neexitujuce pravidlo pre MRA")
 
     if 'Uziva vericiguat' in keys_array:
@@ -893,109 +942,174 @@ def get_final_result_logical(data, net):
             if sTK is not None:
                 value = VericiguatTherapy().calc_fuzzy(
                     vericiguat, sTK, GFR, symptomaticka_hypotenzia)
-                data['sTK'] = value[1]
-                data['Uziva vericiguat'] = value[0]
-            if GFR is not None:
+                if value is not None:
+                    data['sTK'] = value[1]
+                    data['Uziva vericiguat'] = value[0]
+                else:
+                    data['Uziva vericiguat'] = None
+                    data['sTK'] = None
+            elif GFR is not None:
                 value = VericiguatTherapy().calc_fuzzy(
                     vericiguat, sTK, GFR, symptomaticka_hypotenzia)
-                data['GFR'] = value[1]
-                data['Uziva vericiguat'] = value[0]
-
-            if symptomaticka_hypotenzia is not None:
+                if value is not None:
+                    data['GFR'] = value[1]
+                    data['Uziva vericiguat'] = value[0]
+                else:
+                    data['Uziva vericiguat'] = None
+                    data['GFR'] = None
+            elif symptomaticka_hypotenzia is not None:
                 value = VericiguatTherapy().calc_fuzzy(
                     vericiguat, sTK, GFR, symptomaticka_hypotenzia)
-                data['symptomaticka hypotenzia'] = value[1]
-                data['Uziva vericiguat'] = value[0]
-
-            if vericiguat is not None and sTK is None and GFR is None and symptomaticka_hypotenzia is None:
+                if value is not None:
+                    data['symptomaticka hypotenzia'] = value[1]
+                    data['Uziva vericiguat'] = value[0]
+                else:
+                    data['Uziva vericiguat'] = None
+                    data['symptomaticka hypotenzia'] = None
+            elif vericiguat is not None and sTK is None and GFR is None and symptomaticka_hypotenzia is None:
                 data['Uziva vericiguat'] = VericiguatTherapy().calc_fuzzy(
                     vericiguat, None, None, None)
-
+            else:
+                for key, value in data.items():
+                    data[key] = None
+                print("Nezname pravidlo")
         else:
+            for key, value in data.items():
+                data[key] = None
             print("Uziva vericiguat musi byt true alebo false")
 
     if 'Uziva ivabradin' in keys_array:
         if data['Uziva ivabradin'] == 'false' or data['Uziva ivabradin'] == 'true' or data['Uziva ivabradin'] == '0' or data['Uziva ivabradin'] == '1':
             ivabradin = data['Uziva ivabradin']
             fibrilacia_predsieni = data['fibrilacia predsieni'] if 'fibrilacia predsieni' in keys_array else None
-            sf = float(data['sf']) if 'sf' in keys_array else None
+            sf = float(data['SF']) if 'SF' in keys_array else None
             vek = int(data['vek']) if 'vek' in keys_array else None
             gfr = float(data['GFR']) if 'GFR' in keys_array else None
             symptomaticka_bradykardia = data['symptomaticka bradykardia'] if 'symptomaticka bradykardia' in keys_array else None
             if fibrilacia_predsieni is not None:
                 value = IvabradineTherapy().calc_fuzzy(ivabradin, fibrilacia_predsieni,
                                                        sf, vek, symptomaticka_bradykardia, gfr)
-                data['fibrilacia predsieni'] = value[1]
-                data['Uziva ivabradin'] = value[0]
-            if sf is not None:
+                if value is not None:
+                    data['fibrilacia predsieni'] = value[1]
+                    data['Uziva ivabradin'] = value[0]
+                else:
+                    data['Uziva ivabradin'] = None
+                    data['fibrilacia predsieni'] = None
+
+            elif sf is not None:
                 value = IvabradineTherapy().calc_fuzzy(ivabradin, fibrilacia_predsieni,
                                                        sf, vek, symptomaticka_bradykardia, gfr)
-                data['sf'] = value[1]
-                data['Uziva ivabradin'] = value[0]
-            if vek is not None:
+                if value is not None:
+                    data['SF'] = value[1]
+                    data['Uziva ivabradin'] = value[0]
+                else:
+                    data['Uziva ivabradin'] = None
+                    data['SF'] = None
+            elif vek is not None:
                 value = IvabradineTherapy().calc_fuzzy(ivabradin, fibrilacia_predsieni,
                                                        sf, vek, symptomaticka_bradykardia, gfr)
-                data['vek'] = value[1]
-                data['Uziva ivabradin'] = value[0]
-            if gfr is not None:
+                if value is not None:
+                    data['vek'] = value[1]
+                    data['Uziva ivabradin'] = value[0]
+                else:
+                    data['Uziva ivabradin'] = None
+                    data['vek'] = None
+            elif gfr is not None:
                 value = IvabradineTherapy().calc_fuzzy(ivabradin, fibrilacia_predsieni,
                                                        sf, vek, symptomaticka_bradykardia, gfr)
-                data['GFR'] = value[1]
-                data['Uziva ivabradin'] = value[0]
-            if symptomaticka_bradykardia is not None:
+                if value is not None:
+                    data['GFR'] = value[1]
+                    data['Uziva ivabradin'] = value[0]
+                else:
+                    data['Uziva ivabradin'] = None
+                    data['GFR'] = None
+            elif symptomaticka_bradykardia is not None:
                 value = IvabradineTherapy().calc_fuzzy(ivabradin, fibrilacia_predsieni,
                                                        sf, vek, symptomaticka_bradykardia, gfr)
-                data['symptomaticka bradykardia'] = value[1]
-                data['Uziva ivabradin'] = value[0]
-            if ivabradin is not None and fibrilacia_predsieni is None and sf is None and vek is None and gfr is None and symptomaticka_bradykardia is None:
+                if value is not None:
+                    data['symptomaticka bradykardia'] = value[1]
+                    data['Uziva ivabradin'] = value[0]
+                else:
+                    data['Uziva ivabradin'] = None
+                    data['symptomaticka bradykardia'] = None
+            elif ivabradin is not None and fibrilacia_predsieni is None and sf is None and vek is None and gfr is None and symptomaticka_bradykardia is None:
                 data['Uziva ivabradin'] = IvabradineTherapy().calc_fuzzy(
                     ivabradin, None, None, None, None, None)
+            else:
+                for key, value in data.items():
+                    data[key] = None
+                print("Nezname pravidlo")
         else:
+            for key, value in data.items():
+                data[key] = None
             print("Uziva ivabradin musi byt true alebo false")
 
-    if 'Uziva digoxin' in keys_array and 'hodnota digoxinu' not in keys_array:
+    if 'Uziva digoxin' in keys_array:
         if data['Uziva digoxin'] == 'false' or data['Uziva digoxin'] == 'true' or data['Uziva digoxin'] == '0' or data['Uziva digoxin'] == '1':
             digoxin = data['Uziva digoxin']
-            pomaly_rytmus = data['pomaly rytmus'] if 'pomaly rytmus' in keys_array else None
+            pomaly_rytmus = data['Pomaly rytmus'] if 'Pomaly rytmus' in keys_array else None
             av = data['AV blok'] if 'AV blok' in keys_array else None
-            di_val = float(data['hodnota digoxinu'].replace(
-                ',', '.')) if 'hodnota digoxinu' in keys_array else None
+            di_val = float(data['Hodnota digoxinu'].replace(
+                ',', '.')) if 'Hodnota digoxinu' in keys_array else None
 
             if pomaly_rytmus is not None:
                 value = DigoxinTherapy().calc_fuzzy(digoxin,
                                                     pomaly_rytmus, av, di_val)
-                data['pomaly rytmus'] = value[1]
-                data['Uziva digoxin'] = value[0]
-            if av is not None:
+                if value is not None:
+                    data['Pomaly rytmus'] = value[1]
+                    data['Uziva digoxin'] = value[0]
+                else:
+                    data['Uziva digoxin'] = None
+                    data['Pomaly rytmus'] = None
+            elif av is not None:
                 value = DigoxinTherapy().calc_fuzzy(digoxin,
                                                     pomaly_rytmus, av, di_val)
-                data['AV blok'] = value[1]
-                data['Uziva digoxin'] = value[0]
-            if di_val is not None:
+                if value is not None:
+                    data['AV blok'] = value[1]
+                    data['Uziva digoxin'] = value[0]
+                else:
+                    data['Uziva digoxin'] = None
+                    data['AV blok'] = None
+            elif di_val is not None:
                 value = DigoxinTherapy().calc_fuzzy(digoxin,
                                                     pomaly_rytmus, av, di_val)
-                data['hodnota digoxinu'] = value[1]
-                data['Uziva digoxin'] = value[0]
-
+                if value is not None:
+                    data['Hodnota digoxinu'] = value[1]
+                    data['Uziva digoxin'] = value[0]
+                else:
+                    data['Uziva digoxin'] = None
+                    data['Hodnota digoxinu'] = None
+            else:
+                for key, value in data.items():
+                    data[key] = None
+                print("Nezname pravidlo")
         else:
+            for key, value in data.items():
+                data[key] = None
             print("Uziva digoxin musi byt true alebo false")
 
-    if 'hodnota digoxinu' in keys_array and 'Uziva digoxin' not in keys_array:
-        hodnota_digoxinu = float(data['hodnota digoxinu'].replace(
-            ',', '.')) if 'hodnota digoxinu' in keys_array else None
+    if 'Hodnota digoxinu' in keys_array and 'Uziva digoxin' not in keys_array:
+        hodnota_digoxinu = float(str(data['Hodnota digoxinu']).replace(
+            ',', '.')) if 'Hodnota digoxinu' in keys_array else None
         if hodnota_digoxinu < 0.64:
             print("uziva_digoxin == 1 and hodnota_digoxinu < 0.64")
-            data['hodnota digoxinu'] = 1
+            data['Hodnota digoxinu'] = 1
         elif hodnota_digoxinu >= 0.64 and hodnota_digoxinu <= 1.05:
             print(
                 "uziva_digoxin == 1 and hodnota_digoxinu >= 0.64 and hodnota_digoxinu <= 1.05")
-            data['hodnota digoxinu'] = 0
+            data['Hodnota digoxinu'] = 0
+        else:
+            for key, value in data.items():
+                data[key] = None
+            print("Nezname pravidlo pre hodnotu digoxinu")
 
     if 'eGRF' in keys_array and len(keys_array) == 1:
         eGRF = int(data['eGRF'])
         if eGRF < 30:
             data['eGRF'] = 1
         else:
+            for key, value in data.items():
+                data[key] = None
             print("Nezname pravidlo pre eGRF")
 
     if 'K+' in keys_array and ("MRA" not in [place.label for place in net.getPlaces()] and "ACEI" not in [place.label for place in net.getPlaces()] and "ARNI" not in [place.label for place in net.getPlaces()]):
@@ -1003,6 +1117,8 @@ def get_final_result_logical(data, net):
         if K > 5:
             data['K+'] = 0
         else:
+            for key, value in data.items():
+                data[key] = None
             print("Nezname pravidlo pre K+")
 
     if 'SBP' in keys_array and len(keys_array) == 1:
@@ -1012,6 +1128,8 @@ def get_final_result_logical(data, net):
         elif SBP > 95:
             data['SBP'] = 1
         else:
+            for key, value in data.items():
+                data[key] = None
             print("Nezname pravidlo pre SBP")
 
     if 'HR' in keys_array and len(keys_array) == 1:
@@ -1019,6 +1137,8 @@ def get_final_result_logical(data, net):
         if HR < 55:
             data['HR'] = 0
         else:
+            for key, value in data.items():
+                data[key] = None
             print("Nezname pravidlo pre HR")
 
     if 'Zvysenie NTproBNP' in keys_array and len(keys_array) == 1:
@@ -1026,4 +1146,6 @@ def get_final_result_logical(data, net):
         if Zvysenie_NTproBNP > 10:
             data['Zvysenie NTproBNP'] = 1
         else:
+            for key, value in data.items():
+                data[key] = None
             print("Nezname pravidlo pre Zvysenie NTproBNP")

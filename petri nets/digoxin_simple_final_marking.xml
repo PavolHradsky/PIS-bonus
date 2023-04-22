@@ -17,8 +17,8 @@
 		<id>p1</id>
 		<x>220</x>
 		<y>340</y>
-		<label>hodnota digoxinu</label>
-		<tokens>1</tokens>
+		<label>Hodnota digoxinu</label>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -26,7 +26,7 @@
 		<x>580</x>
 		<y>340</y>
 		<label>result</label>
-		<tokens>1</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<arc>

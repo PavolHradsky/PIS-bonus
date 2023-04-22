@@ -9,102 +9,96 @@
 	<transitionRole>false</transitionRole>
 	<transition>
 		<id>t1</id>
-		<x>380</x>
-		<y>140</y>
-		<label>prvy prechod</label>
+		<x>860</x>
+		<y>340</y>
+		<label>pravidlo1</label>
 	</transition>
 	<transition>
 		<id>t2</id>
-		<x>300</x>
-		<y>260</y>
-		<label>druhy prechod</label>
+		<x>860</x>
+		<y>460</y>
+		<label>pravidlo2</label>
 	</transition>
 	<transition>
 		<id>t3</id>
-		<x>380</x>
-		<y>300</y>
-		<label>treti prechod</label>
+		<x>860</x>
+		<y>540</y>
+		<label>pravidlo3</label>
 	</transition>
 	<transition>
 		<id>t4</id>
-		<x>540</x>
-		<y>140</y>
-		<label>stvrty prechod</label>
+		<x>860</x>
+		<y>620</y>
+		<label>pravidlo4</label>
 	</transition>
 	<transition>
 		<id>t5</id>
-		<x>580</x>
-		<y>300</y>
-		<label>piaty prechod</label>
-	</transition>
-	<transition>
-		<id>t6</id>
-		<x>660</x>
-		<y>140</y>
-		<label>siesty prechod</label>
+		<x>860</x>
+		<y>700</y>
+		<label>pravidlo5</label>
 	</transition>
 	<place>
 		<id>p1</id>
-		<x>260</x>
-		<y>140</y>
-		<label>prve miesto</label>
-		<tokens>0.4</tokens>
+		<x>660</x>
+		<y>260</y>
+		<label>QFR  &lt; 20</label>
+		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p2</id>
-		<x>260</x>
-		<y>300</y>
-		<label>druhe miesto</label>
-		<tokens>0.7</tokens>
+		<x>620</x>
+		<y>340</y>
+		<label>sTK &lt; 90</label>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p3</id>
-		<x>380</x>
-		<y>180</y>
-		<label>tretie miesto</label>
-		<tokens>0.0</tokens>
+		<x>620</x>
+		<y>460</y>
+		<label>symptomaticka hypotenzia</label>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p4</id>
-		<x>460</x>
-		<y>260</y>
-		<label>stvrte miesto</label>
-		<tokens>0.0</tokens>
+		<x>620</x>
+		<y>540</y>
+		<label>GFR (20..25)</label>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p5</id>
-		<x>460</x>
-		<y>140</y>
-		<label>piate miesto</label>
-		<tokens>0.0</tokens>
+		<x>620</x>
+		<y>620</y>
+		<label>GFR &gt; 25</label>
+		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p6</id>
-		<x>620</x>
-		<y>140</y>
-		<label>sieste miesto</label>
-		<tokens>0.0</tokens>
+		<x>1060</x>
+		<y>380</y>
+		<label>Nemozno pridat gliflozin</label>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p7</id>
-		<x>700</x>
-		<y>300</y>
-		<label>siedme miesto</label>
-		<tokens>0.0</tokens>
+		<x>1060</x>
+		<y>500</y>
+		<label>Pridajte empagliflozin</label>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p8</id>
-		<x>740</x>
-		<y>140</y>
-		<label>osme miesto</label>
-		<tokens>0.0</tokens>
+		<x>1060</x>
+		<y>620</y>
+		<label>Pridajte dapagliflozin alebo empagliflozin</label>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<arc>
@@ -118,7 +112,7 @@
 		<id>a2</id>
 		<type>regular</type>
 		<sourceId>t1</sourceId>
-		<destinationId>p5</destinationId>
+		<destinationId>p6</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
@@ -132,69 +126,48 @@
 		<id>a4</id>
 		<type>regular</type>
 		<sourceId>t2</sourceId>
-		<destinationId>p3</destinationId>
+		<destinationId>p6</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a5</id>
 		<type>regular</type>
 		<sourceId>p3</sourceId>
-		<destinationId>t1</destinationId>
+		<destinationId>t3</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a6</id>
 		<type>regular</type>
-		<sourceId>p2</sourceId>
-		<destinationId>t3</destinationId>
+		<sourceId>t3</sourceId>
+		<destinationId>p6</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a7</id>
 		<type>regular</type>
-		<sourceId>t3</sourceId>
-		<destinationId>p4</destinationId>
+		<sourceId>p4</sourceId>
+		<destinationId>t4</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a8</id>
 		<type>regular</type>
-		<sourceId>p4</sourceId>
-		<destinationId>t5</destinationId>
+		<sourceId>t4</sourceId>
+		<destinationId>p7</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a9</id>
 		<type>regular</type>
-		<sourceId>t5</sourceId>
-		<destinationId>p7</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a10</id>
-		<type>regular</type>
 		<sourceId>p5</sourceId>
-		<destinationId>t4</destinationId>
+		<destinationId>t5</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a11</id>
 		<type>regular</type>
-		<sourceId>t4</sourceId>
-		<destinationId>p6</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a12</id>
-		<type>regular</type>
-		<sourceId>p6</sourceId>
-		<destinationId>t6</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a13</id>
-		<type>regular</type>
-		<sourceId>t6</sourceId>
+		<sourceId>t5</sourceId>
 		<destinationId>p8</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>

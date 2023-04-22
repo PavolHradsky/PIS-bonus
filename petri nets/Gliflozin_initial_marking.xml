@@ -32,8 +32,8 @@
 		<id>p2</id>
 		<x>300</x>
 		<y>140</y>
-		<label>GFR</label>
-		<tokens>0</tokens>
+		<label>Max davka</label>
+		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<place>

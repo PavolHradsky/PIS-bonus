@@ -83,7 +83,7 @@ Podľa tohoto zostavíme logickú Petriho sieť: (source reálny lekár)
 
 Premenné:
 
-"Uziva ivabradin", "Uziva vericiguat", "sTK", "GFR", "fibrilacia predsieni", "symptomaticka bradykardia", "vek", "sf", "LBBB", "QRS", "symptomaticka hypotenzia", "Uzivany gliflozin",
+"Uziva ivabradin", "Uziva vericiguat", "sTK", "GFR", "fibrilacia predsieni", "symptomaticka bradykardia", "vek", "SF", "LBBB", "QRS", "symptomaticka hypotenzia", "Uzivany gliflozin",
 "Max davka", "K+", "TEP", "CHOCHP", "AV blok", "Kreatinin", "Nebivolol", "Uziva digoxin", "hodnota digoxinu", "pomaly rytmus", "eGRF", "SBP", "HR", "Zvysenie NTproBNP",
 "NYHA-II-III", 'BB', 'ARNI', 'ACEI', "MRA"
 

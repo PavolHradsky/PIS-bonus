@@ -31,7 +31,7 @@
 		<id>p2</id>
 		<x>580</x>
 		<y>180</y>
-		<label>K+</label>
+		<label>GFR</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

@@ -18,15 +18,15 @@
 		<x>300</x>
 		<y>140</y>
 		<label>Uziva vericiguat</label>
-		<tokens>1</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p2</id>
 		<x>300</x>
 		<y>340</y>
-		<label>symptomaticka hypotenzia</label>
-		<tokens>1</tokens>
+		<label>sTK</label>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>

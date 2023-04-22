@@ -25,15 +25,15 @@
 		<x>460</x>
 		<y>220</y>
 		<label>ACEI</label>
-		<tokens>1</tokens>
+		<tokens>1.0</tokens>
 		<static>false</static>
 	</place>
 	<place>
 		<id>p2</id>
 		<x>700</x>
 		<y>220</y>
-		<label>K+</label>
-		<tokens>1</tokens>
+		<label>Max davka</label>
+		<tokens>1.0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -41,7 +41,7 @@
 		<x>940</x>
 		<y>220</y>
 		<label>result</label>
-		<tokens>1</tokens>
+		<tokens>1.0</tokens>
 		<static>false</static>
 	</place>
 	<arc>

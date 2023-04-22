@@ -24,7 +24,7 @@
 		<id>p2</id>
 		<x>300</x>
 		<y>340</y>
-		<label>symptomaticka hypotenzia</label>
+		<label>sTK</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

@@ -26,7 +26,7 @@
 		<id>p2</id>
 		<x>340</x>
 		<y>340</y>
-		<label>hodnota digoxinu</label>
+		<label>Pomaly rytmus</label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>

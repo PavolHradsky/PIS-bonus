@@ -18,7 +18,7 @@
 		<x>300</x>
 		<y>220</y>
 		<label>NYHA-II-III</label>
-		<tokens>0</tokens>
+		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -26,7 +26,7 @@
 		<x>620</x>
 		<y>220</y>
 		<label>result</label>
-		<tokens>0</tokens>
+		<tokens>1</tokens>
 		<static>false</static>
 	</place>
 	<arc>

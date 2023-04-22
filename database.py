@@ -119,6 +119,7 @@ def connect(add, update, dict_values_patient, dict_values_problems):
         """
         # sql3 = """INSERT INTO hesla (password) VALUES (%s)"""
         # cur.execute(sql3, (hashed_with_salt,))
+
         sql_select = """SELECT * FROM pacient"""
         sql_select2 = """SELECT * FROM liecba"""
         sql_select3 = """SELECT * FROM hesla"""

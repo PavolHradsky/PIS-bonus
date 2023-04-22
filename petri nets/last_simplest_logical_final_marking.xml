@@ -17,7 +17,7 @@
 		<id>p1</id>
 		<x>380</x>
 		<y>260</y>
-		<label>Zvysenie NTproBNP</label>
+		<label>SBP</label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>

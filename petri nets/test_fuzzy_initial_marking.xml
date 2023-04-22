@@ -12,7 +12,7 @@
 		<x>780</x>
 		<y>220</y>
 		<label>treatement</label>
-	<weight>0.2</weight></transition>
+	</transition>
 	<place>
 		<id>p1</id>
 		<x>580</x>
