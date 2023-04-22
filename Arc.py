@@ -1,5 +1,7 @@
 from Item import Item
 
+# inspired by https://github.com/Gmod4phun/PetriNetParser/blob/master/petrinetparser.py
+
 
 class Arc:
     def __init__(self, id, src: Item, dest: Item, multiplicity):

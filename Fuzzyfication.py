@@ -2,11 +2,9 @@ import random
 from FuzzyficateFunctions import obtain_trapezoid_fuzzy_value
 from FuzzyficateFunctions import obtain_gaussian_fuzzy_value
 from FuzzyficateFunctions import obtain_sigmoid_fuzzy_value
-from FuzzyficateFunctions import obtain_triangular_fuzzy_value
 from FuzzyficateFunctions import plot_sigmoid_fuzzy_value
 from FuzzyficateFunctions import plot_cup_gaussian_fuzzy_value
 from FuzzyficateFunctions import plot_trapezoid_fuzzy_value
-from FuzzyficateFunctions import plot_triangular_fuzzy_value
 
 
 class Age:

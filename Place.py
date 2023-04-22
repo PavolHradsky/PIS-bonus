@@ -1,5 +1,7 @@
 from Item import Item
 
+# inspired by https://github.com/Gmod4phun/PetriNetParser/blob/master/petrinetparser.py
+
 
 class Place:
     def __init__(self, id, tokens: float, name: str):

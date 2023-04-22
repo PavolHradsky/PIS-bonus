@@ -1,4 +1,5 @@
 from Item import Item
+# inspired by https://github.com/Gmod4phun/PetriNetParser/blob/master/petrinetparser.py
 
 
 class Transition:
@@ -16,6 +17,6 @@ class Transition:
 
     def getWeight(self):
         return self.weight
-    
+
     def getTreshold(self):
         return self.treshold

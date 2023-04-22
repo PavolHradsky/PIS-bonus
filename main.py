@@ -315,6 +315,7 @@ class MainAplication(QMainWindow):
             self.dict_places = {}
             self.dict_transitions = {}
             self.dict_final = {}
+            # setting inital falgs from selected type of net
             if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = 1
                 self.fuzzy_flag = 0
@@ -455,6 +456,7 @@ class MainAplication(QMainWindow):
                 '.')[0] + "_initial_marking.xml", 1, 1, 1, 1)
             self.run_fuzzy_with_weights_and_thresholds()
 
+    # This function is used when fuzzyfication button is clicked
     def fuzzyficate(self):
         self.fuzzification = 1
         counter = 0
@@ -686,6 +688,7 @@ class MainAplication(QMainWindow):
             self.anotherWindow.fuzzyficate_run.setEnabled(False)
         # self.flag = 0
 
+    # This fuction sets the initial marking of the net
     def set_marking_initial(self, validator):
         self.dict_marks = {}
         self.dict_weights = {}
@@ -2310,7 +2313,7 @@ class MainAplication(QMainWindow):
         self.setting_image(0)
 
     def defuzzyfication_decision(self, result):
-        print(self.flag)
+        # this is for defuzzyfication
         if self.flag == 0:
             for place in self.net.getPlaces():
                 if place.label == 'NYHA-II-III' and 'LBBB' not in self.records_dict:
@@ -2698,7 +2701,7 @@ class MainAplication(QMainWindow):
                                 str(result) + " - Pokračovať v liečbe")
                             self.main_layout.defuzzyfication_label.setStyleSheet(
                                 "color: green;")
-
+        # this is defuzzification for values from database (Github)
         if self.flag == 1:
             if 0.0 <= result <= 0.25:
                 self.main_layout.defuzzyfication_label.setText(
@@ -2853,6 +2856,8 @@ class MainAplication(QMainWindow):
         else:
             self.error_message_box()
 
+# This is dialog window with patient selection and sign in with password
+
 
 class DialogWindow(QtWidgets.QDialog):
     def __init__(self):
@@ -2881,6 +2886,7 @@ class DialogWindow(QtWidgets.QDialog):
     def open_main_application(self):
         password = self.main_layout.password.text().encode('utf-8')
         hashed_with_salt = self.hashed[0][1]
+        # added random +++ to salt
         hashed_str, salt_str = hashed_with_salt.split("+++")
         salt = salt_str.encode('utf-8')
         hashed = bcrypt.hashpw(password, salt)
@@ -2967,6 +2973,7 @@ class DialogWindow(QtWidgets.QDialog):
 
 
 if __name__ == '__main__':
+    # Ask if we want to add patient to the database
     print("Pridat pacienta? (y/n)")
     answer = input()
     if answer == "y":

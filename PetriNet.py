@@ -4,6 +4,7 @@ from Place import Place
 from Transition import Transition
 from Arc import Arc
 from Role import Role
+# inspired by https://github.com/Gmod4phun/PetriNetParser/blob/master/petrinetparser.py
 
 
 class PetriNet:
