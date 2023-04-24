@@ -36,7 +36,7 @@
 		<x>460</x>
 		<y>140</y>
 		<label>LBBB (true)</label>
-		<tokens>1.0</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -44,7 +44,7 @@
 		<x>460</x>
 		<y>340</y>
 		<label>LBBB (false)</label>
-		<tokens>0.0</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -52,7 +52,7 @@
 		<x>460</x>
 		<y>500</y>
 		<label>QRS  (&gt;= 150)</label>
-		<tokens>1.0</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -60,7 +60,7 @@
 		<x>460</x>
 		<y>660</y>
 		<label>QRS (130..149)</label>
-		<tokens>0.0</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -68,7 +68,7 @@
 		<x>460</x>
 		<y>860</y>
 		<label>NYHA-II-III (true)</label>
-		<tokens>1.0</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -76,7 +76,7 @@
 		<x>900</x>
 		<y>140</y>
 		<label>Doporucene CRT</label>
-		<tokens>1.0</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -84,7 +84,7 @@
 		<x>900</x>
 		<y>420</y>
 		<label>Malo by byt CRT</label>
-		<tokens>0.0</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
@@ -92,7 +92,7 @@
 		<x>940</x>
 		<y>660</y>
 		<label>Moze byt CRT</label>
-		<tokens>0.0</tokens>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<arc>

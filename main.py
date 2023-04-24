@@ -23,6 +23,7 @@ from PySide6.QtGui import QPixmap, QImage
 import matplotlib
 matplotlib.use('tkagg')
 
+# global variables to store data from database
 dict_values_patient = {}
 dict_values_problem = {}
 
@@ -81,8 +82,7 @@ class MainAplication(QMainWindow):
         self.main_layout = self.loader.load(self.ui)
         self.ui.close()
         self.setCentralWidget(self.main_layout)
-        self.setWindowIcon(QtGui.QIcon(
-            'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
+        self.setWindowIcon(QtGui.QIcon('.\\gui\\icon.jpg'))
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.setStyleSheet(
             "QMainWindow::titleBar { background-color: black; }")
@@ -117,7 +117,7 @@ class MainAplication(QMainWindow):
         self.ui = QFile(".\\gui\\anotherWindowFinal.ui")
         self.net = None
         self.root = None
-        self.tresholds_flag = 0
+        self.tresholds_flag = 0  # these flags tell us which type of Petri net we are using
         self.weights_flag = 0
         self.fuzzy_flag = 0
         self.logical_flag = 0
@@ -133,17 +133,18 @@ class MainAplication(QMainWindow):
         self.transitions_to_change = []
         self.fuzzyfication = 0
         self.list_edit_widgets = []
-        self.logical_validator = QtCore.QRegularExpression("^(0|1)$")
-        self.fuzzy_validator = QtCore.QRegularExpression("^(0(\.\d+)?|1)$")
+        self.logical_validator = QtCore.QRegularExpression(
+            "^(0|1)$")  # validators for line edits
+        self.fuzzy_validator = QtCore.QRegularExpression(
+            "^(0(\.\d+)?|1)$")  # validators for line edits
         self.fuzzyficated_M0 = []
         if self.image_number == 1:
             self.main_layout.prevButton.setEnabled(False)
         if len(self.dict_final) == 0:
             self.main_layout.nextButton.setEnabled(False)
-        self.currentScale = 1.0
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)  # add this line
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialog_window = None  # initialize dialog window as None
-        self.main_layout.closeEvent = self.closeEvent  # add this line
+        self.main_layout.closeEvent = self.closeEvent
         self.records_dict = {}
         self.records_dict_prev = {}
         self.prev_fired = []  # list of fired transitions in previous step
@@ -169,8 +170,7 @@ class MainAplication(QMainWindow):
         self.anotherWindow = None
         self.ui.open(QFile.ReadOnly)
         self.anotherWindow = self.loader.load(self.ui)
-        self.anotherWindow.setWindowIcon(QtGui.QIcon(
-            'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
+        self.anotherWindow.setWindowIcon(QtGui.QIcon('.\\gui\\icon.jpg'))
         self.anotherWindow.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.anotherWindow.setStyleSheet(
             "QMainWindow::titleBar { background-color: black; }")
@@ -195,23 +195,18 @@ class MainAplication(QMainWindow):
 
     # This function flexibly changes the size of the window
     def resizeEvent(self, event):
-
-        if os.path.exists('./images/0.png'):
-            prem = QImage('./images/0.png')
+        # set it separately for initial image
+        if os.path.exists('./images/0.png') or len(self.image_dict) > 0:
+            image_path = './images/0.png' if os.path.exists(
+                './images/0.png') else self.image_dict[self.image_number]
+            prem = QImage(image_path)
             pixmap = QPixmap.fromImage(prem)
-            self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
-            ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-            self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
-
-        if len(self.image_dict) > 0:
-            prem = QImage(self.image_dict[self.image_number])
-            pixmap = QPixmap.fromImage(prem)
-            self.main_layout.photo.setPixmap(pixmap.scaled(self.main_layout.photo.size(
-            ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+            self.main_layout.photo.setPixmap(pixmap.scaled(
+                self.main_layout.photo.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
             self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
         event.accept()
 
-    # This fuction is called when we want to load a new file into the program
+    # This function is called when we want to load a new file from system into the program
     def open_dialog(self):
         fname = QFileDialog.getOpenFileName(
             self, 'Open file', 'c:\\', "XML files (*.xml)")
@@ -225,6 +220,7 @@ class MainAplication(QMainWindow):
             self.file_name = None
         self.main_layout.clearAll.setEnabled(True)
 
+    # This function just shows which option is selected in the combo box
     def combo_changed(self):
         print(self.main_layout.comboBox.currentText())
 
@@ -240,6 +236,7 @@ class MainAplication(QMainWindow):
             self.main_layout.marking.clear()
         self.main_layout.prevButton.setEnabled(False)
         self.main_layout.nextButton.setEnabled(True)
+        # always remove all images from folder before running another file
         files = glob.glob('./images/*')
         if files != None:
             for f in files:
@@ -295,10 +292,6 @@ class MainAplication(QMainWindow):
                 self.anotherWindow.table.setItem(row, 8, item_8)
 
                 row += 1
-            if "fuzzy" in self.file_name:
-                self.fuzzy_flag = 1
-            else:
-                self.fuzzy_flag = 0
             self.net = loading_data(
                 self.file_name, self.fuzzy_flag, self.weights_flag, self.tresholds_flag, 0)
             self.dict_final = {}
@@ -307,15 +300,15 @@ class MainAplication(QMainWindow):
             self.dict_marks = {}
             self.dict_places = {}
             self.dict_transitions = {}
-            self.draw_net_initial()
-            self.setting_image(1)
+            self.draw_net_initial()  # draw net
+            self.setting_image(1)  # set image
             self.dict_weights = {}
             self.dict_tresholds = {}
             self.dict_marks = {}
             self.dict_places = {}
             self.dict_transitions = {}
             self.dict_final = {}
-            # setting inital falgs from selected type of net
+            # setting inital flags from selected type of net
             if self.main_layout.comboBox.currentText() == "Logická Petriho sieť":
                 self.logical_flag = 1
                 self.fuzzy_flag = 0
@@ -365,17 +358,17 @@ class MainAplication(QMainWindow):
             self.tree = None
             dialog = QMessageBox(text="Nevybrali ste žiadny súbor")
             dialog.setWindowTitle("Message Dialog")
-            dialog.setWindowIcon(QtGui.QIcon(
-                'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
+            dialog.setWindowIcon(QtGui.QIcon('.\\gui\\icon.jpg'))
             dialog.exec()   # Stores the return value for the button pressed
 
-    # add label treshold and weight to transition in xml file
+    # add label treshold and weight to each transition in xml file
     def write_to_file_transitions(self):
         for i, rank in enumerate(self.root.iter('transition')):
             new_tag = ET.SubElement(rank, 'treshold')
             new_tag.text = str(self.net.tresholds[i])
             new_tag = ET.SubElement(rank, 'weight')
             new_tag.text = str(self.net.weights[i])
+    # This function updates XML file with new markings and weights and tresholds if they are set
 
     def run_final(self):
         l = 0
@@ -403,7 +396,6 @@ class MainAplication(QMainWindow):
                     if len(self.net.weights) == 0:
                         self.net.weights = [
                             0 for _ in range(len(self.dict_weights))]
-                    # create new tag to xml to each transition
                     self.write_to_file_transitions()
                 else:
                     if len(self.net.tresholds) != 0 and len(self.net.weights) == 0:
@@ -438,7 +430,7 @@ class MainAplication(QMainWindow):
         self.tree.write(os.path.join(dir_path, self.file_name.split('.')[0] + "_initial" + "_marking.xml"),
                         encoding="UTF-8", xml_declaration=True)
         print("Počiatočné označkovanie: ", self.net.M0)
-
+        # create XML file with initial marking set by user
         if self.logical_flag and not self.fuzzy_flag and not self.weights_flag and not self.tresholds_flag:
             self.net = loading_data(self.file_name.split(
                 '.')[0] + "_initial_marking.xml", 0, 0, 0, 1)
@@ -476,9 +468,7 @@ class MainAplication(QMainWindow):
         for place in self.net.getPlaces():
             if place.name in self.records_dict:
                 self.flag = 1
-        print(self.flag)
         if (self.fuzzy_flag or self.weights_flag or self.tresholds_flag) and self.flag == 1:
-
             for _, value in self.dict_marks.items():
                 if value.text() == '':
                     counter += 1
@@ -716,18 +706,47 @@ class MainAplication(QMainWindow):
             placeLabel.setStyleSheet("color: green;")
             # when place has no outgoing arcs then it is not possible to set marking
             if key.label not in [place.label for place in places_with_no_outgoing_arcs]:
-                entry = QtWidgets.QLineEdit()
-                entry.setMaximumWidth(50)
-                # entry.setValidator(QtGui.QRegularExpressionValidator(validator))
-                entry.setStyleSheet("color: white;")
-                self.list_edit_widgets.append(entry)
-                # self.list_edit_widgets.append(placeLabel)
-                self.dict_marks[key] = entry
-                placeLayout = QtWidgets.QVBoxLayout()
-                placeLayout.addWidget(placeLabel)
-                placeLayout.addWidget(entry)
-                placeLayout.addStretch()
-                placesLayout.addLayout(placeLayout)
+                if self.logical_flag:
+                    # create two radio buttons with yes and no label and values add to dcit
+                    radio_yes = QtWidgets.QRadioButton("Yes")
+                    radio_yes.setStyleSheet("color: white;")
+                    radio_no = QtWidgets.QRadioButton("No")
+                    radio_no.setStyleSheet("color: white;")
+                    radio_group = QtWidgets.QButtonGroup(self)
+                    radio_group.addButton(radio_yes)
+                    radio_group.addButton(radio_no)
+
+                    def get_radio_value():
+                        print("dsadssad")
+                        if radio_yes.isChecked():
+                            print("yes")
+                            self.dict_marks[key] = 1
+                        elif radio_no.isChecked():
+                            print("no")
+                            self.dict_marks[key] = 0
+
+                    radio_group.buttonClicked.connect(get_radio_value)
+
+                    placeLayout = QtWidgets.QVBoxLayout()
+                    placeLayout.addWidget(placeLabel)
+                    placeLayout.addWidget(radio_yes)
+                    placeLayout.addWidget(radio_no)
+                    placeLayout.addStretch()
+                    placesLayout.addLayout(placeLayout)
+
+                else:
+                    entry = QtWidgets.QLineEdit()
+                    entry.setMaximumWidth(50)
+                    # entry.setValidator(QtGui.QRegularExpressionValidator(validator))
+                    entry.setStyleSheet("color: white;")
+                    self.list_edit_widgets.append(entry)
+                    # self.list_edit_widgets.append(placeLabel)
+                    self.dict_marks[key] = entry
+                    placeLayout = QtWidgets.QVBoxLayout()
+                    placeLayout.addWidget(placeLabel)
+                    placeLayout.addWidget(entry)
+                    placeLayout.addStretch()
+                    placesLayout.addLayout(placeLayout)
             else:
                 entry = QtWidgets.QLineEdit()
                 entry.setMaximumWidth(50)
@@ -739,7 +758,7 @@ class MainAplication(QMainWindow):
         self.anotherWindow.placesScrollArea.setWidget(
             self.anotherWindow.placesWidget)
         self.anotherWindow.OK1.clicked.connect(
-            lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
+            lambda: [self.set_marking(self.dict_marks)])
         self.anotherWindow.tresholdsWidget.setStyleSheet(
             "background-color: black;")
         self.anotherWindow.weightsWidget.setStyleSheet(
@@ -827,55 +846,64 @@ class MainAplication(QMainWindow):
             self.anotherWindow.OK3.clicked.connect(lambda: [self.set_tresholds(
                 self.dict_tresholds), self.delete_text(self.dict_tresholds)])
 
+    # This function deletes all text from the entries
     def delete_text(self, entries):
         for _, value in entries.items():
             value.setText("")
 
+    # This function sets the marking of the places, if the user has chosen logical marking else weights and tresholds are set for the transitions
     def set_values(self, entries, logical_flag, weights_flag, tresholds_flag):
-        for item, value in entries.items():
-            if value.text() == '':
-                if logical_flag:
+        if logical_flag:
+            for item, value in entries.items():
+                if value == 1:
+                    item.tokens = 1
+                elif value == 0:
                     item.tokens = 0
-                else:
-                    item.tokens = 0.0
-                if weights_flag:
-                    item.weight = 0.0
-                if tresholds_flag:
-                    item.treshold = 0.0
-            else:
-                try:
-                    if logical_flag:
-                        if value.text() == "true":
-                            num = 1
-                        elif value.text() == "false":
-                            num = 0
-                        elif value.text() == "II" or value.text() == "III":
-                            num = 1
-                        elif value.text() != "true" or value.text() != "false" or value.text() != "II" or value.text() != "III":
-                            num = int(value.text())
-                        else:
-                            return
-                    else:
-                        if value.text() == "true":
-                            num = 1.0
-                        elif value.text() == "false":
-                            num = 0.0
-                        elif value.text() == "II" or value.text() == "III":
-                            num = 10.
-                        elif value.text() != "true" or value.text() != "false" or value.text() != "II" or value.text() != "III":
-                            num = float(value.text().replace(',', '.'))
-                        else:
-                            return
 
-                    item.tokens = num
+        else:
+            for item, value in entries.items():
+                if value.text() == '':
+                    if not logical_flag:
+
+                        item.tokens = 0.0
                     if weights_flag:
-                        item.weight = num
+                        item.weight = 0.0
                     if tresholds_flag:
-                        item.treshold = num
-                except ValueError:
-                    QtWidgets.QMessageBox.warning(
-                        self, "Invalid Input", "Please enter a valid number.")
-                    return
+                        item.treshold = 0.0
+                else:
+                    try:
+                        if logical_flag:
+                            if value.text() == "true":
+                                num = 1
+                            elif value.text() == "false":
+                                num = 0
+                            elif value.text() == "II" or value.text() == "III":
+                                num = 1
+                            elif value.text() != "true" or value.text() != "false" or value.text() != "II" or value.text() != "III":
+                                num = int(value.text())
+                            else:
+                                return
+                        else:
+                            if value.text() == "true":
+                                num = 1.0
+                            elif value.text() == "false":
+                                num = 0.0
+                            elif value.text() == "II" or value.text() == "III":
+                                num = 10.
+                            elif value.text() != "true" or value.text() != "false" or value.text() != "II" or value.text() != "III":
+                                num = float(value.text().replace(',', '.'))
+                            else:
+                                return
+
+                        item.tokens = num
+                        if weights_flag:
+                            item.weight = num
+                        if tresholds_flag:
+                            item.treshold = num
+                    except ValueError:
+                        QtWidgets.QMessageBox.warning(
+                            self, "Invalid Input", "Please enter a valid number.")
+                        return
 
     def set_marking(self, entries):
         self.set_values(entries, self.logical_flag,
@@ -894,12 +922,12 @@ class MainAplication(QMainWindow):
                         self.weights_flag, self.tresholds_flag)
         self.net.weights = [
             transition.weight for transition in self.net.getTransitions()]
+    # switching on photos in window
 
     def prev(self):
         if self.image_number > 1:
             #  set button active
             self.main_layout.nextButton.setEnabled(True)
-
             if self.image_number == 2:
                 self.main_layout.prevButton.setEnabled(False)
             self.image_number -= 1
@@ -950,6 +978,7 @@ class MainAplication(QMainWindow):
             self.main_layout.nextButton.setEnabled(False)
             self.image_number -= 1
 
+    # clear all data
     def clear(self):
         self.main_layout.fileNameLabel.setText("No file selected")
         if self.main_layout.steps != None:
@@ -964,6 +993,7 @@ class MainAplication(QMainWindow):
         self.main_layout.nextButton.setEnabled(True)
         self.main_layout.clearAll.setEnabled(False)
 
+    # store all data during simulation to dictionary for further use to draw graph/net
     def draw_net_initial(self, weights=False, thresholds=False):
         graph_data = {
             'places': [],
@@ -1080,6 +1110,7 @@ class MainAplication(QMainWindow):
         self.missing_places = []
         self.missing_transitions = []
 
+    # own function to draw net
     def draw_net(self, weights=False, thresholds=False):
         graph_data = {
             'places': [],
@@ -1327,6 +1358,7 @@ class MainAplication(QMainWindow):
         self.image_index += 1
 
     # this function is used to generate image from the values in dictionary for initial state
+    # I had to create image for label and then paste it on the main image because of the diacritics
     def generate_image_initial(self):
         img = np.zeros((800, 1200, 3), np.uint8)
         img.fill(255)
@@ -1592,8 +1624,8 @@ class MainAplication(QMainWindow):
 
         cv2.imwrite(f"./images/{self.image_index}.png", img)
 
+    # This function is used to create the input and output matrixes of the net
     def fill_matrixes(self, inputMatrix, outputMatrix):
-        # fill each matrix with the proper data
         for arc in self.net.getArcs():
             sourceId = arc.getSourceId()
             destinationId = arc.getDestinationId()
@@ -1621,10 +1653,10 @@ class MainAplication(QMainWindow):
                                  sourceIdInNetList] = arc.getMultiplicity()
         return inputMatrix, outputMatrix
 
+    # This function set the image of the net to the window
     def setting_image(self, first):
         if first:
-            path = './images/0.png'
-            prem = QImage(path)
+            prem = QImage('./images/0.png')
         else:
             self.image_number = 1
             prem = QImage(self.image_dict[self.image_number])
@@ -1633,6 +1665,7 @@ class MainAplication(QMainWindow):
         ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
         self.main_layout.photo.setAlignment(QtCore.Qt.AlignCenter)
 
+    # This function is used to create the dictionary of the net
     def fill_dict_pre_logical_net(self, M):
         self.prev_fired = []
         self.transitions_to_change = {}
@@ -1685,8 +1718,8 @@ class MainAplication(QMainWindow):
 
             fired_transitions = []
             for transition in self.net.getTransitions():
-                ingoin = self.net.getIncoming(transition)
-                if sum([place.tokens for place in ingoin]) == len(ingoin):
+                ingoing_places = self.net.getIncoming(transition)
+                if sum([place.tokens for place in ingoing_places]) == len(ingoing_places):
                     fired_transition = transition
                     if fired_transition.label not in self.prev_fired:
                         fired_transitions.append(fired_transition)
@@ -1703,6 +1736,7 @@ class MainAplication(QMainWindow):
         for i, place in enumerate(places):
             place.tokens = M[0].state[i]
 
+    # This function represents algorithm of logical petri net
     def logical_petri_net(self, M):
         final_state_logcal_net = None
         self.prev_fired = []
@@ -1788,7 +1822,6 @@ class MainAplication(QMainWindow):
         if final_state_logcal_net is None:
             self.main_layout.defuzzyfication_label.setText("Nezname pravidlo")
             self.main_layout.defuzzyfication_label.setStyleSheet("color: red;")
-            self.setting_image(0)
         else:
             self.main_layout.defuzzyfication_label.setText(
                 str(final_state_logcal_net))
@@ -1865,8 +1898,8 @@ class MainAplication(QMainWindow):
         for i, place in enumerate(places):
             place.tokens = M[0].state[i]
 
+    # This function represents algorithm of fuzzy petri net
     def fuzzy_petri_net(self, M):
-        array_steps = []
         Wo = M[0].state
         final_state_fuzzy_net = None
         self.prev_fired = []
@@ -1952,7 +1985,6 @@ class MainAplication(QMainWindow):
         if final_state_fuzzy_net is None:
             self.main_layout.defuzzyfication_label.setText("Nezname pravidlo")
             self.main_layout.defuzzyfication_label.setStyleSheet("color: red;")
-            self.setting_image(0)
         else:
             self.main_layout.defuzzyfication_label.setText(
                 str(final_state_fuzzy_net))
@@ -2032,6 +2064,7 @@ class MainAplication(QMainWindow):
         for i, place in enumerate(places):
             place.tokens = M[0].state[i]
 
+    # This function represents algorithm of fuzzy petri net with weights
     def fuzzy_petri_net_with_weights(self, M):
         array_steps = []
         Wo = M[0].state
@@ -2120,7 +2153,6 @@ class MainAplication(QMainWindow):
         if final_state_fuzzy_net is None:
             self.main_layout.defuzzyfication_label.setText("Nezname pravidlo")
             self.main_layout.defuzzyfication_label.setStyleSheet("color: red;")
-            self.setting_image(0)
         else:
             self.main_layout.defuzzyfication_label.setText(
                 str(final_state_fuzzy_net))
@@ -2301,7 +2333,6 @@ class MainAplication(QMainWindow):
         if final_state_fuzzy_net is None:
             self.main_layout.defuzzyfication_label.setText("Nezname pravidlo")
             self.main_layout.defuzzyfication_label.setStyleSheet("color: red;")
-            self.setting_image(0)
         else:
             self.main_layout.defuzzyfication_label.setText(
                 str(final_state_fuzzy_net))
@@ -2312,8 +2343,8 @@ class MainAplication(QMainWindow):
         self.fuzzification = 0
         self.setting_image(0)
 
+    # This method is used to defuzzyfication decision
     def defuzzyfication_decision(self, result):
-        # this is for defuzzyfication
         if self.flag == 0:
             for place in self.net.getPlaces():
                 if place.label == 'NYHA-II-III' and 'LBBB' not in self.records_dict:
@@ -2733,11 +2764,11 @@ class MainAplication(QMainWindow):
         self.records_dict = {}
         self.records_dict_prev = {}
 
+    # Error message box if net is not valid
     def error_message_box(self):
         dialog = QMessageBox(text="Siet je neohranicena")
         dialog.setWindowTitle("Message Dialog")
-        dialog.setWindowIcon(QtGui.QIcon(
-            'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
+        dialog.setWindowIcon(QtGui.QIcon('.\\gui\\icon.jpg'))
         dialog.exec()   # Stores the return value for the button pressed
 
     def run_logical(self):
@@ -2863,15 +2894,15 @@ class DialogWindow(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
         self.loader = QUiLoader()
-        self.ui = QFile(".\\gui\\patientWindow.ui")
+        self.ui = QFile(
+            ".\\gui\\patientWindow.ui")
         self.ui.open(QFile.ReadOnly)
         self.main_layout = self.loader.load(self.ui)
         self.ui.close()
         self.main_layout.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.main_layout.setStyleSheet(
             "QDialog::titleBar { background-color: black; }")
-        self.main_layout.setWindowIcon(QtGui.QIcon(
-            'C:\\Users\\peter\\OneDrive\\Počítač\\Github\\PIS-bonus\\gui\\icon.jpg'))
+        self.main_layout.setWindowIcon(QtGui.QIcon('.\\gui\\icon.jpg'))
         self.main_layout.setWindowTitle("Výber pacienta")
         self.main_layout.show()
         self.database_output_table1 = []
@@ -2943,6 +2974,7 @@ class DialogWindow(QtWidgets.QDialog):
             self.main_layout.password.clear()
             return
 
+    # Function to choose patient from database
     def combo_changed(self, index):
         if index >= 0:
             self.patient_problems = []
@@ -2963,6 +2995,7 @@ class DialogWindow(QtWidgets.QDialog):
             self.patient_problems = []
             print("No records found for selected patient.")
 
+    # Function for parsing database
     def parsing_database(self):
         for i in self.database_output_table1:
             self.main_layout.patientPicker.addItem(i[1] + " " + i[2])
@@ -3011,6 +3044,7 @@ if __name__ == '__main__':
         result, result1, result2 = connect(
             1, 0, dict_values_patient, dict_values_problem)
     else:
+        # connects database
         result, result1, result2 = connect(0, 0, None, None)
     app = QApplication(sys.argv)
     dialog = DialogWindow()
