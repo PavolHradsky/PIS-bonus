@@ -5,10 +5,10 @@ import bcrypt
 def connect(add, update, dict_values_patient, dict_values_problems):
     """ Connect to the PostgreSQL database server """
     conn = psycopg2.connect(
-        host="localhost",
-        database="liecba",
-        user="postgres",
-        password="adminek123")
+        host="horton.db.elephantsql.com",
+        database="jyiqdclo",
+        user="jyiqdclo",
+        password="B85pFrz1g6uwlZ4ETbhpy7WdAhaRU8kE")  # possible to use .env file
     try:
         # create a cursor
         cur = conn.cursor()

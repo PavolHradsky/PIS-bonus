@@ -67,7 +67,7 @@ def reachability(net):
 # This class represents main window of application
 
 
-class MainAplication(QMainWindow):
+class MainApplication(QMainWindow):
 
     loader = QUiLoader()
     file_path = None
@@ -77,12 +77,12 @@ class MainAplication(QMainWindow):
     def __init__(self):
         super().__init__()
         self.main_layout = QWidget()
-        self.ui = QFile(".\\gui\\responsive.ui")
+        self.ui = QFile("..\\PIS-bonus\\gui\\responsive.ui")
         self.ui.open(QFile.ReadOnly)
         self.main_layout = self.loader.load(self.ui)
         self.ui.close()
         self.setCentralWidget(self.main_layout)
-        self.setWindowIcon(QtGui.QIcon('.\\gui\\icon.jpg'))
+        self.setWindowIcon(QtGui.QIcon('..\\PIS-bonus\\gui\\icon.jpg'))
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.setStyleSheet(
             "QMainWindow::titleBar { background-color: black; }")
@@ -114,7 +114,7 @@ class MainAplication(QMainWindow):
         self.TR = []
         self.k = 0
         self.tree = None
-        self.ui = QFile(".\\gui\\anotherWindowFinal.ui")
+        self.ui = QFile("..\\PIS-bonus\\gui\\anotherWindowFinal.ui")
         self.net = None
         self.root = None
         self.tresholds_flag = 0  # these flags tell us which type of Petri net we are using
@@ -170,7 +170,8 @@ class MainAplication(QMainWindow):
         self.anotherWindow = None
         self.ui.open(QFile.ReadOnly)
         self.anotherWindow = self.loader.load(self.ui)
-        self.anotherWindow.setWindowIcon(QtGui.QIcon('.\\gui\\icon.jpg'))
+        self.anotherWindow.setWindowIcon(
+            QtGui.QIcon('..\\PIS-bonus\\gui\\icon.jpg'))
         self.anotherWindow.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.anotherWindow.setStyleSheet(
             "QMainWindow::titleBar { background-color: black; }")
@@ -196,9 +197,9 @@ class MainAplication(QMainWindow):
     # This function flexibly changes the size of the window
     def resizeEvent(self, event):
         # set it separately for initial image
-        if os.path.exists('./images/0.png') or len(self.image_dict) > 0:
-            image_path = './images/0.png' if os.path.exists(
-                './images/0.png') else self.image_dict[self.image_number]
+        if os.path.exists('../PIS-bonus/images/0.png') or len(self.image_dict) > 0:
+            image_path = '../PIS-bonus/images/0.png' if os.path.exists(
+                '../PIS-bonus/images/0.png') else self.image_dict[self.image_number]
             prem = QImage(image_path)
             pixmap = QPixmap.fromImage(prem)
             self.main_layout.photo.setPixmap(pixmap.scaled(
@@ -237,7 +238,7 @@ class MainAplication(QMainWindow):
         self.main_layout.prevButton.setEnabled(False)
         self.main_layout.nextButton.setEnabled(True)
         # always remove all images from folder before running another file
-        files = glob.glob('./images/*')
+        files = glob.glob('../PIS-bonus/images/*')
         if files != None:
             for f in files:
                 os.remove(f)
@@ -316,7 +317,7 @@ class MainAplication(QMainWindow):
                 self.tresholds_flag = 0
                 self.set_marking_initial(self.logical_validator)
                 self.anotherWindow.navod.setText(
-                    "True/False alebo 1/0 pripadne prislusny retazec do vstupov pre premenne -> SAVE")
+                    "true/false alebo 1/0 -> SAVE")
                 self.anotherWindow.navod.setStyleSheet("color: green;")
                 self.anotherWindow.enter.clicked.connect(self.run_final)
                 self.anotherWindow.fuzzyficate_run.setEnabled(False)
@@ -358,7 +359,7 @@ class MainAplication(QMainWindow):
             self.tree = None
             dialog = QMessageBox(text="Nevybrali ste žiadny súbor")
             dialog.setWindowTitle("Message Dialog")
-            dialog.setWindowIcon(QtGui.QIcon('.\\gui\\icon.jpg'))
+            dialog.setWindowIcon(QtGui.QIcon('..\\PIS-bonus\\gui\\icon.jpg'))
             dialog.exec()   # Stores the return value for the button pressed
 
     # add label treshold and weight to each transition in xml file
@@ -706,47 +707,18 @@ class MainAplication(QMainWindow):
             placeLabel.setStyleSheet("color: green;")
             # when place has no outgoing arcs then it is not possible to set marking
             if key.label not in [place.label for place in places_with_no_outgoing_arcs]:
-                if self.logical_flag:
-                    # create two radio buttons with yes and no label and values add to dcit
-                    radio_yes = QtWidgets.QRadioButton("Yes")
-                    radio_yes.setStyleSheet("color: white;")
-                    radio_no = QtWidgets.QRadioButton("No")
-                    radio_no.setStyleSheet("color: white;")
-                    radio_group = QtWidgets.QButtonGroup(self)
-                    radio_group.addButton(radio_yes)
-                    radio_group.addButton(radio_no)
-
-                    def get_radio_value():
-                        print("dsadssad")
-                        if radio_yes.isChecked():
-                            print("yes")
-                            self.dict_marks[key] = 1
-                        elif radio_no.isChecked():
-                            print("no")
-                            self.dict_marks[key] = 0
-
-                    radio_group.buttonClicked.connect(get_radio_value)
-
-                    placeLayout = QtWidgets.QVBoxLayout()
-                    placeLayout.addWidget(placeLabel)
-                    placeLayout.addWidget(radio_yes)
-                    placeLayout.addWidget(radio_no)
-                    placeLayout.addStretch()
-                    placesLayout.addLayout(placeLayout)
-
-                else:
-                    entry = QtWidgets.QLineEdit()
-                    entry.setMaximumWidth(50)
-                    # entry.setValidator(QtGui.QRegularExpressionValidator(validator))
-                    entry.setStyleSheet("color: white;")
-                    self.list_edit_widgets.append(entry)
-                    # self.list_edit_widgets.append(placeLabel)
-                    self.dict_marks[key] = entry
-                    placeLayout = QtWidgets.QVBoxLayout()
-                    placeLayout.addWidget(placeLabel)
-                    placeLayout.addWidget(entry)
-                    placeLayout.addStretch()
-                    placesLayout.addLayout(placeLayout)
+                entry = QtWidgets.QLineEdit()
+                entry.setMaximumWidth(50)
+                # entry.setValidator(QtGui.QRegularExpressionValidator(validator))
+                entry.setStyleSheet("color: white;")
+                self.list_edit_widgets.append(entry)
+                # self.list_edit_widgets.append(placeLabel)
+                self.dict_marks[key] = entry
+                placeLayout = QtWidgets.QVBoxLayout()
+                placeLayout.addWidget(placeLabel)
+                placeLayout.addWidget(entry)
+                placeLayout.addStretch()
+                placesLayout.addLayout(placeLayout)
             else:
                 entry = QtWidgets.QLineEdit()
                 entry.setMaximumWidth(50)
@@ -758,7 +730,7 @@ class MainAplication(QMainWindow):
         self.anotherWindow.placesScrollArea.setWidget(
             self.anotherWindow.placesWidget)
         self.anotherWindow.OK1.clicked.connect(
-            lambda: [self.set_marking(self.dict_marks)])
+            lambda: [self.set_marking(self.dict_marks), self.delete_text(self.dict_marks)])
         self.anotherWindow.tresholdsWidget.setStyleSheet(
             "background-color: black;")
         self.anotherWindow.weightsWidget.setStyleSheet(
@@ -853,57 +825,50 @@ class MainAplication(QMainWindow):
 
     # This function sets the marking of the places, if the user has chosen logical marking else weights and tresholds are set for the transitions
     def set_values(self, entries, logical_flag, weights_flag, tresholds_flag):
-        if logical_flag:
-            for item, value in entries.items():
-                if value == 1:
-                    item.tokens = 1
-                elif value == 0:
+        for item, value in entries.items():
+            if value.text() == '':
+                if logical_flag:
                     item.tokens = 0
-
-        else:
-            for item, value in entries.items():
-                if value.text() == '':
-                    if not logical_flag:
-
-                        item.tokens = 0.0
-                    if weights_flag:
-                        item.weight = 0.0
-                    if tresholds_flag:
-                        item.treshold = 0.0
                 else:
-                    try:
-                        if logical_flag:
-                            if value.text() == "true":
-                                num = 1
-                            elif value.text() == "false":
-                                num = 0
-                            elif value.text() == "II" or value.text() == "III":
-                                num = 1
-                            elif value.text() != "true" or value.text() != "false" or value.text() != "II" or value.text() != "III":
-                                num = int(value.text())
-                            else:
-                                return
+                    item.tokens = 0.0
+                if weights_flag:
+                    item.weight = 0.0
+                if tresholds_flag:
+                    item.treshold = 0.0
+            else:
+                try:
+                    if logical_flag:
+                        if value.text() == "true":
+                            num = 1
+                        elif value.text() == "false":
+                            num = 0
+                        elif value.text() == "II" or value.text() == "III":
+                            num = 1
+                        elif value.text() != "true" or value.text() != "false" or value.text() != "II" or value.text() != "III":
+                            num = int(value.text())
                         else:
-                            if value.text() == "true":
-                                num = 1.0
-                            elif value.text() == "false":
-                                num = 0.0
-                            elif value.text() == "II" or value.text() == "III":
-                                num = 10.
-                            elif value.text() != "true" or value.text() != "false" or value.text() != "II" or value.text() != "III":
-                                num = float(value.text().replace(',', '.'))
-                            else:
-                                return
+                            return
+                    else:
+                        if value.text() == "true":
+                            num = 1.0
+                        elif value.text() == "false":
+                            num = 0.0
+                        elif value.text() == "II" or value.text() == "III":
+                            num = 10.
+                        elif value.text() != "true" or value.text() != "false" or value.text() != "II" or value.text() != "III":
+                            num = float(value.text().replace(',', '.'))
+                        else:
+                            return
 
-                        item.tokens = num
-                        if weights_flag:
-                            item.weight = num
-                        if tresholds_flag:
-                            item.treshold = num
-                    except ValueError:
-                        QtWidgets.QMessageBox.warning(
-                            self, "Invalid Input", "Please enter a valid number.")
-                        return
+                    item.tokens = num
+                    if weights_flag:
+                        item.weight = num
+                    if tresholds_flag:
+                        item.treshold = num
+                except ValueError:
+                    QtWidgets.QMessageBox.warning(
+                        self, "Invalid Input", "Please enter a valid number.")
+                    return
 
     def set_marking(self, entries):
         self.set_values(entries, self.logical_flag,
@@ -1349,7 +1314,7 @@ class MainAplication(QMainWindow):
                 y1 = rad * sin(angle*i * pi/180)
                 self.dict_final[dict_keys[i-1]]["suradnice"] = {
                     "main_coords": (round(x + x1), round(y + y1))}
-        path = './images/' + str(self.image_number) + '.png'
+        path = '../PIS-bonus/images/' + str(self.image_number) + '.png'
         self.image_dict[self.image_number] = path
 
         self.generate_image()
@@ -1476,7 +1441,7 @@ class MainAplication(QMainWindow):
                                       text_size[0], text_pos[1] - text_size[1]), (255, 255, 255), -1)
                         cv2.putText(
                             img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
-        cv2.imwrite(f"./images/0.png", img)
+        cv2.imwrite(f"../PIS-bonus/images/0.png", img)
 
     def generate_image(self):
         img = np.zeros((800, 1200, 3), np.uint8)
@@ -1622,7 +1587,7 @@ class MainAplication(QMainWindow):
                         cv2.putText(
                             img, text, text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
 
-        cv2.imwrite(f"./images/{self.image_index}.png", img)
+        cv2.imwrite(f"../PIS-bonus/images/{self.image_index}.png", img)
 
     # This function is used to create the input and output matrixes of the net
     def fill_matrixes(self, inputMatrix, outputMatrix):
@@ -1656,7 +1621,7 @@ class MainAplication(QMainWindow):
     # This function set the image of the net to the window
     def setting_image(self, first):
         if first:
-            prem = QImage('./images/0.png')
+            prem = QImage('../PIS-bonus/images/0.png')
         else:
             self.image_number = 1
             prem = QImage(self.image_dict[self.image_number])
@@ -2768,7 +2733,7 @@ class MainAplication(QMainWindow):
     def error_message_box(self):
         dialog = QMessageBox(text="Siet je neohranicena")
         dialog.setWindowTitle("Message Dialog")
-        dialog.setWindowIcon(QtGui.QIcon('.\\gui\\icon.jpg'))
+        dialog.setWindowIcon(QtGui.QIcon('..\\PIS-bonus\\gui\\icon.jpg'))
         dialog.exec()   # Stores the return value for the button pressed
 
     def run_logical(self):
@@ -2776,7 +2741,7 @@ class MainAplication(QMainWindow):
         self.image_number = 1
         self.image_dict = {}
         self.step_dict = {}
-        files = glob.glob('./images/*')
+        files = glob.glob('../PIS-bonus/images/*')
         for f in files:
             os.remove(f)
         M = reachability(self.net)
@@ -2804,7 +2769,7 @@ class MainAplication(QMainWindow):
     def run_fuzzy(self):
         self.image_dict = {}
         self.step_dict = {}
-        files = glob.glob('./images/*')
+        files = glob.glob('../PIS-bonus/images/*')
         for f in files:
             os.remove(f)
         M = reachability(self.net)
@@ -2833,7 +2798,7 @@ class MainAplication(QMainWindow):
         self.image_number = 1
         self.image_dict = {}
         self.step_dict = {}
-        files = glob.glob('./images/*')
+        files = glob.glob('../PIS-bonus/images/*')
         for f in files:
             os.remove(f)
         M = reachability(self.net)
@@ -2862,7 +2827,7 @@ class MainAplication(QMainWindow):
         self.image_number = 1
         self.image_dict = {}
         self.step_dict = {}
-        files = glob.glob('./images/*')
+        files = glob.glob('../PIS-bonus/images/*')
         for f in files:
             os.remove(f)
         M = reachability(self.net)
@@ -2895,14 +2860,15 @@ class DialogWindow(QtWidgets.QDialog):
         super().__init__()
         self.loader = QUiLoader()
         self.ui = QFile(
-            ".\\gui\\patientWindow.ui")
+            "..\\PIS-bonus\\gui\\patientWindow.ui")
         self.ui.open(QFile.ReadOnly)
         self.main_layout = self.loader.load(self.ui)
         self.ui.close()
         self.main_layout.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.main_layout.setStyleSheet(
             "QDialog::titleBar { background-color: black; }")
-        self.main_layout.setWindowIcon(QtGui.QIcon('.\\gui\\icon.jpg'))
+        self.main_layout.setWindowIcon(
+            QtGui.QIcon('..\\PIS-bonus\\gui\\icon.jpg'))
         self.main_layout.setWindowTitle("Výber pacienta")
         self.main_layout.show()
         self.database_output_table1 = []
@@ -2923,12 +2889,12 @@ class DialogWindow(QtWidgets.QDialog):
         hashed = bcrypt.hashpw(password, salt)
         if hashed_str.encode('utf-8') == hashed:
             self.main_layout.close()
-            self.main_application = MainAplication()
-            files = glob.glob('./images/*')
+            self.main_application = MainApplication()
+            files = glob.glob('../PIS-bonus/images/*')
             if files != None:
                 for f in files:
                     os.remove(f)
-            files = glob.glob('./images_fuzzyfication/*')
+            files = glob.glob('../PIS-bonus/images_fuzzyfication/*')
             if files != None:
                 for f in files:
                     os.remove(f)
